@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Key Config</title>
+<link rel="stylesheet" href="css/KeyConfig.css">
+<script>
+require("../dist/windows/KeyConfigRenderer.js");
+</script>
+</head>
+<body>
+<div class="slot">
+	<div class="title">Slot1</div>
+	<div class="record">
+		<div class="caption">A</div>
+		<div class="value"><input id="slot1-a" type="text"></div>
+	</div>
+	<div class="record">
+		<div class="caption">B</div>
+		<div class="value"><input id="slot1-b" type="text"></div>
+	</div>
+	<div class="record">
+		<div class="caption">Start</div>
+		<div class="value"><input id="slot1-start" type="text"></div>
+	</div>
+	<div class="record">
+		<div class="caption">Select</div>
+		<div class="value"><input id="slot1-select" type="text"></div>
+	</div>
+	<div class="record">
+		<div class="caption">Up</div>
+		<div class="value"><input id="slot1-up" type="text"></div>
+	</div>
+	<div class="record">
+		<div class="caption">Down</div>
+		<div class="value"><input id="slot1-down" type="text"></div>
+	</div>
+	<div class="record">
+		<div class="caption">Left</div>
+		<div class="value"><input id="slot1-left" type="text"></div>
+	</div>
+	<div class="record">
+		<div class="caption">Right</div>
+		<div class="value"><input id="slot1-right" type="text"></div>
+	</div>
+</div>
+
+<div class="right">
+	<div class="system">
+		<div class="title">System</div>
+		<div class="record">
+			<div class="caption">Fast</div>
+			<div class="value"><input id="fast" type="text"></div>
+		</div>
+		<div class="record">
+			<div class="caption">Save</div>
+			<div class="value"><input type="text" disabled></div>
+		</div>
+		<div class="record">
+			<div class="caption">Load</div>
+			<div class="value"><input type="text" disabled></div>
+		</div>
+		<div class="record">
+			<div class="caption">Auto Fire</div>
+			<div class="value"><input type="text" disabled></div>
+		</div>
+		<div class="record">
+			<div class="caption">Pause</div>
+			<div class="value"><input type="text" disabled></div>
+		</div>
+	</div>
+	<button id="ok" class="ok">OK</button>
+</div>
+</body>
+</html>

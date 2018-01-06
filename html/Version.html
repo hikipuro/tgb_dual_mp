@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>TGB Dual MP Version</title>
+<link rel="stylesheet" href="css/Version.css">
+<script>
+let ipcRenderer = require("electron").ipcRenderer;
+document.addEventListener("DOMContentLoaded", () => {
+	let ok = document.querySelector("#ok");
+	ok.addEventListener("click", () => {
+		ipcRenderer.send("VersionWindow.Result");
+	});
+});
+</script>
+<style>
+</style>
+</head>
+<body>
+<div class="main">
+	<div class="line">TGB Dual MP Ver. 2018.1.2</div>
+	
+	<div class="title">Original TGB Dual</div>
+	<div class="line">TGB Dual Ver  Vol.8'''</div>
+	<div class="line">Copyright(C) 2000-2004 Hii</div>
+
+	<button id="ok">OK</button>
+</div>
+</body>
+</html>

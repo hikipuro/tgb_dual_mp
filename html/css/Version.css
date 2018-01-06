@@ -1,0 +1,31 @@
+
+html, input, button {
+	font-family:-apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI","Noto Sans Japanese","ヒラギノ角ゴ ProN W3", Meiryo, sans-serif;
+	font-size: 12px;
+	/*user-select: none;*/
+}
+
+body {
+	margin: 8px;
+	background: #eee;
+	overflow: hidden;
+}
+
+.main {
+	text-align: center;
+}
+
+.title {
+	margin: 10px;
+	font-weight: bold;
+}
+
+.line {
+	margin: 10px;
+}
+
+#ok {
+	margin: 5px 10px;
+	width: 8em;
+	height: 1.8em;
+}
