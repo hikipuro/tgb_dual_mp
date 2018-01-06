@@ -1,5 +1,5 @@
 import * as Electron from "electron";
-import { ipcRenderer } from "electron";
+import { ipcRenderer, MenuItem } from "electron";
 import * as fs from "fs";
 import * as path from "path";
 import * as nodeZip from "node-zip";
@@ -7,14 +7,10 @@ import * as nodeZip from "node-zip";
 import { KeyCode } from "../KeyCode";
 import { TgbDual } from "../TgbDual";
 import { Config } from "../config/Config";
-//import { KeyConfig } from "../config/KeyConfig";
-//import { PathConfig } from "../config/PathConfig";
 import { Gamepads } from "../Gamepads";
 
 let tgbDual: TgbDual;
 let config: Config;
-//let keyConfig: KeyConfig;
-//let pathConfig: PathConfig;
 const defaultTitle: string = document.title;
 
 // uncaught exception
@@ -24,22 +20,23 @@ window.onerror = function (message, filename, lineno, colno, error) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-	ipcRenderer.on("Menu.LoadSlot1", (e: Electron.IpcMessageEvent, path: string) => {
-		console.log("Menu.LoadSlot1", e, path);
-		loadFile(path);
+	ipcRenderer.on("menu", (event: Electron.IpcMessageEvent, menu: MenuItem) => {
+		console.log("menu", menu);
+		switch (menu.id) {
+		case "file.reset-slot1":
+			tgbDual.reset();
+			break;
+		case "file.pause":
+			tgbDual.pause();
+			break;
+		case "file.release-slot1":
+			tgbDual.stop();
+			document.title = defaultTitle;
+			break;
+		}
 	});
-	ipcRenderer.on("Menu.FreeSlot1", (e: Electron.IpcMessageEvent) => {
-		console.log("Menu.FreeSlot1", e);
-		tgbDual.stop();
-		document.title = defaultTitle;
-	});
-	ipcRenderer.on("Menu.ResetSlot1", (e: Electron.IpcMessageEvent) => {
-		console.log("Menu.ResetSlot1", e);
-		tgbDual.reset();
-	});
-	ipcRenderer.on("Menu.Pause", (e: Electron.IpcMessageEvent) => {
-		console.log("Menu.Pause", e);
-		tgbDual.pause();
+	ipcRenderer.on("load", (event: Electron.IpcMessageEvent, arg: any) => {
+		loadFile(arg);
 	});
 	ipcRenderer.on("Get.Config", (event: Electron.IpcMessageEvent, arg: any) => {
 		config = Config.fromJSON(arg);
@@ -50,7 +47,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		console.log("blur");
 	});
 	ipcRenderer.send("Get.Config");
-	console.log(process.cwd() + "/test.txt");
 
 	TgbDual.oninit = () => {
 		console.log("*** oninit");

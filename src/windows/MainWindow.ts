@@ -3,7 +3,7 @@ import * as path from "path";
 import * as url from "url";
 import * as fs from "fs";
 
-import { MenuItem, ipcMain, IpcMessageEvent } from "electron";
+import { MenuItem, ipcMain, IpcMessageEvent, MenuItemConstructorOptions } from "electron";
 import { Constants } from "../Constants";
 import { Config } from "../config/Config";
 import { KeyConfig } from "../config/KeyConfig";
@@ -12,165 +12,184 @@ import { KeyConfigWindow } from "./KeyConfigWindow";
 import { VersionWindow } from "./VersionWindow";
 
 module Settings {
-	export const Width: number = 800;
-	export const Height: number = 600;
-	export const MinWidth: number = 400;
-	export const MinHeight: number = 300;
 	export const DevTools: boolean = true;
 }
 
 const templateMenu: Electron.MenuItemConstructorOptions[] = [
 	{
+		id: "file",
 		label: "ファイル (&F)",
 		submenu: [
 			{
-				label: "Slot1に読み込み (&1)",
-				click(item, focusedWindow) {
-					MainWindow.instance.onClickLoadSlot1Menu(item, focusedWindow);
-				}
+				id: "file.load-slot1",
+				label: "Slot1に読み込み (&1)"
 			},
 			{
-				label: "Slot1リセット (&R)",
-				click(item, focusedWindow) {
-					MainWindow.instance.onClickResetSlot1Menu(item, focusedWindow);
-				}
+				id: "file.reset-slot1",
+				label: "Slot1リセット (&R)"
 			},
 			{
+				id: "file.save-state",
 				label: "状態保存 (&S)",
 				enabled: false,
 				submenu: [
 					{
-						label: "0: ----/--/-- --:--:--",
+						id: "file.save-state.0",
+						label: "0: ----/--/-- --:--:--"
 					},
 					{
-						label: "1: ----/--/-- --:--:--",
+						id: "file.save-state.1",
+						label: "1: ----/--/-- --:--:--"
 					},
 					{
-						label: "2: ----/--/-- --:--:--",
+						id: "file.save-state.2",
+						label: "2: ----/--/-- --:--:--"
 					},
 					{
-						label: "3: ----/--/-- --:--:--",
+						id: "file.save-state.3",
+						label: "3: ----/--/-- --:--:--"
 					},
 					{
-						label: "4: ----/--/-- --:--:--",
+						id: "file.save-state.4",
+						label: "4: ----/--/-- --:--:--"
 					},
 					{
-						label: "5: ----/--/-- --:--:--",
+						id: "file.save-state.5",
+						label: "5: ----/--/-- --:--:--"
 					},
 					{
-						label: "6: ----/--/-- --:--:--",
+						id: "file.save-state.6",
+						label: "6: ----/--/-- --:--:--"
 					},
 					{
-						label: "7: ----/--/-- --:--:--",
+						id: "file.save-state.7",
+						label: "7: ----/--/-- --:--:--"
 					},
 					{
-						label: "8: ----/--/-- --:--:--",
+						id: "file.save-state.8",
+						label: "8: ----/--/-- --:--:--"
 					},
 					{
-						label: "9: ----/--/-- --:--:--",
+						id: "file.save-state.9",
+						label: "9: ----/--/-- --:--:--"
 					}
 				]
 			},
 			{
+				id: "file.load-state",
 				label: "状態復元 (&L)",
 				enabled: false,
 				submenu: [
 					{
-						label: "0: ----/--/-- --:--:--",
+						id: "file.load-state.0",
+						label: "0: ----/--/-- --:--:--"
 					},
 					{
-						label: "1: ----/--/-- --:--:--",
+						id: "file.load-state.1",
+						label: "1: ----/--/-- --:--:--"
 					},
 					{
-						label: "2: ----/--/-- --:--:--",
+						id: "file.load-state.2",
+						label: "2: ----/--/-- --:--:--"
 					},
 					{
-						label: "3: ----/--/-- --:--:--",
+						id: "file.load-state.3",
+						label: "3: ----/--/-- --:--:--"
 					},
 					{
-						label: "4: ----/--/-- --:--:--",
+						id: "file.load-state.4",
+						label: "4: ----/--/-- --:--:--"
 					},
 					{
-						label: "5: ----/--/-- --:--:--",
+						id: "file.load-state.5",
+						label: "5: ----/--/-- --:--:--"
 					},
 					{
-						label: "6: ----/--/-- --:--:--",
+						id: "file.load-state.6",
+						label: "6: ----/--/-- --:--:--"
 					},
 					{
-						label: "7: ----/--/-- --:--:--",
+						id: "file.load-state.7",
+						label: "7: ----/--/-- --:--:--"
 					},
 					{
-						label: "8: ----/--/-- --:--:--",
+						id: "file.load-state.8",
+						label: "8: ----/--/-- --:--:--"
 					},
 					{
-						label: "9: ----/--/-- --:--:--",
+						id: "file.load-state.9",
+						label: "9: ----/--/-- --:--:--"
 					}
 				]
 			},
 			{
-				label: "一時停止 (&P)",
-				click(item, focusedWindow) {
-					MainWindow.instance.onClickPauseMenu(item, focusedWindow);
-				}
+				id: "file.pause",
+				label: "一時停止 (&P)"
 			},
 			{
-				label: "Slot1解放 (&F)",
-				click(item, focusedWindow) {
-					MainWindow.instance.onClickFreeSlot1Menu(item, focusedWindow);
-				}
+				id: "file.release-slot1",
+				label: "Slot1解放 (&F)"
 			},
 			{
-				type: "separator",
+				type: "separator"
 			},
 			{
+				id: "file.load-slot2",
 				label: "Slot2に読み込み (&2)",
 				enabled: false
 			},
 			{
+				id: "file.reset-slot2",
 				label: "Slot2リセット (&E)",
 				enabled: false
 			},
 			{
+				id: "file.release-slot2",
 				label: "Slot2解放 (&Q)",
 				enabled: false
 			},
 			{
-				type: "separator",
+				type: "separator"
 			},
 			{
+				id: "file.net",
 				label: "通信対戦 (&T)",
 				enabled: false
 			},
 			{
-				type: "separator",
+				type: "separator"
 			},
 			{
+				id: "file.quit",
 				label: "終了 (&X)",
-				role: "quit",
+				role: "quit"
 			},
 		]
 	},
 	{
+		id: "option",
 		label: "オプション (&O)",
 		submenu: [
 			{
-				label: "キーコンフィグ (&K)",
-				click(item, focusedWindow) {
-					MainWindow.instance.onClickKeyConfigMenu(item, focusedWindow);
-				}
+				id: "option.key",
+				label: "キーコンフィグ (&K)"
 			},
 			{
+				id: "option.sound",
 				label: "サウンド設定 (&A)",
 				enabled: false
 			},
 			{
+				id: "option.speed",
 				label: "速度設定 (&S)",
 				enabled: false
 			},
 			{
+				id: "option.screen",
 				label: "画面設定 (&L)",
 				submenu: [
 					{
+						id: "option.screen.fullscreen",
 						label: "フルスクリーン",
 						role: "togglefullscreen"
 					},
@@ -178,57 +197,48 @@ const templateMenu: Electron.MenuItemConstructorOptions[] = [
 						type: "separator"
 					},
 					{
-						label: "x1",
-						click(item, focusedWindow) {
-							MainWindow.instance.onClickScreenSizeMenu(item, focusedWindow, 1);
-						}
+						id: "option.screen.x1",
+						label: "x1"
 					},
 					{
-						label: "x2",
-						click(item, focusedWindow) {
-							MainWindow.instance.onClickScreenSizeMenu(item, focusedWindow, 2);
-						}
+						id: "option.screen.x2",
+						label: "x2"
 					},
 					{
-						label: "x3",
-						click(item, focusedWindow) {
-							MainWindow.instance.onClickScreenSizeMenu(item, focusedWindow, 3);
-						}
+						id: "option.screen.x3",
+						label: "x3"
 					},
 					{
-						label: "x4",
-						click(item, focusedWindow) {
-							MainWindow.instance.onClickScreenSizeMenu(item, focusedWindow, 4);
-						}
+						id: "option.screen.x4",
+						label: "x4"
 					},
 					{
-						label: "x5",
-						click(item, focusedWindow) {
-							MainWindow.instance.onClickScreenSizeMenu(item, focusedWindow, 5);
-						}
+						id: "option.screen.x5",
+						label: "x5"
 					},
 					{
-						label: "x6",
-						click(item, focusedWindow) {
-							MainWindow.instance.onClickScreenSizeMenu(item, focusedWindow, 6);
-						}
+						id: "option.screen.x6",
+						label: "x6"
 					},
 					{
 						type: "separator"
 					},
 					{
+						id: "option.screen.bg",
 						label: "BG Layer",
 						type: "checkbox",
 						checked: true,
 						enabled: false
 					},
 					{
+						id: "option.screen.window",
 						label: "Window Layer",
 						type: "checkbox",
 						checked: true,
 						enabled: false
 					},
 					{
+						id: "option.screen.sprite",
 						label: "Sprite Layer",
 						type: "checkbox",
 						checked: true,
@@ -238,87 +248,86 @@ const templateMenu: Electron.MenuItemConstructorOptions[] = [
 						type: "separator"
 					},
 					{
+						id: "option.screen.filter",
 						label: "フィルタ係数 (&F)",
 						enabled: false
 					},
 				]
 			},
 			{
+				id: "option.type",
 				label: "機種設定 (&G)",
 				enabled: false
 			},
 			{
+				id: "option.emulator",
 				label: "エミュレータ設定 (&E)",
 				enabled: false
 			},
 			{
+				id: "option.directory",
 				label: "ディレクトリ設定 (&D)",
 				enabled: false
 			},
 			{
-				type: "separator",
+				type: "separator"
 			},
 			{
+				id: "option.par",
 				label: "PARもどき (&P)",
 				enabled: false
 			},
 			{
+				id: "option.record",
 				label: "記録 (&R)",
 				enabled: false
 			},
 			{
+				id: "option.special",
 				label: "特殊 (&S)",
 				enabled: false
 			},
 			{
+				id: "option.peripheral",
 				label: "周辺機器 (&E)",
 				enabled: false
 			},
 			{
-				type: "separator",
+				type: "separator"
 			},
 			{
+				id: "option.log",
 				label: "ログ表示 (&L)",
 				enabled: false
 			}
 		]
 	},
 	{
+		id: "help",
 		label: "ヘルプ (&H)",
 		submenu: [
 			{
-				label: "アプリのフォルダを開く (&O)",
-				click(item, focusedWindow) {
-					Electron.shell.openExternal(process.cwd());
-				}
+				id: "help.open-app-folder",
+				label: "アプリのフォルダを開く (&O)"
 			},
 			{
-				type: "separator",
+				type: "separator"
 			},
 			{
-				label: "バージョン情報 (&V)",
-				click(item, focusedWindow) {
-					MainWindow.instance.onClickVersionMenu(item, focusedWindow);
-				}
+				id: "help.version",
+				label: "バージョン情報 (&V)"
 			}
 		]
 	}
 ];
 
-
 export class MainWindow {
-	public static instance: MainWindow = null;
 	public browserWindow: Electron.BrowserWindow = null;
 	protected _keyConfigWindow: KeyConfigWindow;
 	protected _versionWindow: VersionWindow;
 	protected _config: Config;
 
 	constructor() {
-		if (MainWindow.instance != null) {
-			throw new Error("duplicate MainWindow");
-		}
-		MainWindow.instance = this;
-
 		this._config = Config.load();
 
 		ipcMain.on("Get.Config", (event: IpcMessageEvent, arg: any) => {
@@ -344,35 +353,26 @@ export class MainWindow {
 				//nodeIntegration: false
 			}
 		});
-		//const config = Config.readText("nodemain.json");
-		//const configJSON = JSON.parse(config);
-		//this.browserWindow = new Electron.BrowserWindow(configJSON.mainWindow);
 
+		this.addClickEventAllMenuItems(templateMenu);
 		const menu = Electron.Menu.buildFromTemplate(templateMenu);
 		Electron.Menu.setApplicationMenu(menu);
 
 		this.browserWindow.on("enter-full-screen", () => {
 			this.browserWindow.setAutoHideMenuBar(true);
-			//this.browserWindow.setAutoHideCursor(true);
+			//this.browserWindow.setMenuBarVisibility(false);
 		});
 		this.browserWindow.on("leave-full-screen", () => {
 			this.browserWindow.setAutoHideMenuBar(false);
 			this.browserWindow.setMenuBarVisibility(true);
-			//this.browserWindow.setAutoHideCursor(false);
 		});
-		
+
 		this.browserWindow.on("unresponsive", () => {
 			this.send("blur");
 		});
 		this.browserWindow.on("close", () => {
 			// save settings
 			this._config.save();
-			/*
-			fs.writeFileSync(path.join(
-				process.cwd(),
-				"config.json"
-			), JSON.stringify(this._config.keyConfig, null, 2));
-			*/
 		});
 
 		this.browserWindow.loadURL(url.format({
@@ -384,7 +384,6 @@ export class MainWindow {
 		if (Settings.DevTools) {
 			this.browserWindow.webContents.openDevTools();
 		}
-
 	}
 
 	public show(): void {
@@ -396,9 +395,51 @@ export class MainWindow {
 		const webContents = this.browserWindow.webContents;
 		webContents.send.apply(webContents, argArray);
 	}
-	
-	public onClickLoadSlot1Menu = (item: MenuItem, focusedWindow: Electron.BrowserWindow) => {
-		console.log(item);
+
+	protected addClickEventAllMenuItems(templateMenu: MenuItemConstructorOptions[]): void {
+		if (templateMenu == null) {
+			return;
+		}
+		templateMenu.every((options: MenuItemConstructorOptions, index: number): boolean => {
+			options.click = this.onClickMenuItem;
+			this.addClickEventAllMenuItems(options.submenu as MenuItemConstructorOptions[]);
+			return true;
+		});
+	}
+
+	protected onClickMenuItem = (item: MenuItem, focusedWindow: Electron.BrowserWindow) => {
+		const id: string = item.id;
+
+		switch (id) {
+			case "file.load-slot1":
+				this.openFileOpenDialog();
+				return;
+			case "option.key":
+				this.openKeyConfigWindow();
+				return;
+			case "help.open-app-folder":
+				Electron.shell.openExternal(process.cwd());
+				return;
+			case "help.version":
+				this.openVersionWindow();
+				return;
+		}
+
+		if (id.indexOf("option.screen.x") == 0) {
+			const scale = Number(id.substr(-1, 1));
+			const width = Constants.ScreenWidth * scale;
+			const height = Constants.ScreenHeight * scale;
+			this.setWindowSize(width, height);
+			return;
+		}
+		this.send("menu", item);
+	}
+
+	protected setWindowSize(width: number, height: number): void {
+		this.browserWindow.setContentSize(width, height, false);
+	}
+
+	protected openFileOpenDialog() {
 		const dialog = new OpenDialog();
 		dialog.defaultPath = __dirname;
 		dialog.addFilter("Game Boy Rom Image", ["gb", "gbc", "zip"]);
@@ -407,24 +448,12 @@ export class MainWindow {
 			if (filenames.length <= 0) {
 				return;
 			}
-			this.send("Menu.LoadSlot1", filenames[0]);
+			this.send("load", filenames[0]);
 		});
 		dialog.show();
 	}
-	
-	public onClickFreeSlot1Menu = (item: MenuItem, focusedWindow: Electron.BrowserWindow) => {
-		this.send("Menu.FreeSlot1");
-	}
-	
-	public onClickResetSlot1Menu = (item: MenuItem, focusedWindow: Electron.BrowserWindow) => {
-		this.send("Menu.ResetSlot1");
-	}
 
-	public onClickPauseMenu = (item: MenuItem, focusedWindow: Electron.BrowserWindow) => {
-		this.send("Menu.Pause");
-	}
-
-	public onClickKeyConfigMenu = (item: MenuItem, focusedWindow: Electron.BrowserWindow) => {
+	public openKeyConfigWindow(): void {
 		if (this._keyConfigWindow != null) {
 			this._keyConfigWindow.show();
 			return;
@@ -433,7 +462,7 @@ export class MainWindow {
 		this._keyConfigWindow = new KeyConfigWindow(this.browserWindow, this._config.keyConfig);
 		this._keyConfigWindow.on("close", (keyConfig: KeyConfig) => {
 			this._config.keyConfig = keyConfig;
-			this.send("Get.KeyConfig", keyConfig);
+			this.send("Get.Config", this._config);
 		});
 		this._keyConfigWindow.browserWindow.on("close", () => {
 			this._keyConfigWindow.browserWindow.destroy();
@@ -444,13 +473,7 @@ export class MainWindow {
 		});
 	}
 
-	public onClickScreenSizeMenu = (item: MenuItem, focusedWindow: Electron.BrowserWindow, scale: number) => {
-		const width = Constants.ScreenWidth * scale;
-		const height = Constants.ScreenHeight * scale;
-		this.browserWindow.setContentSize(width, height, false);
-	}
-
-	public onClickVersionMenu = (item: MenuItem, focusedWindow: Electron.BrowserWindow) => {
+	protected openVersionWindow(): void {
 		if (this._versionWindow != null) {
 			this._versionWindow.show();
 			return;
