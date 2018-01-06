@@ -5,6 +5,7 @@ html, input, button {
 
 input {
 	padding: 0;
+	height: 16px;
 }
 
 body {
