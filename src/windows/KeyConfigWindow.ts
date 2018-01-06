@@ -9,7 +9,7 @@ import { KeyCode } from "../KeyCode";
 
 module Settings {
 	export const Width: number = 340;
-	export const Height: number = 230;
+	export const Height: number = 248;
 }
 
 export class KeyConfigWindow extends EventEmitter {
@@ -24,6 +24,7 @@ export class KeyConfigWindow extends EventEmitter {
 		}
 
 		this.browserWindow = new Electron.BrowserWindow({
+			parent: parent,
 			title: "Key Config",
 			type: "toolbar",
 			useContentSize: true,
@@ -36,7 +37,7 @@ export class KeyConfigWindow extends EventEmitter {
 			resizable: false,
 			//skipTaskbar: true,
 			fullscreenable: false,
-			parent: parent,
+			autoHideMenuBar: true,
 			show: false
 		});
 		this.browserWindow.setMenu(null);

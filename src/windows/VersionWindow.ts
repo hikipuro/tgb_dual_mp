@@ -6,7 +6,7 @@ import { ipcMain, IpcMessageEvent } from "electron";
 
 module Settings {
 	export const Width: number = 260;
-	export const Height: number = 140;
+	export const Height: number = 156;
 }
 
 export class VersionWindow {
@@ -14,6 +14,7 @@ export class VersionWindow {
 
 	constructor(parent: Electron.BrowserWindow = null) {
 		this.browserWindow = new Electron.BrowserWindow({
+			parent: parent,
 			title: "TGB Dual MP Version",
 			type: "toolbar",
 			useContentSize: true,
@@ -24,7 +25,7 @@ export class VersionWindow {
 			maximizable: false,
 			resizable: false,
 			fullscreenable: false,
-			parent: parent,
+			autoHideMenuBar: true,
 			show: false
 		});
 		this.browserWindow.setMenu(null);
