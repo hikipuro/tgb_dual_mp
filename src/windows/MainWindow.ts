@@ -15,6 +15,12 @@ module Settings {
 	export const DevTools: boolean = true;
 }
 
+declare module "electron" {
+	interface MenuItem {
+		id: string;
+	}
+}
+
 const templateMenu: Electron.MenuItemConstructorOptions[] = [
 	{
 		id: "file",
@@ -418,7 +424,7 @@ export class MainWindow {
 				this.openKeyConfigWindow();
 				return;
 			case "help.open-app-folder":
-				Electron.shell.openExternal(process.cwd());
+				Electron.shell.openItem(process.cwd());
 				return;
 			case "help.version":
 				this.openVersionWindow();

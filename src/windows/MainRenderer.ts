@@ -9,6 +9,12 @@ import { TgbDual } from "../TgbDual";
 import { Config } from "../config/Config";
 import { Gamepads } from "../Gamepads";
 
+declare module "electron" {
+	interface MenuItem {
+		id: string;
+	}
+}
+
 export class MainRenderer {
 	protected tgbDual: TgbDual;
 	protected config: Config;
