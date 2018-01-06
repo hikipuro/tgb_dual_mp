@@ -139,7 +139,7 @@ export class MainRenderer {
 		
 		// keyboard input
 		document.onkeydown = (e: KeyboardEvent) => {
-			e.preventDefault();
+			//e.preventDefault();
 			const keyConfig = this.config.key;
 			const keyState = this.tgbDual.keyState;
 			switch (e.keyCode) {
@@ -162,7 +162,7 @@ export class MainRenderer {
 			}
 		};
 		document.onkeyup = (e: KeyboardEvent) => {
-			e.preventDefault();
+			//e.preventDefault();
 			const keyConfig = this.config.key;
 			const keyState = this.tgbDual.keyState;
 			switch (e.keyCode) {

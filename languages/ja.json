@@ -1,0 +1,36 @@
+{
+	"menu": {
+		"file": "ファイル (&F)",
+		"file.load-slot1": "Slot1に読み込み (&1)",
+		"file.reset-slot1": "Slot1リセット (&R)",
+		"file.save-state": "状態保存 (&S)",
+		"file.load-state": "状態復元 (&L)",
+		"file.pause": "一時停止 (&P)",
+		"file.release-slot1": "Slot1解放 (&F)",
+		"file.load-slot2": "Slot2に読み込み (&2)",
+		"file.reset-slot2": "Slot2リセット (&E)",
+		"file.release-slot2": "Slot2解放 (&Q)",
+		"file.net": "通信対戦 (&T)",
+		"file.quit": "終了 (&X)",
+
+		"option": "オプション (&O)",
+		"option.key": "キーコンフィグ (&K)",
+		"option.sound": "サウンド設定 (&A)",
+		"option.speed": "速度設定 (&S)",
+		"option.screen": "画面設定 (&L)",
+		"option.screen.fullscreen": "フルスクリーン",
+		"option.screen.filter": "フィルタ係数 (&F)",
+		"option.type": "機種設定 (&G)",
+		"option.emulator": "エミュレータ設定 (&E)",
+		"option.directory": "ディレクトリ設定 (&D)",
+		"option.par": "PARもどき (&P)",
+		"option.record": "記録 (&R)",
+		"option.special": "特殊 (&S)",
+		"option.peripheral": "周辺機器 (&E)",
+		"option.log": "ログ表示 (&L)",
+
+		"help": "ヘルプ (&H)",
+		"help.open-app-folder": "アプリのフォルダを開く (&O)",
+		"help.version": "バージョン情報 (&V)"
+	}
+}

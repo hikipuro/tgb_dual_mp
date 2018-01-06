@@ -21,312 +21,6 @@ declare module "electron" {
 	}
 }
 
-const templateMenu: Electron.MenuItemConstructorOptions[] = [
-	{
-		id: "file",
-		label: "ファイル (&F)",
-		submenu: [
-			{
-				id: "file.load-slot1",
-				label: "Slot1に読み込み (&1)"
-			},
-			{
-				id: "file.reset-slot1",
-				label: "Slot1リセット (&R)"
-			},
-			{
-				id: "file.save-state",
-				label: "状態保存 (&S)",
-				enabled: false,
-				submenu: [
-					{
-						id: "file.save-state.0",
-						label: "0: ----/--/-- --:--:--"
-					},
-					{
-						id: "file.save-state.1",
-						label: "1: ----/--/-- --:--:--"
-					},
-					{
-						id: "file.save-state.2",
-						label: "2: ----/--/-- --:--:--"
-					},
-					{
-						id: "file.save-state.3",
-						label: "3: ----/--/-- --:--:--"
-					},
-					{
-						id: "file.save-state.4",
-						label: "4: ----/--/-- --:--:--"
-					},
-					{
-						id: "file.save-state.5",
-						label: "5: ----/--/-- --:--:--"
-					},
-					{
-						id: "file.save-state.6",
-						label: "6: ----/--/-- --:--:--"
-					},
-					{
-						id: "file.save-state.7",
-						label: "7: ----/--/-- --:--:--"
-					},
-					{
-						id: "file.save-state.8",
-						label: "8: ----/--/-- --:--:--"
-					},
-					{
-						id: "file.save-state.9",
-						label: "9: ----/--/-- --:--:--"
-					}
-				]
-			},
-			{
-				id: "file.load-state",
-				label: "状態復元 (&L)",
-				enabled: false,
-				submenu: [
-					{
-						id: "file.load-state.0",
-						label: "0: ----/--/-- --:--:--"
-					},
-					{
-						id: "file.load-state.1",
-						label: "1: ----/--/-- --:--:--"
-					},
-					{
-						id: "file.load-state.2",
-						label: "2: ----/--/-- --:--:--"
-					},
-					{
-						id: "file.load-state.3",
-						label: "3: ----/--/-- --:--:--"
-					},
-					{
-						id: "file.load-state.4",
-						label: "4: ----/--/-- --:--:--"
-					},
-					{
-						id: "file.load-state.5",
-						label: "5: ----/--/-- --:--:--"
-					},
-					{
-						id: "file.load-state.6",
-						label: "6: ----/--/-- --:--:--"
-					},
-					{
-						id: "file.load-state.7",
-						label: "7: ----/--/-- --:--:--"
-					},
-					{
-						id: "file.load-state.8",
-						label: "8: ----/--/-- --:--:--"
-					},
-					{
-						id: "file.load-state.9",
-						label: "9: ----/--/-- --:--:--"
-					}
-				]
-			},
-			{
-				id: "file.pause",
-				label: "一時停止 (&P)"
-			},
-			{
-				id: "file.release-slot1",
-				label: "Slot1解放 (&F)"
-			},
-			{
-				type: "separator"
-			},
-			{
-				id: "file.load-slot2",
-				label: "Slot2に読み込み (&2)",
-				enabled: false
-			},
-			{
-				id: "file.reset-slot2",
-				label: "Slot2リセット (&E)",
-				enabled: false
-			},
-			{
-				id: "file.release-slot2",
-				label: "Slot2解放 (&Q)",
-				enabled: false
-			},
-			{
-				type: "separator"
-			},
-			{
-				id: "file.net",
-				label: "通信対戦 (&T)",
-				enabled: false
-			},
-			{
-				type: "separator"
-			},
-			{
-				id: "file.quit",
-				label: "終了 (&X)",
-				role: "quit"
-			},
-		]
-	},
-	{
-		id: "option",
-		label: "オプション (&O)",
-		submenu: [
-			{
-				id: "option.key",
-				label: "キーコンフィグ (&K)"
-			},
-			{
-				id: "option.sound",
-				label: "サウンド設定 (&A)",
-				enabled: false
-			},
-			{
-				id: "option.speed",
-				label: "速度設定 (&S)",
-				enabled: false
-			},
-			{
-				id: "option.screen",
-				label: "画面設定 (&L)",
-				submenu: [
-					{
-						id: "option.screen.fullscreen",
-						label: "フルスクリーン",
-						role: "togglefullscreen"
-					},
-					{
-						type: "separator"
-					},
-					{
-						id: "option.screen.x1",
-						label: "x1"
-					},
-					{
-						id: "option.screen.x2",
-						label: "x2"
-					},
-					{
-						id: "option.screen.x3",
-						label: "x3"
-					},
-					{
-						id: "option.screen.x4",
-						label: "x4"
-					},
-					{
-						id: "option.screen.x5",
-						label: "x5"
-					},
-					{
-						id: "option.screen.x6",
-						label: "x6"
-					},
-					{
-						type: "separator"
-					},
-					{
-						id: "option.screen.bg",
-						label: "BG Layer",
-						type: "checkbox",
-						checked: true,
-						enabled: false
-					},
-					{
-						id: "option.screen.window",
-						label: "Window Layer",
-						type: "checkbox",
-						checked: true,
-						enabled: false
-					},
-					{
-						id: "option.screen.sprite",
-						label: "Sprite Layer",
-						type: "checkbox",
-						checked: true,
-						enabled: false
-					},
-					{
-						type: "separator"
-					},
-					{
-						id: "option.screen.filter",
-						label: "フィルタ係数 (&F)",
-						enabled: false
-					},
-				]
-			},
-			{
-				id: "option.type",
-				label: "機種設定 (&G)",
-				enabled: false
-			},
-			{
-				id: "option.emulator",
-				label: "エミュレータ設定 (&E)",
-				enabled: false
-			},
-			{
-				id: "option.directory",
-				label: "ディレクトリ設定 (&D)",
-				enabled: false
-			},
-			{
-				type: "separator"
-			},
-			{
-				id: "option.par",
-				label: "PARもどき (&P)",
-				enabled: false
-			},
-			{
-				id: "option.record",
-				label: "記録 (&R)",
-				enabled: false
-			},
-			{
-				id: "option.special",
-				label: "特殊 (&S)",
-				enabled: false
-			},
-			{
-				id: "option.peripheral",
-				label: "周辺機器 (&E)",
-				enabled: false
-			},
-			{
-				type: "separator"
-			},
-			{
-				id: "option.log",
-				label: "ログ表示 (&L)",
-				enabled: false
-			}
-		]
-	},
-	{
-		id: "help",
-		label: "ヘルプ (&H)",
-		submenu: [
-			{
-				id: "help.open-app-folder",
-				label: "アプリのフォルダを開く (&O)"
-			},
-			{
-				type: "separator"
-			},
-			{
-				id: "help.version",
-				label: "バージョン情報 (&V)"
-			}
-		]
-	}
-];
-
 export class MainWindow {
 	public browserWindow: Electron.BrowserWindow = null;
 	protected _keyConfigWindow: KeyConfigWindow;
@@ -360,6 +54,10 @@ export class MainWindow {
 			}
 		});
 
+		const templateMenu = JSON.parse(fs.readFileSync("./config/AppMenu.json", "utf8"));
+		const languageJson = this.getLanguageJson();
+
+		this.translateMenuText(templateMenu, languageJson);
 		this.addClickEventAllMenuItems(templateMenu);
 		const menu = Electron.Menu.buildFromTemplate(templateMenu);
 		Electron.Menu.setApplicationMenu(menu);
@@ -385,7 +83,14 @@ export class MainWindow {
 			pathname: path.join(__dirname, "../../html/Main.html"),
 			protocol: "file:",
 			slashes: true,
-		}));
+		}), {
+			/*
+			postData: [{
+				type: "rawData",
+				bytes: Buffer.from("hello=world")
+			}],
+			*/
+		});
 
 		if (Settings.DevTools) {
 			this.browserWindow.webContents.openDevTools();
@@ -400,6 +105,30 @@ export class MainWindow {
 		const argArray = [channel].concat(args);
 		const webContents = this.browserWindow.webContents;
 		webContents.send.apply(webContents, argArray);
+	}
+
+	protected getLanguageJson(): any {
+		const locale: string = Electron.app.getLocale();
+		const languageFile: string = "./languages/" + locale + ".json";
+		if (!fs.existsSync(languageFile)) {
+			return null;
+		}
+		return JSON.parse(fs.readFileSync(languageFile, "utf8"));
+	}
+
+	protected translateMenuText(templateMenu: MenuItemConstructorOptions[], languageJson: any): void {
+		if (templateMenu == null || languageJson == null) {
+			return;
+		}
+		templateMenu.every((options: MenuItemConstructorOptions, index: number): boolean => {
+			const text: string = languageJson.menu[options.id];
+			if (text == null || text === "") {
+				return true;
+			}
+			options.label = text;
+			this.translateMenuText(options.submenu as MenuItemConstructorOptions[], languageJson);
+			return true;
+		});
 	}
 
 	protected addClickEventAllMenuItems(templateMenu: MenuItemConstructorOptions[]): void {
