@@ -5,7 +5,12 @@
 <title>TGB Dual MP [no file loaded]</title>
 <link rel="stylesheet" href="css/Main.css">
 <script>
-require("../dist/windows/MainRenderer.js");
+let Module = require("../dist/windows/MainRenderer.js");
+
+let mainRenderer = null;
+document.addEventListener("DOMContentLoaded", () => {
+	mainRenderer = new Module.MainRenderer();
+});
 </script>
 </head>
 <body>

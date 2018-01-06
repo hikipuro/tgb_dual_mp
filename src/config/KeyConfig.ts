@@ -30,41 +30,24 @@ export class KeyConfig {
 	public fast: KeyInfo = new KeyInfo(KeyCode.Tab, "Tab");
 
 	public setValue(id: string, code: number, label: string): void {
-		console.log(this[id]);
 		this[id].set(code, label);
 	}
 
 	public static fromJSON(json: any): KeyConfig {
 		const keyConfig = new KeyConfig();
-		
-		let keyInfo: KeyInfo;
-		
-		keyInfo = KeyInfo.fromJSON(json.a);
-		if (keyInfo != null) { keyConfig.a = keyInfo; }
+		if (json == null) {
+			return keyConfig;
+		}
 
-		keyInfo = KeyInfo.fromJSON(json.b);
-		if (keyInfo != null) { keyConfig.b = keyInfo; }
-
-		keyInfo = KeyInfo.fromJSON(json.start);
-		if (keyInfo != null) { keyConfig.start = keyInfo; }
-
-		keyInfo = KeyInfo.fromJSON(json.select);
-		if (keyInfo != null) { keyConfig.select = keyInfo; }
-
-		keyInfo = KeyInfo.fromJSON(json.up);
-		if (keyInfo != null) { keyConfig.up = keyInfo; }
-
-		keyInfo = KeyInfo.fromJSON(json.down);
-		if (keyInfo != null) { keyConfig.down = keyInfo; }
-
-		keyInfo = KeyInfo.fromJSON(json.left);
-		if (keyInfo != null) { keyConfig.left = keyInfo; }
-
-		keyInfo = KeyInfo.fromJSON(json.right);
-		if (keyInfo != null) { keyConfig.right = keyInfo; }
-
-		keyInfo = KeyInfo.fromJSON(json.fast);
-		if (keyInfo != null) { keyConfig.fast = keyInfo; }
+		for (var name in keyConfig) {
+			if (!keyConfig.hasOwnProperty(name)) {
+				continue;
+			}
+			const keyInfo = KeyInfo.fromJSON(json[name]);
+			if (keyInfo != null) {
+				keyConfig[name] = keyInfo;
+			}
+		}
 		return keyConfig;
 	}
 }

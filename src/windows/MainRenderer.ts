@@ -9,115 +9,190 @@ import { TgbDual } from "../TgbDual";
 import { Config } from "../config/Config";
 import { Gamepads } from "../Gamepads";
 
-let tgbDual: TgbDual;
-let config: Config;
-const defaultTitle: string = document.title;
-
-// uncaught exception
-window.onerror = function (message, filename, lineno, colno, error) {
-	console.log("window.onerror", message);
-	tgbDual.stop();
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-	ipcRenderer.on("menu", (event: Electron.IpcMessageEvent, menu: MenuItem) => {
-		console.log("menu", menu);
-		switch (menu.id) {
-		case "file.reset-slot1":
-			tgbDual.reset();
-			break;
-		case "file.pause":
-			tgbDual.pause();
-			break;
-		case "file.release-slot1":
-			tgbDual.stop();
-			document.title = defaultTitle;
-			break;
-		}
-	});
-	ipcRenderer.on("load", (event: Electron.IpcMessageEvent, arg: any) => {
-		loadFile(arg);
-	});
-	ipcRenderer.on("Get.Config", (event: Electron.IpcMessageEvent, arg: any) => {
-		config = Config.fromJSON(arg);
-		tgbDual.pathConfig = config.pathConfig;
-		console.log("Get.Config", config);
-	});
-	ipcRenderer.on("blur", (event: Electron.IpcMessageEvent, arg: any) => {
-		console.log("blur");
-	});
-	ipcRenderer.send("Get.Config");
-
-	TgbDual.oninit = () => {
-		console.log("*** oninit");
-		tgbDual = new TgbDual();
-
-		document.body.appendChild(tgbDual.element);
-		tgbDual.on("update", updateGamepad);
-	};
-
-	// close
-	window.onbeforeunload = (e: BeforeUnloadEvent) => {
-		tgbDual.stop();
-		tgbDual.destroy();
-	};
-
-	// window resize
-	window.onresize = () => {
-		const width = window.innerWidth;
-		const height = window.innerHeight;
-		const ratio = width / height;
-		const style = tgbDual.element.style;
-
-		if (TgbDual.ScreenRatio <= ratio) {
-			style.width = null;
-			style.height = "100%";
-		} else {
-			style.width = "100%";
-			style.height = null;
-		}
-	}
+export class MainRenderer {
+	protected tgbDual: TgbDual;
+	protected config: Config;
+	protected readonly defaultTitle: string = document.title;
+	protected gamePads: Gamepads = new Gamepads();
 	
-	// drag & drop
-	document.body.ondragover = () => {
-		return false;
-	};
-	document.body.ondragleave = () => {
-		return false;
-	}
-	document.body.ondragend = () => {
-		return false;
-	}
-	document.body.ondrop = (e) => {
-		console.log("*************** ondrop");
-		e.preventDefault();
-		if (!TgbDual.isInitialized) {
-			return;
+	constructor() {
+		this.initIPC();
+		this.initWindowEvents();
+		this.initDocumentEvents();
+
+		console.log("TgbDual.isInitialized: ", TgbDual.isInitialized);
+		if (TgbDual.isInitialized) {
+			this.createNewTgbDual();
+		} else {
+			TgbDual.oninit = () => {
+				console.log("*** oninit");
+				this.createNewTgbDual();
+			};
 		}
-		const file = e.dataTransfer.files[0];
-		loadFile(file.path);
+
+		ipcRenderer.send("Get.Config");
 	}
 
-	function loadFile(filePath: string): void {
+	protected createNewTgbDual(): void {
+		this.tgbDual = new TgbDual();
+		document.body.appendChild(this.tgbDual.element);
+		this.tgbDual.on("update", this.updateGamepad);
+	}
+
+	protected initIPC(): void {
+		ipcRenderer.on("menu", (event: Electron.IpcMessageEvent, menu: MenuItem) => {
+			console.log("menu", menu);
+			switch (menu.id) {
+			case "file.reset-slot1":
+				this.tgbDual.reset();
+				break;
+			case "file.pause":
+				this.tgbDual.pause();
+				break;
+			case "file.release-slot1":
+				this.tgbDual.stop();
+				document.title = this.defaultTitle;
+				break;
+			}
+		});
+		ipcRenderer.on("load", (event: Electron.IpcMessageEvent, arg: any) => {
+			this.loadFile(arg);
+		});
+		ipcRenderer.on("Get.Config", (event: Electron.IpcMessageEvent, arg: any) => {
+			this.config = Config.fromJSON(arg);
+			this.tgbDual.pathConfig = this.config.path;
+			console.log("Get.Config", this.config);
+		});
+		ipcRenderer.on("blur", (event: Electron.IpcMessageEvent, arg: any) => {
+			console.log("blur");
+		});
+	}
+
+	protected initWindowEvents(): void {
+		// uncaught exception
+		window.onerror = (message, filename, lineno, colno, error) => {
+			console.log("window.onerror", message);
+			if (this.tgbDual != null) {
+				this.tgbDual.stop();
+			}
+		}
+		
+		// window resize
+		window.onresize = () => {
+			const width = window.innerWidth;
+			const height = window.innerHeight;
+			const ratio = width / height;
+			const style = this.tgbDual.element.style;
+
+			if (TgbDual.ScreenRatio <= ratio) {
+				style.width = null;
+				style.height = "100%";
+			} else {
+				style.width = "100%";
+				style.height = null;
+			}
+		}
+		
+		// window close
+		window.onbeforeunload = (e: BeforeUnloadEvent) => {
+			if (this.tgbDual == null) {
+				return;
+			}
+			this.tgbDual.stop();
+			this.tgbDual.destroy();
+		};
+
+		// gamepad (debug)
+		window.addEventListener("gamepadconnected", (e: GamepadEvent) => {
+			console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
+			e.gamepad.index, e.gamepad.id,
+			e.gamepad.buttons.length, e.gamepad.axes.length);
+		});
+	}
+
+	protected initDocumentEvents(): void {
+		// drag & drop
+		document.body.ondragover = () => {
+			return false;
+		};
+		document.body.ondragleave = () => {
+			return false;
+		}
+		document.body.ondragend = () => {
+			return false;
+		}
+		document.body.ondrop = (e) => {
+			console.log("*************** ondrop");
+			e.preventDefault();
+			if (!TgbDual.isInitialized) {
+				return;
+			}
+			const file = e.dataTransfer.files[0];
+			this.loadFile(file.path);
+		}
+		
+		// keyboard input
+		document.onkeydown = (e: KeyboardEvent) => {
+			e.preventDefault();
+			const keyConfig = this.config.key;
+			const keyState = this.tgbDual.keyState;
+			switch (e.keyCode) {
+			case keyConfig.up.code:		keyState.Up = true; break;
+			case keyConfig.down.code:	keyState.Down = true; break;
+			case keyConfig.left.code:	keyState.Left = true; break;
+			case keyConfig.right.code:	keyState.Right = true; break;
+			case keyConfig.start.code:	keyState.Start = true; break;
+			case keyConfig.select.code:	keyState.Select = true; break;
+			case keyConfig.b.code:		keyState.B = true; break;
+			case keyConfig.a.code:		keyState.A = true; break;
+			case keyConfig.fast.code:	this.tgbDual.isFastMode = true; break;
+
+			case KeyCode.D0:
+				this.tgbDual.saveState();
+				break;
+			case KeyCode.D9:
+				this.tgbDual.restoreState();
+				break;
+			}
+		};
+		document.onkeyup = (e: KeyboardEvent) => {
+			e.preventDefault();
+			const keyConfig = this.config.key;
+			const keyState = this.tgbDual.keyState;
+			switch (e.keyCode) {
+			case keyConfig.up.code:		keyState.Up = false; break;
+			case keyConfig.down.code:	keyState.Down = false; break;
+			case keyConfig.left.code:	keyState.Left = false; break;
+			case keyConfig.right.code:	keyState.Right = false; break;
+			case keyConfig.start.code:	keyState.Start = false; break;
+			case keyConfig.select.code:	keyState.Select = false; break;
+			case keyConfig.b.code:		keyState.B = false; break;
+			case keyConfig.a.code:		keyState.A = false; break;
+			case keyConfig.fast.code:	this.tgbDual.isFastMode = false; break;
+			}
+		};
+	}
+
+	protected loadFile(filePath: string): void {
 		const ext = path.extname(filePath).toLowerCase();
 		console.log(filePath, "ext:" + ext);
 
 		if (ext === ".zip") {
-			loadZipFile(filePath);
+			this.loadZipFile(filePath);
 			return;
 		}
 
 		if (ext === ".gb" || ext === ".gbc") {
-			tgbDual.stop();
-			tgbDual.loadFile(filePath);
-			tgbDual.start();
-			const romInfo = tgbDual.getInfo();
+			this.tgbDual.stop();
+			this.tgbDual.loadFile(filePath);
+			this.tgbDual.start();
+			const romInfo = this.tgbDual.getInfo();
 			document.title = romInfo.cartName;
 			console.log("romInfo", romInfo, romInfo.cartName.length);
 		}
 	}
-
-	function loadZipFile(zipPath: string): void {
+	
+	protected loadZipFile(zipPath: string): void {
 		if (!fs.existsSync(zipPath)) {
 			return;
 		}
@@ -136,59 +211,21 @@ document.addEventListener("DOMContentLoaded", () => {
 				continue;
 			}
 			const data = zip.files[file].asNodeBuffer();
-			tgbDual.stop();
-			tgbDual.romPath = zipPath;
-			tgbDual.loadRom(data);
-			tgbDual.start();
+			this.tgbDual.stop();
+			this.tgbDual.romPath = zipPath;
+			this.tgbDual.loadRom(data);
+			this.tgbDual.start();
 
-			const romInfo = tgbDual.romInfo;
+			const romInfo = this.tgbDual.romInfo;
 			document.title = romInfo.cartName;
 			break;
 		}
 	}
+	
+	protected updateGamepad = (): void => {
+		const keyState = this.tgbDual.keyState;
+		const gamePads = this.gamePads;
 
-	// key input
-	document.onkeydown = (e: KeyboardEvent) => {
-		const keyConfig = config.keyConfig;
-		const keyState = tgbDual.keyState;
-		switch (e.keyCode) {
-			case keyConfig.up.code:		keyState.Up = true; break;
-			case keyConfig.down.code:	keyState.Down = true; break;
-			case keyConfig.left.code:	keyState.Left = true; break;
-			case keyConfig.right.code:	keyState.Right = true; break;
-			case keyConfig.start.code:	keyState.Start = true; break;
-			case keyConfig.select.code:	keyState.Select = true; break;
-			case keyConfig.b.code:		keyState.B = true; break;
-			case keyConfig.a.code:		keyState.A = true; break;
-			case keyConfig.fast.code:	tgbDual.isFastMode = true; break;
-
-			case KeyCode.D0:
-				tgbDual.saveState();
-				break;
-			case KeyCode.D9:
-				tgbDual.restoreState();
-				break;
-		}
-	};
-	document.onkeyup = (e: KeyboardEvent) => {
-		const keyConfig = config.keyConfig;
-		const keyState = tgbDual.keyState;
-		switch (e.keyCode) {
-			case keyConfig.up.code:		keyState.Up = false; break;
-			case keyConfig.down.code:	keyState.Down = false; break;
-			case keyConfig.left.code:	keyState.Left = false; break;
-			case keyConfig.right.code:	keyState.Right = false; break;
-			case keyConfig.start.code:	keyState.Start = false; break;
-			case keyConfig.select.code:	keyState.Select = false; break;
-			case keyConfig.b.code:		keyState.B = false; break;
-			case keyConfig.a.code:		keyState.A = false; break;
-			case keyConfig.fast.code:	tgbDual.isFastMode = false; break;
-		}
-	};
-	let gamePads: Gamepads = new Gamepads();
-
-	function updateGamepad() {
-		const keyState = tgbDual.keyState;
 		gamePads.update();
 		if (gamePads.isKeyDown(0, 1)) {
 			keyState.A = true;
@@ -238,11 +275,4 @@ document.addEventListener("DOMContentLoaded", () => {
 			keyState.Right = false;
 		}
 	};
-	//*/
-
-	window.addEventListener("gamepadconnected", (e: GamepadEvent) => {
-		console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
-		e.gamepad.index, e.gamepad.id,
-		e.gamepad.buttons.length, e.gamepad.axes.length);
-	});
-});
+}

@@ -459,9 +459,9 @@ export class MainWindow {
 			return;
 		}
 
-		this._keyConfigWindow = new KeyConfigWindow(this.browserWindow, this._config.keyConfig);
+		this._keyConfigWindow = new KeyConfigWindow(this.browserWindow, this._config.key);
 		this._keyConfigWindow.on("close", (keyConfig: KeyConfig) => {
-			this._config.keyConfig = keyConfig;
+			this._config.key = keyConfig;
 			this.send("Get.Config", this._config);
 		});
 		this._keyConfigWindow.browserWindow.on("close", () => {

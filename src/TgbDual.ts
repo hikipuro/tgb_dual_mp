@@ -257,14 +257,14 @@ export class TgbDual extends EventEmitter {
 			return;
 		}
 		
-		if (!fs.existsSync(this.pathConfig.savePath)) {
-			fs.mkdirSync(this.pathConfig.savePath);
+		if (!fs.existsSync(this.pathConfig.save)) {
+			fs.mkdirSync(this.pathConfig.save);
 		}
 
 		const pointer = TgbDual.API.getSram();
 		const size = 0x2000 * this.romInfo.ramSize;
 		const data = Module.HEAPU8.subarray(pointer, pointer + size);
-		const saveFilePath = path.join(this.pathConfig.savePath, saveFileName);
+		const saveFilePath = path.join(this.pathConfig.save, saveFileName);
 		fs.writeFileSync(saveFilePath, data);
 	}
 	
@@ -279,7 +279,7 @@ export class TgbDual extends EventEmitter {
 			return null;
 		}
 		
-		const saveFilePath = path.join(this.pathConfig.savePath, saveFileName);
+		const saveFilePath = path.join(this.pathConfig.save, saveFileName);
 		if (!fs.existsSync(saveFilePath)) {
 			return null;
 		}

@@ -6,12 +6,12 @@ import { PathConfig } from "./PathConfig";
 
 export class Config {
 	public static readonly Path: string = "config.json";
-	public keyConfig: KeyConfig;
-	public pathConfig: PathConfig;
+	public key: KeyConfig;
+	public path: PathConfig;
 
 	constructor() {
-		this.keyConfig = new KeyConfig();
-		this.pathConfig = new PathConfig();
+		this.key = new KeyConfig();
+		this.path = new PathConfig();
 	}
 
 	public static load(): Config {
@@ -30,7 +30,12 @@ export class Config {
 
 	public static fromJSON(json: any): Config {
 		const config = new Config();
-		config.keyConfig = json.keyConfig;
+		if (json == null) {
+			return config;
+		}
+		
+		config.key = KeyConfig.fromJSON(json.key);
+		config.path = PathConfig.fromJSON(json.path);
 		return config;
 	}
 
