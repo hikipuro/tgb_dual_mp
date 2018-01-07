@@ -55,13 +55,13 @@ export class VersionWindow {
 	}
 	
 	protected addIpcEvents(): void {
-		ipcMain.on("VersionWindow.Result", (event: IpcMessageEvent, arg: any): void => {
+		ipcMain.once("VersionWindow.close", (event: IpcMessageEvent, arg: any): void => {
 			this.browserWindow.close();
 			event.returnValue = null;
 		});
 	}
 
 	protected removeIpcEvents(): void {
-		ipcMain.removeAllListeners("VersionWindow.Result");
+		ipcMain.removeAllListeners("VersionWindow.close");
 	}
 }

@@ -27,7 +27,7 @@ export class MainRenderer {
 		this.initIPC();
 		this.initWindowEvents();
 		this.initDocumentEvents();
-		this.config = ipcRenderer.sendSync("Get.Config");
+		this.config = ipcRenderer.sendSync("MainWindow.getConfig");
 
 		console.log("TgbDual.isInitialized: ", TgbDual.isInitialized);
 		if (TgbDual.isInitialized) {
@@ -70,11 +70,11 @@ export class MainRenderer {
 	}
 
 	protected initIPC(): void {
-		ipcRenderer.on("log", (event: Electron.IpcMessageEvent, ...args) => {
+		ipcRenderer.on("MainWindow.log", (event: Electron.IpcMessageEvent, ...args) => {
 			console.log(...args);
 		});
-		ipcRenderer.on("menu", (event: Electron.IpcMessageEvent, menu: MenuItem) => {
-			console.log("menu", menu);
+		ipcRenderer.on("MainWindow.menu", (event: Electron.IpcMessageEvent, menu: MenuItem) => {
+			console.log("MainWindow.menu", menu);
 
 			const id = menu.id;
 			
@@ -85,7 +85,7 @@ export class MainRenderer {
 				const fileNumber = Number(id.substr(-1, 1));
 				console.log("save", fileNumber);
 				this.tgbDual.saveState(fileNumber);
-				ipcRenderer.send("update.menu.save-state", this.tgbDual.romPath);
+				ipcRenderer.send("MainWindow.updateSaveLoadStateMenu", this.tgbDual.romPath);
 				return;
 			}
 
@@ -109,23 +109,23 @@ export class MainRenderer {
 			case "file.release-slot1":
 				this.tgbDual.stop();
 				document.title = this.defaultTitle;
-				ipcRenderer.send("update.menu.save-state", null);
+				ipcRenderer.send("MainWindow.updateSaveLoadStateMenu", null);
 				break;
 			}
 		});
-		ipcRenderer.on("load", (event: Electron.IpcMessageEvent, arg: any) => {
+		ipcRenderer.on("MainWindow.load", (event: Electron.IpcMessageEvent, arg: any) => {
 			this.loadFile(arg);
 		});
-		ipcRenderer.on("Get.Config", (event: Electron.IpcMessageEvent, arg: any) => {
+		ipcRenderer.on("MainWindow.getConfig", (event: Electron.IpcMessageEvent, arg: any) => {
 			this.config = Config.fromJSON(arg);
 			this.tgbDual.pathConfig = this.config.path;
-			console.log("Get.Config", this.config);
+			console.log("MainWindow.getConfig", this.config);
 		});
+		/*
 		ipcRenderer.on("blur", (event: Electron.IpcMessageEvent, arg: any) => {
 			console.log("blur");
 		});
 
-		/*
 		ipcRenderer.on("suspend", (event: Electron.IpcMessageEvent, arg: any) => {
 			console.log("suspend");
 		});
@@ -259,7 +259,7 @@ export class MainRenderer {
 				const romInfo = this.tgbDual.getInfo();
 				document.title = romInfo.cartName;
 				console.log("romInfo", romInfo, romInfo.cartName.length);
-				ipcRenderer.send("update.menu.save-state", filePath);
+				ipcRenderer.send("MainWindow.updateSaveLoadStateMenu", filePath);
 			}
 		}
 	}
@@ -290,7 +290,7 @@ export class MainRenderer {
 
 			const romInfo = this.tgbDual.romInfo;
 			document.title = romInfo.cartName;
-			ipcRenderer.send("update.menu.save-state", zipPath);
+			ipcRenderer.send("MainWindow.updateSaveLoadStateMenu", zipPath);
 			return true;
 		}
 		return false;

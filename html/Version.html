@@ -9,7 +9,7 @@ let ipcRenderer = require("electron").ipcRenderer;
 document.addEventListener("DOMContentLoaded", () => {
 	let ok = document.querySelector("#ok");
 	ok.addEventListener("click", () => {
-		ipcRenderer.send("VersionWindow.Result");
+		ipcRenderer.send("VersionWindow.close");
 	});
 });
 </script>

@@ -51,7 +51,7 @@ export class MainWindow {
 	}
 
 	public log(...args: any[]): void {
-		this.send("log", ...args);
+		this.send("MainWindow.log", ...args);
 	}
 
 	public send(channel: string, ...args: any[]): void {
@@ -134,11 +134,11 @@ export class MainWindow {
 		this.browserWindow.on("show", () => {
 			this.send("show");
 		});
-		//*/
 
 		this.browserWindow.on("unresponsive", () => {
 			this.send("blur");
 		});
+		//*/
 		this.browserWindow.once("close", () => {
 			this.removeIpcEvents();
 
@@ -155,11 +155,11 @@ export class MainWindow {
 			this.send("MainWindow.init", process.argv);
 			event.returnValue = process.argv;
 		})
-		ipcMain.on("Get.Config", (event: IpcMessageEvent, arg: any) => {
-			event.sender.send("Get.Config", this._config);
+		ipcMain.on("MainWindow.getConfig", (event: IpcMessageEvent, arg: any) => {
+			event.sender.send("MainWindow.getConfig", this._config);
 			event.returnValue = this._config;
 		});
-		ipcMain.on("update.menu.save-state", (event: IpcMessageEvent, arg: any) => {
+		ipcMain.on("MainWindow.updateSaveLoadStateMenu", (event: IpcMessageEvent, arg: any) => {
 			if (arg == null || arg === "") {
 				MainMenu.call("disableAllSaveLoadState");
 				return;
@@ -196,8 +196,8 @@ export class MainWindow {
 
 	protected removeIpcEvents(): void {
 		ipcMain.removeAllListeners("MainWindow.init");
-		ipcMain.removeAllListeners("Get.Config");
-		ipcMain.removeAllListeners("update.menu.save-state");
+		ipcMain.removeAllListeners("MainWindow.getConfig");
+		ipcMain.removeAllListeners("MainWindow.updateSaveLoadStateMenu");
 	}
 
 	protected onClickMenuItem = (item: MenuItem, focusedWindow: Electron.BrowserWindow, event: Event): void => {
@@ -228,7 +228,7 @@ export class MainWindow {
 			this.setWindowSize(width, height);
 			return;
 		}
-		this.send("menu", item);
+		this.send("MainWindow.menu", item);
 	}
 
 	protected setWindowSize(width: number, height: number): void {
@@ -244,7 +244,7 @@ export class MainWindow {
 			if (filenames.length <= 0) {
 				return;
 			}
-			this.send("load", filenames[0]);
+			this.send("MainWindow.load", filenames[0]);
 			dialog = null;
 		});
 		dialog.show();
@@ -266,7 +266,7 @@ export class MainWindow {
 		});
 		this._keyConfigWindow.once("close", (keyConfig: KeyConfig) => {
 			this._config.key = keyConfig;
-			this.send("Get.Config", this._config);
+			this.send("MainWindow.getConfig", this._config);
 		});
 	}
 

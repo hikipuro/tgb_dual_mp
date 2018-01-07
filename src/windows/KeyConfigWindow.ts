@@ -67,10 +67,10 @@ export class KeyConfigWindow extends EventEmitter {
 	}
 	
 	protected addIpcEvents(): void {
-		ipcMain.on("KeyConfigWindow.init", (event: IpcMessageEvent, arg: any): void => {
+		ipcMain.once("KeyConfigWindow.init", (event: IpcMessageEvent, arg: any): void => {
 			event.returnValue = this.keyConfig;
 		});
-		ipcMain.on("KeyConfigWindow.close", (event: IpcMessageEvent, arg: any): void => {
+		ipcMain.once("KeyConfigWindow.close", (event: IpcMessageEvent, arg: any): void => {
 			this.keyConfig = arg;
 			this.emit("close", this.keyConfig);
 			this.browserWindow.close();
