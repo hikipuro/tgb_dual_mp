@@ -55,6 +55,9 @@ export class MainWindow {
 	}
 
 	public send(channel: string, ...args: any[]): void {
+		if (this.browserWindow.isDestroyed()) {
+			return;
+		}
 		const webContents = this.browserWindow.webContents;
 		webContents.send(channel, ...args);
 	}
@@ -145,11 +148,6 @@ export class MainWindow {
 	}
 
 	protected addIpcEvents(): void {
-		// this log event can also be used in other window
-		ipcMain.on("log", (event: IpcMessageEvent, ...args: any[]) => {
-			this.log(...args);
-			event.returnValue = null;
-		})
 		ipcMain.on("App.menu.click", (item: MenuItem, focusedWindow: Electron.BrowserWindow) => {
 			this.onClickMenuItem(item, focusedWindow, null);
 		})
@@ -197,7 +195,6 @@ export class MainWindow {
 	}
 
 	protected removeIpcEvents(): void {
-		ipcMain.removeAllListeners("log");
 		ipcMain.removeAllListeners("MainWindow.init");
 		ipcMain.removeAllListeners("Get.Config");
 		ipcMain.removeAllListeners("update.menu.save-state");

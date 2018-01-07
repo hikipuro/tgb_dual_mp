@@ -7,7 +7,7 @@ export module RendererUtility {
 		}
 		const consoleLog = console.log;
 		console.log = function (...args: any[]) {
-			Electron.ipcRenderer.send("log", ...args);
+			Electron.ipcRenderer.send("App.log", ...args);
 			consoleLog(...args);
 		};
 	}

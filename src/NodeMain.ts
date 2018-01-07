@@ -1,5 +1,6 @@
 import * as Electron from "electron";
 
+import { ipcMain, IpcMessageEvent } from "electron";
 import { MainMenu } from "./MainMenu";
 import { MainWindow } from "./windows/MainWindow";
 import { KeyConfigWindow } from "./windows/KeyConfigWindow";
@@ -18,6 +19,8 @@ class NodeMain {
 	}
 
 	protected onReady = () => {
+		this.addIpcEvents();
+
 		//*
 		this._mainMenu = new MainMenu();
 		const menu = this._mainMenu.createMenu();
@@ -53,7 +56,22 @@ class NodeMain {
 		//*/
 	}
 
+	protected addIpcEvents(): void {
+		// this log event can use in all windows
+		ipcMain.on("App.log", (event: IpcMessageEvent, ...args: any[]) => {
+			if (this._mainWindow != null) {
+				this._mainWindow.log(...args);
+			}
+			event.returnValue = null;
+		});
+	}
+	
+	protected removeIpcEvents(): void {
+		ipcMain.removeAllListeners("App.log");
+	}
+
 	protected onWindowAllClosed = () => {
+		this.removeIpcEvents();
 		if (process.platform != "darwin") {
 			this._app.quit();
 		}
