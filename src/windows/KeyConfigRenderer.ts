@@ -1,5 +1,6 @@
-import { KeyConfig } from "../config/KeyConfig";
 import { ipcRenderer, IpcMessageEvent } from "electron";
+import { KeyConfig } from "../config/KeyConfig";
+import { RendererUtility } from "../RendererUtility";
 
 class KeyInputElements {
 	public focusElement: HTMLInputElement = null;
@@ -162,12 +163,14 @@ class SystemKeyInputElements {
 
 export class KeyConfigRenderer {
 	constructor(keyConfig: KeyConfig) {
+		RendererUtility.overrideConsoleLog();
+
 		keyConfig = KeyConfig.fromJSON(keyConfig);
 		const buttonOK = document.querySelector("#ok");
 		const keySlot1 = new KeyInputElements("#slot1-");
 		const systemKey = new SystemKeyInputElements();
 
-		console.log("keyConfig", keyConfig);
+		//console.log("keyConfig", keyConfig);
 		keySlot1.setLabel(keyConfig);
 		systemKey.setLabel(keyConfig);
 

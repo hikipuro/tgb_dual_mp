@@ -30,48 +30,7 @@ export class MainWindow {
 
 	constructor() {
 		this._config = Config.load();
-
-		ipcMain.on("MainWindow.init", (event: IpcMessageEvent, arg: any) => {
-			this.send("MainWindow.init", process.argv);
-			event.returnValue = process.argv;
-		})
-		ipcMain.on("Get.Config", (event: IpcMessageEvent, arg: any) => {
-			event.sender.send("Get.Config", this._config);
-			event.returnValue = this._config;
-		});
-		ipcMain.on("update.menu.save-state", (event: IpcMessageEvent, arg: any) => {
-			if (arg == null || arg === "") {
-				this.disableAllSaveLoadStateMenu();
-				return;
-			}
-			let filePath: string = arg;
-			const pathInfo = path.parse(filePath);
-			filePath = pathInfo.name + ".";
-			filePath = path.join(this._config.path.save, filePath);
-
-			const menu = Electron.Menu.getApplicationMenu();
-			if (menu == null) {
-				this.disableAllSaveLoadStateMenu();
-				return;
-			}
-
-			for (let i = 1; i < 10; i++) {
-				const loadItemId = "file.load-state." + i;
-				const loadItem = menu.getMenuItemById(loadItemId);
-				const saveItemId = "file.save-state." + i;
-				const saveItem = menu.getMenuItemById(saveItemId);
-				if (loadItem == null || saveItem == null) {
-					continue;
-				}
-				saveItem.enabled = true;
-				const saveFile = filePath + "sv" + i;
-				if (!fs.existsSync(saveFile)) {
-					loadItem.enabled = false;
-					continue;
-				}
-				loadItem.enabled = true;
-			}
-		});
+		this.initIPC();
 
 		this.browserWindow = new Electron.BrowserWindow({
 			title: "TGB Dual MP [no file loaded]",
@@ -160,6 +119,7 @@ export class MainWindow {
 
 	public destroy(): void {
 		this.browserWindow.destroy();
+		ipcMain.removeAllListeners("log");
 		ipcMain.removeAllListeners("MainWindow.init");
 		ipcMain.removeAllListeners("Get.Config");
 		ipcMain.removeAllListeners("update.menu.save-state");
@@ -172,6 +132,54 @@ export class MainWindow {
 	public send(channel: string, ...args: any[]): void {
 		const webContents = this.browserWindow.webContents;
 		webContents.send(channel, ...args);
+	}
+
+	protected initIPC(): void {
+		ipcMain.on("log", (event: IpcMessageEvent, ...args: any[]) => {
+			this.log(...args);
+			event.returnValue = null;
+		})
+		ipcMain.on("MainWindow.init", (event: IpcMessageEvent, arg: any) => {
+			this.send("MainWindow.init", process.argv);
+			event.returnValue = process.argv;
+		})
+		ipcMain.on("Get.Config", (event: IpcMessageEvent, arg: any) => {
+			event.sender.send("Get.Config", this._config);
+			event.returnValue = this._config;
+		});
+		ipcMain.on("update.menu.save-state", (event: IpcMessageEvent, arg: any) => {
+			if (arg == null || arg === "") {
+				this.disableAllSaveLoadStateMenu();
+				return;
+			}
+			let filePath: string = arg;
+			const pathInfo = path.parse(filePath);
+			filePath = pathInfo.name + ".";
+			filePath = path.join(this._config.path.save, filePath);
+
+			const menu = Electron.Menu.getApplicationMenu();
+			if (menu == null) {
+				this.disableAllSaveLoadStateMenu();
+				return;
+			}
+
+			for (let i = 1; i < 10; i++) {
+				const loadItemId = "file.load-state." + i;
+				const loadItem = menu.getMenuItemById(loadItemId);
+				const saveItemId = "file.save-state." + i;
+				const saveItem = menu.getMenuItemById(saveItemId);
+				if (loadItem == null || saveItem == null) {
+					continue;
+				}
+				saveItem.enabled = true;
+				const saveFile = filePath + "sv" + i;
+				if (!fs.existsSync(saveFile)) {
+					loadItem.enabled = false;
+					continue;
+				}
+				loadItem.enabled = true;
+			}
+		});
 	}
 
 	protected getLanguageJson(): any {
@@ -284,16 +292,16 @@ export class MainWindow {
 		}
 
 		this._keyConfigWindow = new KeyConfigWindow(this.browserWindow, this._config.key);
-		this._keyConfigWindow.on("close", (keyConfig: KeyConfig) => {
-			this._config.key = keyConfig;
-			this.send("Get.Config", this._config);
+		this._keyConfigWindow.browserWindow.on("ready-to-show", () => {
+			this._keyConfigWindow.show();
 		});
 		this._keyConfigWindow.browserWindow.on("close", () => {
 			this._keyConfigWindow.destroy();
 			this._keyConfigWindow = null;
 		});
-		this._keyConfigWindow.browserWindow.on("ready-to-show", () => {
-			this._keyConfigWindow.show();
+		this._keyConfigWindow.on("close", (keyConfig: KeyConfig) => {
+			this._config.key = keyConfig;
+			this.send("Get.Config", this._config);
 		});
 	}
 
@@ -304,12 +312,12 @@ export class MainWindow {
 		}
 
 		this._versionWindow = new VersionWindow(this.browserWindow);
+		this._versionWindow.browserWindow.on("ready-to-show", () => {
+			this._versionWindow.show();
+		});
 		this._versionWindow.browserWindow.on("close", () => {
 			this._versionWindow.destroy();
 			this._versionWindow = null;
-		});
-		this._versionWindow.browserWindow.on("ready-to-show", () => {
-			this._versionWindow.show();
 		});
 	}
 }
