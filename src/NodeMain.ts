@@ -1,11 +1,13 @@
 import * as Electron from "electron";
 
+import { MainMenu } from "./MainMenu";
 import { MainWindow } from "./windows/MainWindow";
 import { KeyConfigWindow } from "./windows/KeyConfigWindow";
 import { VersionWindow } from "./windows/VersionWindow";
 
 class NodeMain {
 	protected _app: Electron.App = null;
+	protected _mainMenu: MainMenu = null;
 	protected _mainWindow: MainWindow = null;
 
 	constructor(app: Electron.App) {
@@ -16,6 +18,12 @@ class NodeMain {
 	}
 
 	protected onReady = () => {
+		//*
+		this._mainMenu = new MainMenu();
+		const menu = this._mainMenu.createMenu();
+		Electron.Menu.setApplicationMenu(menu);
+		//*/
+
 		//*
 		this._mainWindow = new MainWindow();
 		this._mainWindow.browserWindow.once("ready-to-show", () => {
