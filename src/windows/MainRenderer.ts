@@ -46,6 +46,9 @@ export class MainRenderer {
 	}
 
 	protected initIPC(): void {
+		ipcRenderer.on("log", (event: Electron.IpcMessageEvent, ...args) => {
+			console.log(...args);
+		});
 		ipcRenderer.on("menu", (event: Electron.IpcMessageEvent, menu: MenuItem) => {
 			console.log("menu", menu);
 			switch (menu.id) {
@@ -72,6 +75,21 @@ export class MainRenderer {
 		ipcRenderer.on("blur", (event: Electron.IpcMessageEvent, arg: any) => {
 			console.log("blur");
 		});
+
+		/*
+		ipcRenderer.on("suspend", (event: Electron.IpcMessageEvent, arg: any) => {
+			console.log("suspend");
+		});
+		ipcRenderer.on("resume", (event: Electron.IpcMessageEvent, arg: any) => {
+			console.log("resume");
+		});
+		ipcRenderer.on("hide", (event: Electron.IpcMessageEvent, arg: any) => {
+			console.log("hide");
+		});
+		ipcRenderer.on("show", (event: Electron.IpcMessageEvent, arg: any) => {
+			console.log("show");
+		});
+		//*/
 	}
 
 	protected initWindowEvents(): void {

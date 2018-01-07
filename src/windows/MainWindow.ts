@@ -54,7 +54,7 @@ export class MainWindow {
 			}
 		});
 
-		const templateMenu = JSON.parse(fs.readFileSync("./config/AppMenu.json", "utf8"));
+		const templateMenu = JSON.parse(fs.readFileSync(__dirname + "/../../config/AppMenu.json", "utf8"));
 		const languageJson = this.getLanguageJson();
 
 		this.translateMenuText(templateMenu, languageJson);
@@ -62,6 +62,7 @@ export class MainWindow {
 		const menu = Electron.Menu.buildFromTemplate(templateMenu);
 		Electron.Menu.setApplicationMenu(menu);
 
+		// fullscreen
 		this.browserWindow.on("enter-full-screen", () => {
 			this.browserWindow.setAutoHideMenuBar(true);
 			//this.browserWindow.setMenuBarVisibility(false);
@@ -69,6 +70,25 @@ export class MainWindow {
 		this.browserWindow.on("leave-full-screen", () => {
 			this.browserWindow.setAutoHideMenuBar(false);
 			this.browserWindow.setMenuBarVisibility(true);
+		});
+
+		/*
+		// suspend / resume
+		Electron.powerMonitor.on("suspend", () => {
+			this.send("suspend");
+		});
+		Electron.powerMonitor.on("resume", () => {
+			this.send("resume");
+		});
+
+		// lock
+		this.browserWindow.on("hide", () => {
+			this.send("hide");
+		});
+		//*/
+
+		this.browserWindow.on("show", () => {
+			this.send("show");
 		});
 
 		this.browserWindow.on("unresponsive", () => {
@@ -92,24 +112,32 @@ export class MainWindow {
 			*/
 		});
 
-		if (Settings.DevTools) {
+		if (this.isDevMode() && Settings.DevTools) {
 			this.browserWindow.webContents.openDevTools();
 		}
+	}
+
+	public isDevMode(): boolean {
+		const path = Electron.app.getAppPath();
+		return path.indexOf("default_app.asar") >= 0;
 	}
 
 	public show(): void {
 		this.browserWindow.show();
 	}
 
+	public log(...args: any[]): void {
+		this.send("log", ...args);
+	}
+
 	public send(channel: string, ...args: any[]): void {
-		const argArray = [channel].concat(args);
 		const webContents = this.browserWindow.webContents;
-		webContents.send.apply(webContents, argArray);
+		webContents.send(channel, ...args);
 	}
 
 	protected getLanguageJson(): any {
 		const locale: string = Electron.app.getLocale();
-		const languageFile: string = "./languages/" + locale + ".json";
+		const languageFile: string = __dirname + "/../../languages/" + locale + ".json";
 		if (!fs.existsSync(languageFile)) {
 			return null;
 		}
