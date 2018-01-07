@@ -51,7 +51,31 @@ export class MainRenderer {
 		});
 		ipcRenderer.on("menu", (event: Electron.IpcMessageEvent, menu: MenuItem) => {
 			console.log("menu", menu);
-			switch (menu.id) {
+
+			const id = menu.id;
+			
+			if (id.indexOf("file.save-state.") === 0) {
+				if (this.tgbDual.isPaused) {
+					return;
+				}
+				const fileNumber = Number(id.substr(-1, 1));
+				console.log("save", fileNumber);
+				this.tgbDual.saveState(fileNumber);
+				ipcRenderer.send("update.menu.save-state", this.tgbDual.romPath);
+				return;
+			}
+
+			if (id.indexOf("file.load-state.") === 0) {
+				if (this.tgbDual.isPaused) {
+					return;
+				}
+				const fileNumber = Number(id.substr(-1, 1));
+				console.log("restore", fileNumber);
+				this.tgbDual.restoreState(fileNumber);
+				return;
+			}
+
+			switch (id) {
 			case "file.reset-slot1":
 				this.tgbDual.reset();
 				break;
@@ -61,6 +85,7 @@ export class MainRenderer {
 			case "file.release-slot1":
 				this.tgbDual.stop();
 				document.title = this.defaultTitle;
+				ipcRenderer.send("update.menu.save-state", null);
 				break;
 			}
 		});
@@ -170,13 +195,6 @@ export class MainRenderer {
 			case keyConfig.b.code:		keyState.B = true; break;
 			case keyConfig.a.code:		keyState.A = true; break;
 			case keyConfig.fast.code:	this.tgbDual.isFastMode = true; break;
-
-			case KeyCode.D0:
-				this.tgbDual.saveState();
-				break;
-			case KeyCode.D9:
-				this.tgbDual.restoreState();
-				break;
 			}
 		};
 		document.onkeyup = (e: KeyboardEvent) => {
@@ -208,21 +226,23 @@ export class MainRenderer {
 
 		if (ext === ".gb" || ext === ".gbc") {
 			this.tgbDual.stop();
-			this.tgbDual.loadFile(filePath);
-			this.tgbDual.start();
-			const romInfo = this.tgbDual.getInfo();
-			document.title = romInfo.cartName;
-			console.log("romInfo", romInfo, romInfo.cartName.length);
+			if (this.tgbDual.loadFile(filePath)) {
+				this.tgbDual.start();
+				const romInfo = this.tgbDual.getInfo();
+				document.title = romInfo.cartName;
+				console.log("romInfo", romInfo, romInfo.cartName.length);
+				ipcRenderer.send("update.menu.save-state", filePath);
+			}
 		}
 	}
 	
-	protected loadZipFile(zipPath: string): void {
+	protected loadZipFile(zipPath: string): boolean {
 		if (!fs.existsSync(zipPath)) {
-			return;
+			return false;
 		}
 		const zipData = fs.readFileSync(zipPath);
 		if (zipData == null) {
-			return;
+			return false;
 		}
 		const zip = new nodeZip(zipData, {
 			base64: false,
@@ -242,8 +262,10 @@ export class MainRenderer {
 
 			const romInfo = this.tgbDual.romInfo;
 			document.title = romInfo.cartName;
-			break;
+			ipcRenderer.send("update.menu.save-state", zipPath);
+			return true;
 		}
+		return false;
 	}
 	
 	protected updateGamepad = (): void => {

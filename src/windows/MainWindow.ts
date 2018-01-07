@@ -18,6 +18,7 @@ module Settings {
 declare module "electron" {
 	interface MenuItem {
 		id: string;
+		submenu: Electron.Menu;
 	}
 }
 
@@ -33,6 +34,39 @@ export class MainWindow {
 		ipcMain.on("Get.Config", (event: IpcMessageEvent, arg: any) => {
 			//event.returnValue = this._keyConfig;
 			event.sender.send("Get.Config", this._config);
+		});
+		ipcMain.on("update.menu.save-state", (event: IpcMessageEvent, arg: any) => {
+			if (arg == null || arg === "") {
+				this.disableAllSaveLoadStateMenu();
+				return;
+			}
+			let filePath: string = arg;
+			const pathInfo = path.parse(filePath);
+			filePath = pathInfo.name + ".";
+			filePath = path.join(this._config.path.save, filePath);
+
+			const menu = Electron.Menu.getApplicationMenu();
+			if (menu == null) {
+				this.disableAllSaveLoadStateMenu();
+				return;
+			}
+
+			for (let i = 1; i < 10; i++) {
+				const loadItemId = "file.load-state." + i;
+				const loadItem = menu.getMenuItemById(loadItemId);
+				const saveItemId = "file.save-state." + i;
+				const saveItem = menu.getMenuItemById(saveItemId);
+				if (loadItem == null || saveItem == null) {
+					continue;
+				}
+				saveItem.enabled = true;
+				const saveFile = filePath + "sv" + i;
+				if (!fs.existsSync(saveFile)) {
+					loadItem.enabled = false;
+					continue;
+				}
+				loadItem.enabled = true;
+			}
 		});
 
 		this.browserWindow = new Electron.BrowserWindow({
@@ -170,8 +204,29 @@ export class MainWindow {
 		});
 	}
 
-	protected onClickMenuItem = (item: MenuItem, focusedWindow: Electron.BrowserWindow) => {
+	protected disableAllSaveLoadStateMenu(): void {
+		const menu = Electron.Menu.getApplicationMenu();
+		if (menu == null) {
+			return;
+		}
+		for (let i = 1; i < 10; i++) {
+			const loadItemId = "file.load-state." + i;
+			const loadItem = menu.getMenuItemById(loadItemId);
+			const saveItemId = "file.save-state." + i;
+			const saveItem = menu.getMenuItemById(saveItemId);
+			if (loadItem == null || saveItem == null) {
+				continue;
+			}
+			loadItem.enabled = false;
+			saveItem.enabled = false;
+		}
+	}
+
+	protected onClickMenuItem = (item: MenuItem, focusedWindow: Electron.BrowserWindow, event: Event): void => {
 		const id: string = item.id;
+		if (id == null) {
+			return;
+		}
 
 		switch (id) {
 			case "file.load-slot1":

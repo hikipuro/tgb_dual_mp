@@ -65,27 +65,7 @@ export class TgbDual extends EventEmitter {
 		Module.FS.syncfs(true, function (err) {
 			// handle callback
 			console.log(err);
-			const str = Module.FS.readFile("/data/aa.txt", {
-				encoding: "utf8", flags: "r"
-			});
-			console.log("readFile", str);
 		});
-
-		console.log("syncfs 2");
-		var data = new Uint8Array(32);
-		//let ff = Module.FS.open("/data/aa.txt", "w");
-		//Module.FS.writeFile(ff, data, 0, data.length, 0);
-		//Module.FS.close(ff);
-		Module.FS.writeFile("/data/aa.txt", "hogehoge2", {
-			encoding: "utf8", flags: "w"
-		});
-		
-
-		Module.FS.syncfs(false, function (err) {
-			// handle callback
-			console.log(err);
-		});
-		console.log("syncfs 3");
 
 		this.keyState = new TgbDual.KeyState();
 		this.element = document.createElement("canvas");
@@ -115,10 +95,6 @@ export class TgbDual extends EventEmitter {
 	}
 
 	public destroy(): void {
-		Module.FS.syncfs(false, function (err) {
-			// handle callback
-			console.log(err);
-		});
 	}
 
 	protected update = (time: number): void => {
@@ -304,27 +280,56 @@ export class TgbDual extends EventEmitter {
 		console.log("pause", this._isPaused);
 	}
 
-	public saveState(): void {
-		console.log("saveState", Module.FS.cwd());
-		//const file = Module.FS.open("/data/test.sav", "w");
-		//console.log("saveState", file);
-		
-		TgbDual.API.saveState("/data/test.sav");
-		//Module.FS.close(file);
-		setTimeout(() => {
-			Module.FS.syncfs(false, function (err) {
-				// handle callback
-				console.log(err);
-			});
-		}, 100);
-		const str = Module.FS.readFile("/data/test.sav", {
+	public saveState(index: number): void {
+		if (index == null || index < 0 || index > 9) {
+			return;
+		}
+		if (this.romPath == null || this.romPath === "") {
+			return;
+		}
+
+		index = Math.floor(index);
+		TgbDual.API.saveState("/data/save_tmp.sav");
+		const data = Module.FS.readFile("/data/save_tmp.sav", {
 			encoding: "binary", flags: "r"
 		});
-		console.log("readFile", str);
+		Module.FS.unlink("/data/save_tmp.sav");
+
+		const pathInfo = path.parse(this.romPath);
+		const saveFileName = pathInfo.name + ".sv" + index;
+		if (saveFileName.length <= 4) {
+			return;
+		}
+		const saveFilePath = path.join(this.pathConfig.save, saveFileName);
+		fs.writeFileSync(saveFilePath, data);
 	}
 
-	public restoreState(): void {
-		TgbDual.API.restoreState("/data/test.sav");
+	public restoreState(index: number): void {
+		if (index == null || index < 0 || index > 9) {
+			return;
+		}
+		if (this.romPath == null || this.romPath === "") {
+			return;
+		}
+		
+		index = Math.floor(index);
+		const pathInfo = path.parse(this.romPath);
+		const saveFileName = pathInfo.name + ".sv" + index;
+		if (saveFileName.length <= 4) {
+			return;
+		}
+
+		const saveFilePath = path.join(this.pathConfig.save, saveFileName);
+		if (!fs.existsSync(saveFilePath)) {
+			return;
+		}
+		const data = fs.readFileSync(saveFilePath);
+
+		Module.FS.writeFile("/data/load_tmp.sav", data, {
+			encoding: "binary", flags: "w"
+		});
+		TgbDual.API.restoreState("/data/load_tmp.sav");
+		Module.FS.unlink("/data/load_tmp.sav");
 	}
 
 	protected isFileLoaded(): boolean {
@@ -385,18 +390,19 @@ export class TgbDual extends EventEmitter {
 		}
 	}
 
-	public loadFile(path: string): void {
+	public loadFile(path: string): boolean {
 		console.log("loadFile", path);
 		if (!fs.existsSync(path)) {
-			return;
+			return false;
 		}
 		const data = fs.readFileSync(path);
 		if (data == null) {
-			return;
+			return false;
 		}
 		//console.log(data);
 		this.romPath = path;
 		this.loadRom(data);
+		return true;
 	}
 
 	public loadRom(data: Buffer): void {
