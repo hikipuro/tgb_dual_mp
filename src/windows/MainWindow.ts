@@ -31,10 +31,13 @@ export class MainWindow {
 	constructor() {
 		this._config = Config.load();
 
+		ipcMain.on("MainWindow.init", (event: IpcMessageEvent, arg: any) => {
+			this.send("MainWindow.init", process.argv);
+			event.returnValue = process.argv;
+		})
 		ipcMain.on("Get.Config", (event: IpcMessageEvent, arg: any) => {
 			event.sender.send("Get.Config", this._config);
 			event.returnValue = this._config;
-			
 		});
 		ipcMain.on("update.menu.save-state", (event: IpcMessageEvent, arg: any) => {
 			if (arg == null || arg === "") {
@@ -149,14 +152,17 @@ export class MainWindow {
 		if (Config.isDevMode() && Settings.DevTools) {
 			this.browserWindow.webContents.openDevTools();
 		}
-
-		this.browserWindow.on("ready-to-show", () => {
-			this.send("init", process.argv);
-		});
 	}
 
 	public show(): void {
 		this.browserWindow.show();
+	}
+
+	public destroy(): void {
+		this.browserWindow.destroy();
+		ipcMain.removeAllListeners("MainWindow.init");
+		ipcMain.removeAllListeners("Get.Config");
+		ipcMain.removeAllListeners("update.menu.save-state");
 	}
 
 	public log(...args: any[]): void {
@@ -257,7 +263,7 @@ export class MainWindow {
 	}
 
 	protected openFileOpenDialog() {
-		const dialog = new OpenDialog();
+		let dialog = new OpenDialog();
 		dialog.defaultPath = Config.getCurrentPath();
 		dialog.addFilter("Game Boy Rom Image", ["gb", "gbc", "zip"]);
 		dialog.addFilter("All Files", ["*"]);
@@ -266,6 +272,7 @@ export class MainWindow {
 				return;
 			}
 			this.send("load", filenames[0]);
+			dialog = null;
 		});
 		dialog.show();
 	}
@@ -282,7 +289,7 @@ export class MainWindow {
 			this.send("Get.Config", this._config);
 		});
 		this._keyConfigWindow.browserWindow.on("close", () => {
-			this._keyConfigWindow.browserWindow.destroy();
+			this._keyConfigWindow.destroy();
 			this._keyConfigWindow = null;
 		});
 		this._keyConfigWindow.browserWindow.on("ready-to-show", () => {
@@ -298,7 +305,7 @@ export class MainWindow {
 
 		this._versionWindow = new VersionWindow(this.browserWindow);
 		this._versionWindow.browserWindow.on("close", () => {
-			this._versionWindow.browserWindow.destroy();
+			this._versionWindow.destroy();
 			this._versionWindow = null;
 		});
 		this._versionWindow.browserWindow.on("ready-to-show", () => {

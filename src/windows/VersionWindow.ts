@@ -45,4 +45,9 @@ export class VersionWindow {
 	public show(): void {
 		this.browserWindow.show();
 	}
+
+	public destroy(): void {
+		this.browserWindow.destroy();
+		ipcMain.removeAllListeners("VersionWindow.Result");
+	}
 }

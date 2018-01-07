@@ -22,6 +22,10 @@ class NodeMain {
 			this._mainWindow = null;
 			this._app.quit();
 		});
+		this._mainWindow.browserWindow.on("close", () => {
+			this._mainWindow.destroy();
+			this._mainWindow = null;
+		});
 		this._mainWindow.browserWindow.on("ready-to-show", () => {
 			this._mainWindow.show();
 		});

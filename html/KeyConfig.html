@@ -5,7 +5,14 @@
 <title>Key Config</title>
 <link rel="stylesheet" href="css/KeyConfig.css">
 <script>
-require("../dist/windows/KeyConfigRenderer.js");
+let Electron = require("electron");
+let Module = require("../dist/windows/KeyConfigRenderer.js");
+
+let keyConfigRenderer = null;
+document.addEventListener("DOMContentLoaded", () => {
+	let keyConfig = Electron.ipcRenderer.sendSync("KeyConfigWindow.init");
+	keyConfigRenderer = new Module.KeyConfigRenderer(keyConfig);
+});
 </script>
 </head>
 <body>

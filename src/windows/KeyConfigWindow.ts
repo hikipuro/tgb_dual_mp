@@ -50,14 +50,13 @@ export class KeyConfigWindow extends EventEmitter {
 			ipcMain.removeAllListeners("KeyConfigWindow.Init");
 			ipcMain.removeAllListeners("KeyConfigWindow.Result");
 		});
+		ipcMain.on("KeyConfigWindow.init", (event: IpcMessageEvent, arg: any): void => {
+			event.returnValue = this.keyConfig;
+		});
 		ipcMain.on("KeyConfigWindow.Result", (event: IpcMessageEvent, arg: any): void => {
 			this.keyConfig = arg;
 			this.emit("close", this.keyConfig);
 			this.browserWindow.close();
-		});
-		ipcMain.on("KeyConfigWindow.Init", (event: IpcMessageEvent, arg: any): void => {
-			event.sender.send("KeyConfigWindow.Init", this.keyConfig);
-			//const keyConfig: KeyConfig = arg;
 		});
 	}
 
@@ -65,7 +64,9 @@ export class KeyConfigWindow extends EventEmitter {
 		this.browserWindow.show();
 	}
 
-	protected onGetResult(event: IpcMessageEvent, arg: any): void {
-		const keyConfig: KeyConfig = arg;
+	public destroy(): void {
+		this.browserWindow.destroy();
+		ipcMain.removeAllListeners("KeyConfigWindow.init");
+		ipcMain.removeAllListeners("KeyConfigWindow.Result");
 	}
 }

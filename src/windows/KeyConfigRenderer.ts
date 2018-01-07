@@ -214,25 +214,3 @@ export class KeyConfigRenderer {
 		return text.charAt(0).toUpperCase() + text.slice(1);
 	}
 }
-
-let keyConfigRenderer: KeyConfigRenderer;
-let _keyConfig: KeyConfig;
-let initCount = 0;
-function checkInitialized(): void {
-	initCount++;
-	if (initCount < 2) {
-		return;
-	}
-	keyConfigRenderer = new KeyConfigRenderer(_keyConfig);
-}
-
-ipcRenderer.send("KeyConfigWindow.Init");
-ipcRenderer.on("KeyConfigWindow.Init", (e: IpcMessageEvent, keyConfig: any) => {
-	//console.log("KeyConfigWindow.Init", keyConfig);
-	_keyConfig = keyConfig;
-	checkInitialized();
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-	checkInitialized();
-});
