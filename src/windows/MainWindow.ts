@@ -32,8 +32,9 @@ export class MainWindow {
 		this._config = Config.load();
 
 		ipcMain.on("Get.Config", (event: IpcMessageEvent, arg: any) => {
-			//event.returnValue = this._keyConfig;
 			event.sender.send("Get.Config", this._config);
+			event.returnValue = this._config;
+			
 		});
 		ipcMain.on("update.menu.save-state", (event: IpcMessageEvent, arg: any) => {
 			if (arg == null || arg === "") {
@@ -119,11 +120,10 @@ export class MainWindow {
 		this.browserWindow.on("hide", () => {
 			this.send("hide");
 		});
-		//*/
-
 		this.browserWindow.on("show", () => {
 			this.send("show");
 		});
+		//*/
 
 		this.browserWindow.on("unresponsive", () => {
 			this.send("blur");
@@ -146,14 +146,13 @@ export class MainWindow {
 			*/
 		});
 
-		if (this.isDevMode() && Settings.DevTools) {
+		if (Config.isDevMode() && Settings.DevTools) {
 			this.browserWindow.webContents.openDevTools();
 		}
-	}
 
-	public isDevMode(): boolean {
-		const path = Electron.app.getAppPath();
-		return path.indexOf("default_app.asar") >= 0;
+		this.browserWindow.on("ready-to-show", () => {
+			this.send("init", process.argv);
+		});
 	}
 
 	public show(): void {
@@ -236,7 +235,7 @@ export class MainWindow {
 				this.openKeyConfigWindow();
 				return;
 			case "help.open-app-folder":
-				Electron.shell.openItem(process.cwd());
+				Electron.shell.openItem(Config.getCurrentPath());
 				return;
 			case "help.version":
 				this.openVersionWindow();
@@ -259,7 +258,7 @@ export class MainWindow {
 
 	protected openFileOpenDialog() {
 		const dialog = new OpenDialog();
-		dialog.defaultPath = __dirname;
+		dialog.defaultPath = Config.getCurrentPath();
 		dialog.addFilter("Game Boy Rom Image", ["gb", "gbc", "zip"]);
 		dialog.addFilter("All Files", ["*"]);
 		dialog.on("select", (filenames) => {

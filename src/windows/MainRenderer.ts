@@ -20,11 +20,14 @@ export class MainRenderer {
 	protected config: Config;
 	protected readonly defaultTitle: string = document.title;
 	protected gamePads: Gamepads = new Gamepads();
+	protected commandLineArgs: string[] = [];
 	
-	constructor() {
+	constructor(commandLineArgs: string[]) {
+		this.commandLineArgs = commandLineArgs;
 		this.initIPC();
 		this.initWindowEvents();
 		this.initDocumentEvents();
+		this.config = ipcRenderer.sendSync("Get.Config");
 
 		console.log("TgbDual.isInitialized: ", TgbDual.isInitialized);
 		if (TgbDual.isInitialized) {
@@ -35,14 +38,34 @@ export class MainRenderer {
 				this.createNewTgbDual();
 			};
 		}
-
-		ipcRenderer.send("Get.Config");
 	}
 
 	protected createNewTgbDual(): void {
 		this.tgbDual = new TgbDual();
 		document.body.appendChild(this.tgbDual.element);
+		this.tgbDual.pathConfig = this.config.path;
 		this.tgbDual.on("update", this.updateGamepad);
+
+		if (this.commandLineArgs != null) {
+			//console.log("commandLineArgs", this.commandLineArgs);
+			const length = this.commandLineArgs.length;
+			for (let i = 0; i < length; i++) {
+				const arg = this.commandLineArgs[i];
+				if (arg == null || arg === "") {
+					continue;
+				}
+				const pathInfo = path.parse(arg);
+				const ext = pathInfo.ext.toLowerCase();
+				if (ext != ".gb" && ext != ".gbc") {
+					continue;
+				}
+				if (!fs.existsSync(arg)) {
+					continue;
+				}
+				this.loadFile(arg);
+				break;
+			}
+		}
 	}
 
 	protected initIPC(): void {

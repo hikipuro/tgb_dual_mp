@@ -40,8 +40,29 @@ export class Config {
 	}
 
 	public static getFilePath(): string {
-		return path.join(process.cwd(), Config.Path);
-		//return process.cwd();
-		//return Electron.app.getAppPath();
+		return path.join(Config.getCurrentPath(), Config.Path);
+	}
+	
+	public static getCurrentPath(): string {
+		if (this.isDevMode()) {
+			return process.cwd();
+		}
+		// TODO: fix this
+		if (process.type === "renderer") {
+			return process.cwd();
+		}
+		let filePath = Electron.app.getAppPath();
+		return path.dirname(filePath);
+	}
+	
+	public static isDevMode(): boolean {
+		// TODO: fix this
+		// not correct result when this method run in renderer process
+		// because Electron.app is null object
+		if (process.type === "renderer") {
+			return false;
+		}
+		const path = Electron.app.getAppPath();
+		return path.indexOf("default_app.asar") >= 0;
 	}
 }

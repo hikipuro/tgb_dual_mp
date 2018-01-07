@@ -300,6 +300,9 @@ export class TgbDual extends EventEmitter {
 		if (saveFileName.length <= 4) {
 			return;
 		}
+		if (!fs.existsSync(this.pathConfig.save)) {
+			fs.mkdirSync(this.pathConfig.save);
+		}
 		const saveFilePath = path.join(this.pathConfig.save, saveFileName);
 		fs.writeFileSync(saveFilePath, data);
 	}

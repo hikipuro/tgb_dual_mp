@@ -1,13 +1,13 @@
-
 import * as path from "path";
+import { Config } from "./Config";
 
 export class PathConfig {
 	public save: string = null;
 
 	constructor() {
-		this.save = path.join(process.cwd(), "save");
+		this.save = path.join(Config.getCurrentPath(), "save");
 	}
-	
+
 	public static fromJSON(json: any): PathConfig {
 		const pathConfig = new PathConfig();
 		if (json == null) {

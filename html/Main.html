@@ -5,11 +5,26 @@
 <title>TGB Dual MP [no file loaded]</title>
 <link rel="stylesheet" href="css/Main.css">
 <script>
+let Electron = require("electron");
 let Module = require("../dist/windows/MainRenderer.js");
+
+let loadedCount = 0;
+function checkLoadComplete() {
+	loadedCount++;
+	if (loadedCount == 2) {
+		mainRenderer = new Module.MainRenderer(commandLineArgs);
+	}
+}
+
+let commandLineArgs = null;
+Electron.ipcRenderer.on("init", (sender, args) => {
+	commandLineArgs = args;
+	checkLoadComplete();
+});
 
 let mainRenderer = null;
 document.addEventListener("DOMContentLoaded", () => {
-	mainRenderer = new Module.MainRenderer();
+	checkLoadComplete();
 });
 </script>
 </head>
