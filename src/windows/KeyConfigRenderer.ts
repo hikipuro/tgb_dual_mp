@@ -175,9 +175,7 @@ export class KeyConfigRenderer {
 		systemKey.setLabel(keyConfig);
 
 		buttonOK.addEventListener("click", () => {
-			ipcRenderer.send("KeyConfigWindow.Result", keyConfig);
-			//var window = remote.getCurrentWindow();
-			//window.close();
+			ipcRenderer.send("KeyConfigWindow.close", keyConfig);
 		});
 
 		document.addEventListener("keydown", (e: KeyboardEvent) => {

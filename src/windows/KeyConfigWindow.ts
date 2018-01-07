@@ -10,6 +10,8 @@ import { KeyCode } from "../KeyCode";
 module Settings {
 	export const Width: number = 340;
 	export const Height: number = 248;
+	export const Title: string = "Key Config";
+	export const Content: string = "../../html/KeyConfig.html";
 }
 
 export class KeyConfigWindow extends EventEmitter {
@@ -22,10 +24,23 @@ export class KeyConfigWindow extends EventEmitter {
 		if (keyConfig != null) {
 			this.keyConfig = keyConfig;
 		}
+		
+		this.initWindow(parent);
+		this.addIpcEvents();
+	}
 
+	public show(): void {
+		this.browserWindow.show();
+	}
+
+	public destroy(): void {
+		this.browserWindow.destroy();
+	}
+
+	protected initWindow(parent: Electron.BrowserWindow): void {
 		this.browserWindow = new Electron.BrowserWindow({
 			parent: parent,
-			title: "Key Config",
+			title: Settings.Title,
 			type: "toolbar",
 			useContentSize: true,
 			width: Settings.Width,
@@ -42,31 +57,29 @@ export class KeyConfigWindow extends EventEmitter {
 		});
 		this.browserWindow.setMenu(null);
 		this.browserWindow.loadURL(url.format({
-			pathname: path.join(__dirname, "../../html/KeyConfig.html"),
+			pathname: path.join(__dirname, Settings.Content),
 			protocol: "file:",
 			slashes: true
 		}));
-		this.browserWindow.on("close", () => {
-			ipcMain.removeAllListeners("KeyConfigWindow.Init");
-			ipcMain.removeAllListeners("KeyConfigWindow.Result");
+		this.browserWindow.once("close", () => {
+			this.removeIpcEvents();
 		});
+	}
+	
+	protected addIpcEvents(): void {
 		ipcMain.on("KeyConfigWindow.init", (event: IpcMessageEvent, arg: any): void => {
 			event.returnValue = this.keyConfig;
 		});
-		ipcMain.on("KeyConfigWindow.Result", (event: IpcMessageEvent, arg: any): void => {
+		ipcMain.on("KeyConfigWindow.close", (event: IpcMessageEvent, arg: any): void => {
 			this.keyConfig = arg;
 			this.emit("close", this.keyConfig);
 			this.browserWindow.close();
+			event.returnValue = null;
 		});
 	}
 
-	public show(): void {
-		this.browserWindow.show();
-	}
-
-	public destroy(): void {
-		this.browserWindow.destroy();
+	protected removeIpcEvents(): void {
 		ipcMain.removeAllListeners("KeyConfigWindow.init");
-		ipcMain.removeAllListeners("KeyConfigWindow.Result");
+		ipcMain.removeAllListeners("KeyConfigWindow.close");
 	}
 }

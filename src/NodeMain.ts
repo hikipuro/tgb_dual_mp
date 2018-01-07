@@ -18,21 +18,21 @@ class NodeMain {
 	protected onReady = () => {
 		//*
 		this._mainWindow = new MainWindow();
-		this._mainWindow.browserWindow.on("ready-to-show", () => {
+		this._mainWindow.browserWindow.once("ready-to-show", () => {
 			this._mainWindow.show();
 		});
-		this._mainWindow.browserWindow.on("close", () => {
+		this._mainWindow.browserWindow.once("close", () => {
 			this._mainWindow.destroy();
 			this._mainWindow = null;
 		});
-		this._mainWindow.browserWindow.on("closed", () => {
+		this._mainWindow.browserWindow.once("closed", () => {
 			this._app.quit();
 		});
 		//*/
 
 		/*
 		const keyConfig = new KeyConfigWindow();
-		keyConfig.browserWindow.on("closed", () => {
+		keyConfig.browserWindow.once("closed", () => {
 			this._app.quit();
 		});
 		keyConfig.browserWindow.webContents.openDevTools();
@@ -41,7 +41,7 @@ class NodeMain {
 
 		/*
 		const version = new VersionWindow();
-		version.browserWindow.on("closed", () => {
+		version.browserWindow.once("closed", () => {
 			this._app.quit();
 		});
 		version.browserWindow.webContents.openDevTools();

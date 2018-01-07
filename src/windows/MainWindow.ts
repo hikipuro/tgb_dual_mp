@@ -12,6 +12,8 @@ import { KeyConfigWindow } from "./KeyConfigWindow";
 import { VersionWindow } from "./VersionWindow";
 
 module Settings {
+	export const Title: string = "TGB Dual MP [no file loaded]";
+	export const Content: string = "../../html/Main.html";
 	export const DevTools: boolean = true;
 }
 
@@ -28,12 +30,38 @@ export class MainWindow {
 	protected _versionWindow: VersionWindow;
 	protected _config: Config;
 
-	constructor() {
+	constructor(parent: Electron.BrowserWindow = null) {
+		// load config.json
 		this._config = Config.load();
-		this.initIPC();
 
+		this.initAppMenu();
+		this.initWindow(parent);
+		this.addIpcEvents();
+	}
+
+	public show(): void {
+		this.browserWindow.show();
+		if (Config.isDevMode() && Settings.DevTools) {
+			this.browserWindow.webContents.openDevTools();
+		}
+	}
+
+	public destroy(): void {
+		this.browserWindow.destroy();
+	}
+
+	public log(...args: any[]): void {
+		this.send("log", ...args);
+	}
+
+	public send(channel: string, ...args: any[]): void {
+		const webContents = this.browserWindow.webContents;
+		webContents.send(channel, ...args);
+	}
+	
+	protected initWindow(parent: Electron.BrowserWindow): void {
 		this.browserWindow = new Electron.BrowserWindow({
-			title: "TGB Dual MP [no file loaded]",
+			title: Settings.Title,
 			useContentSize: true,
 			width: Constants.ScreenWidth * 3,
 			height: Constants.ScreenHeight * 3,
@@ -51,13 +79,18 @@ export class MainWindow {
 			}
 		});
 
-		const templateMenu = JSON.parse(fs.readFileSync(__dirname + "/../../config/AppMenu.json", "utf8"));
-		const languageJson = this.getLanguageJson();
-
-		this.translateMenuText(templateMenu, languageJson);
-		this.addClickEventAllMenuItems(templateMenu);
-		const menu = Electron.Menu.buildFromTemplate(templateMenu);
-		Electron.Menu.setApplicationMenu(menu);
+		this.browserWindow.loadURL(url.format({
+			pathname: path.join(__dirname, Settings.Content),
+			protocol: "file:",
+			slashes: true,
+		}), {
+			/*
+			postData: [{
+				type: "rawData",
+				bytes: Buffer.from("hello=world")
+			}],
+			*/
+		});
 
 		// fullscreen
 		this.browserWindow.on("enter-full-screen", () => {
@@ -90,51 +123,27 @@ export class MainWindow {
 		this.browserWindow.on("unresponsive", () => {
 			this.send("blur");
 		});
-		this.browserWindow.on("close", () => {
-			// save settings
+		this.browserWindow.once("close", () => {
+			this.removeIpcEvents();
+
+			// save config.json
 			this._config.save();
 		});
-
-		this.browserWindow.loadURL(url.format({
-			pathname: path.join(__dirname, "../../html/Main.html"),
-			protocol: "file:",
-			slashes: true,
-		}), {
-			/*
-			postData: [{
-				type: "rawData",
-				bytes: Buffer.from("hello=world")
-			}],
-			*/
-		});
-
-		if (Config.isDevMode() && Settings.DevTools) {
-			this.browserWindow.webContents.openDevTools();
-		}
 	}
 
-	public show(): void {
-		this.browserWindow.show();
+	protected initAppMenu(): void {
+		const appMenuFile = path.join(__dirname, "/../../config/AppMenu.json");
+		const templateMenu = JSON.parse(fs.readFileSync(appMenuFile, "utf8"));
+		const languageJson = this.getLanguageJson();
+
+		this.translateMenuText(templateMenu, languageJson);
+		this.addClickEventAllMenuItems(templateMenu);
+		const menu = Electron.Menu.buildFromTemplate(templateMenu);
+		Electron.Menu.setApplicationMenu(menu);
 	}
 
-	public destroy(): void {
-		this.browserWindow.destroy();
-		ipcMain.removeAllListeners("log");
-		ipcMain.removeAllListeners("MainWindow.init");
-		ipcMain.removeAllListeners("Get.Config");
-		ipcMain.removeAllListeners("update.menu.save-state");
-	}
-
-	public log(...args: any[]): void {
-		this.send("log", ...args);
-	}
-
-	public send(channel: string, ...args: any[]): void {
-		const webContents = this.browserWindow.webContents;
-		webContents.send(channel, ...args);
-	}
-
-	protected initIPC(): void {
+	protected addIpcEvents(): void {
+		// this log event can also be used in other window
 		ipcMain.on("log", (event: IpcMessageEvent, ...args: any[]) => {
 			this.log(...args);
 			event.returnValue = null;
@@ -180,6 +189,13 @@ export class MainWindow {
 				loadItem.enabled = true;
 			}
 		});
+	}
+
+	protected removeIpcEvents(): void {
+		ipcMain.removeAllListeners("log");
+		ipcMain.removeAllListeners("MainWindow.init");
+		ipcMain.removeAllListeners("Get.Config");
+		ipcMain.removeAllListeners("update.menu.save-state");
 	}
 
 	protected getLanguageJson(): any {
@@ -285,7 +301,7 @@ export class MainWindow {
 		dialog.show();
 	}
 
-	public openKeyConfigWindow(): void {
+	protected openKeyConfigWindow(): void {
 		if (this._keyConfigWindow != null) {
 			this._keyConfigWindow.show();
 			return;
