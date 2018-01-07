@@ -3,15 +3,18 @@ import * as fs from "fs";
 import * as path from "path";
 import { KeyConfig } from "./KeyConfig";
 import { PathConfig } from "./PathConfig";
+import { WindowConfig } from "./WindowConfig";
 
 export class Config {
 	public static readonly Path: string = "config.json";
 	public key: KeyConfig;
 	public path: PathConfig;
+	public window: WindowConfig;
 
 	constructor() {
 		this.key = new KeyConfig();
 		this.path = new PathConfig();
+		this.window = new WindowConfig();
 	}
 
 	public static load(): Config {
@@ -36,6 +39,7 @@ export class Config {
 		
 		config.key = KeyConfig.fromJSON(json.key);
 		config.path = PathConfig.fromJSON(json.path);
+		config.window = WindowConfig.fromJSON(json.window);
 		return config;
 	}
 

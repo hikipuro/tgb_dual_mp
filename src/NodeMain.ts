@@ -11,8 +11,8 @@ class NodeMain {
 	constructor(app: Electron.App) {
 		this._app = app;
 		//this._app.disableHardwareAcceleration();
-		this._app.on("ready", this.onReady);
-		this._app.on("window-all-closed", this.onWindowAllClosed);
+		this._app.once("ready", this.onReady);
+		this._app.once("window-all-closed", this.onWindowAllClosed);
 	}
 
 	protected onReady = () => {
@@ -21,12 +21,8 @@ class NodeMain {
 		this._mainWindow.browserWindow.once("ready-to-show", () => {
 			this._mainWindow.show();
 		});
-		this._mainWindow.browserWindow.once("close", () => {
-			this._mainWindow.destroy();
-			this._mainWindow = null;
-		});
 		this._mainWindow.browserWindow.once("closed", () => {
-			this._app.quit();
+			this._mainWindow.destroy();
 		});
 		//*/
 

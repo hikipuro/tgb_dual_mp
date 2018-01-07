@@ -45,6 +45,7 @@ export class MainRenderer {
 		document.body.appendChild(this.tgbDual.element);
 		this.tgbDual.pathConfig = this.config.path;
 		this.tgbDual.on("update", this.updateGamepad);
+		this.adjustScreenSize();
 
 		if (this.commandLineArgs != null) {
 			//console.log("commandLineArgs", this.commandLineArgs);
@@ -151,18 +152,7 @@ export class MainRenderer {
 		
 		// window resize
 		window.onresize = () => {
-			const width = window.innerWidth;
-			const height = window.innerHeight;
-			const ratio = width / height;
-			const style = this.tgbDual.element.style;
-
-			if (TgbDual.ScreenRatio <= ratio) {
-				style.width = null;
-				style.height = "100%";
-			} else {
-				style.width = "100%";
-				style.height = null;
-			}
+			this.adjustScreenSize();
 		}
 		
 		// window close
@@ -236,6 +226,21 @@ export class MainRenderer {
 			case keyConfig.fast.code:	this.tgbDual.isFastMode = false; break;
 			}
 		};
+	}
+
+	protected adjustScreenSize(): void {
+		const width = window.innerWidth;
+		const height = window.innerHeight;
+		const ratio = width / height;
+		const style = this.tgbDual.element.style;
+
+		if (TgbDual.ScreenRatio <= ratio) {
+			style.width = null;
+			style.height = "100%";
+		} else {
+			style.width = "100%";
+			style.height = null;
+		}
 	}
 
 	protected loadFile(filePath: string): void {

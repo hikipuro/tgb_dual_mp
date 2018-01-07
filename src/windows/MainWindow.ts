@@ -63,8 +63,8 @@ export class MainWindow {
 		this.browserWindow = new Electron.BrowserWindow({
 			title: Settings.Title,
 			useContentSize: true,
-			width: Constants.ScreenWidth * 3,
-			height: Constants.ScreenHeight * 3,
+			width: this._config.window.width,
+			height: this._config.window.height,
 			minWidth: Constants.ScreenWidth,
 			minHeight: Constants.ScreenHeight,
 			acceptFirstMouse: true,
@@ -90,6 +90,19 @@ export class MainWindow {
 				bytes: Buffer.from("hello=world")
 			}],
 			*/
+		});
+
+		// resize
+		this.browserWindow.on("resize", () => {
+			if (this.browserWindow.isFullScreen()) {
+				return;
+			}
+			if (this.browserWindow.isMaximized()) {
+				return;
+			}
+			const size = this.browserWindow.getContentSize();
+			this._config.window.width = size[0];
+			this._config.window.height = size[1];
 		});
 
 		// fullscreen
@@ -308,14 +321,14 @@ export class MainWindow {
 		}
 
 		this._keyConfigWindow = new KeyConfigWindow(this.browserWindow, this._config.key);
-		this._keyConfigWindow.browserWindow.on("ready-to-show", () => {
+		this._keyConfigWindow.browserWindow.once("ready-to-show", () => {
 			this._keyConfigWindow.show();
 		});
-		this._keyConfigWindow.browserWindow.on("close", () => {
+		this._keyConfigWindow.browserWindow.once("close", () => {
 			this._keyConfigWindow.destroy();
 			this._keyConfigWindow = null;
 		});
-		this._keyConfigWindow.on("close", (keyConfig: KeyConfig) => {
+		this._keyConfigWindow.once("close", (keyConfig: KeyConfig) => {
 			this._config.key = keyConfig;
 			this.send("Get.Config", this._config);
 		});
@@ -328,10 +341,10 @@ export class MainWindow {
 		}
 
 		this._versionWindow = new VersionWindow(this.browserWindow);
-		this._versionWindow.browserWindow.on("ready-to-show", () => {
+		this._versionWindow.browserWindow.once("ready-to-show", () => {
 			this._versionWindow.show();
 		});
-		this._versionWindow.browserWindow.on("close", () => {
+		this._versionWindow.browserWindow.once("close", () => {
 			this._versionWindow.destroy();
 			this._versionWindow = null;
 		});
