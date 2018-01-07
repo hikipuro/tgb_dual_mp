@@ -148,13 +148,11 @@ export class MainWindow {
 	}
 
 	protected addIpcEvents(): void {
-		ipcMain.on("App.menu.click", (item: MenuItem, focusedWindow: Electron.BrowserWindow) => {
-			this.onClickMenuItem(item, focusedWindow, null);
-		})
+		ipcMain.on("App.menu.click", this.onClickMenuItem);
 		ipcMain.on("MainWindow.init", (event: IpcMessageEvent, arg: any) => {
 			this.send("MainWindow.init", process.argv);
 			event.returnValue = process.argv;
-		})
+		});
 		ipcMain.on("MainWindow.getConfig", (event: IpcMessageEvent, arg: any) => {
 			event.sender.send("MainWindow.getConfig", this._config);
 			event.returnValue = this._config;
@@ -195,6 +193,7 @@ export class MainWindow {
 	}
 
 	protected removeIpcEvents(): void {
+		ipcMain.removeListener("App.menu.click", this.onClickMenuItem);
 		ipcMain.removeAllListeners("MainWindow.init");
 		ipcMain.removeAllListeners("MainWindow.getConfig");
 		ipcMain.removeAllListeners("MainWindow.updateSaveLoadStateMenu");
