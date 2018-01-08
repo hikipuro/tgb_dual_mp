@@ -106,12 +106,6 @@ export class MainRenderer {
 				return;
 			}
 
-			if (id.indexOf("option.screen.") === 0) {
-				const layerName = id.split(".", 3)[2];
-				this.tgbDual.enableScreenLayer(layerName, menu.checked);
-				return;
-			}
-
 			switch (id) {
 			case "file.reset-slot1":
 				this.tgbDual.reset();
@@ -125,6 +119,10 @@ export class MainRenderer {
 				this.tgbDual.stop();
 				document.title = this.defaultTitle;
 				ipcRenderer.send("MainWindow.updateSaveLoadStateMenu", null);
+				break;
+			case "option.screen.aspect-ratio":
+				this.config.screen.fixedAspectRatio = menu.checked;
+				this.adjustScreenSize();
 				break;
 			}
 		});
@@ -265,6 +263,12 @@ export class MainRenderer {
 		const height = window.innerHeight;
 		const ratio = width / height;
 		const style = this.tgbDual.element.style;
+
+		if (!this.config.screen.fixedAspectRatio) {
+			style.width = "100%";
+			style.height = "100%";
+			return;
+		}
 
 		if (TgbDual.ScreenRatio <= ratio) {
 			style.width = null;

@@ -205,6 +205,12 @@
 						"role": "togglefullscreen"
 					},
 					{
+						"id": "option.screen.aspect-ratio",
+						"label": "Fixed aspect ratio",
+						"type": "checkbox",
+						"checked": true
+					},
+					{
 						"type": "separator"
 					},
 					{

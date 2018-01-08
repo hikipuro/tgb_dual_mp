@@ -155,6 +155,8 @@ export class MainWindow {
 	protected initMenu(): void {
 		const menu = MainMenu.Instance;
 		let item: MenuItem;
+		item = menu.findMenuItemById("option.screen.aspect-ratio");
+		item.checked = this._config.screen.fixedAspectRatio;
 		item = menu.findMenuItemById("option.screen.bg");
 		item.checked = this._config.screen.bg;
 		item = menu.findMenuItemById("option.screen.window");
@@ -231,6 +233,10 @@ export class MainWindow {
 			case "option.sound":
 				this.showSoundConfigWindow();
 				return;
+			case "option.screen.aspect-ratio":
+				this._config.screen.fixedAspectRatio = item.checked;
+				this.send("MainWindow.menu", item);
+				return;
 			case "help.open-app-folder":
 				Electron.shell.openItem(Config.getCurrentPath());
 				return;
@@ -249,6 +255,10 @@ export class MainWindow {
 		
 		if (id.indexOf("option.screen.") === 0) {
 			const layerName = id.split(".", 3)[2];
+			if (this._config.screen[layerName] == null) {
+				this.send("MainWindow.menu", item);
+				return;
+			}
 			this._config.screen[layerName] = item.checked;
 			this.send("MainWindow.screenConfig", this._config);
 			return;
