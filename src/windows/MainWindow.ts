@@ -279,13 +279,21 @@ export class MainWindow {
 
 	protected showOpenFileDialog() {
 		let dialog = new OpenDialog();
-		dialog.defaultPath = Config.getCurrentPath();
+
+		const romsPath = this._config.path.roms;
+		if (romsPath == null || !fs.existsSync(romsPath)) {
+			dialog.defaultPath = Config.getCurrentPath();
+		} else {
+			dialog.defaultPath = romsPath;
+		}
+
 		dialog.addFilter("Game Boy Rom Image", ["gb", "gbc", "zip"]);
 		dialog.addFilter("All Files", ["*"]);
-		dialog.on("select", (filenames) => {
+		dialog.on("select", (filenames: string[]) => {
 			if (filenames.length <= 0) {
 				return;
 			}
+			this._config.path.roms = path.dirname(filenames[0]);
 			this.send("MainWindow.load", filenames[0]);
 			dialog = null;
 		});
