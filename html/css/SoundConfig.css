@@ -1,0 +1,48 @@
+html, input, button {
+	font-family:-apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI","Noto Sans Japanese","ヒラギノ角ゴ ProN W3", Meiryo, sans-serif;
+	font-size: 12px;
+}
+
+input {
+	padding: 0;
+}
+
+body {
+	margin: 8px;
+	background: #eee;
+	overflow: hidden;
+}
+
+.pane {
+	display: inline-block;
+	vertical-align: top;
+	border: 1px ridge #888;
+	width: 155px;
+	margin-bottom: 1em;
+}
+
+.title {
+	display: block;
+	margin: 8px 8px;
+	font-weight: bold;
+}
+
+.record {
+	display: block;
+	margin: 4px 8px;
+}
+
+.caption {
+	display: inline-block;
+	vertical-align: top;
+	width: 56px;
+	height: 19px;
+	margin-left: 4px;
+}
+
+.value {
+	display: inline-block;
+	vertical-align: top;
+	width: 20px;
+	height: 19px;
+}

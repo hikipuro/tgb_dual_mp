@@ -535,6 +535,18 @@ void nextFrame()
 	//if (g_gb[0]) g_gb[0]->set_skip(0);
 }
 
+void enableSoundChannel(int ch, bool enable) {
+	g_gb[0]->get_apu()->get_renderer()->set_enable(ch, enable);
+}
+
+void enableSoundEcho(bool enable) {
+	g_gb[0]->get_apu()->get_renderer()->set_echo(enable);
+}
+
+void enableSoundLowPass(bool enable) {
+	g_gb[0]->get_apu()->get_renderer()->set_lowpass(enable);
+}
+
 #ifdef __cplusplus
 	}
 #endif

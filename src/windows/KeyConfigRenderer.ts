@@ -209,6 +209,21 @@ export class KeyConfigRenderer {
 		document.addEventListener("keypress", (e: KeyboardEvent) => {
 			e.preventDefault();
 		});
+		
+		
+		// disable drag & drop
+		document.body.ondragover = () => {
+			return false;
+		};
+		document.body.ondragleave = () => {
+			return false;
+		}
+		document.body.ondragend = () => {
+			return false;
+		}
+		document.body.ondrop = () => {
+			return false;
+		}
 	}
 
 	protected capitalize(text: string): string {

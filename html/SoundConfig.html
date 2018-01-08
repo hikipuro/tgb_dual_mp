@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="css/SoundConfig.css">
+<script>
+let Electron = require("electron");
+let Module = require("../dist/windows/SoundConfigRenderer.js");
+
+let renderer = null;
+document.addEventListener("DOMContentLoaded", () => {
+	let soundConfig = Electron.ipcRenderer.sendSync("SoundConfigWindow.init");
+	renderer = new Module.SoundConfigRenderer(soundConfig);
+});
+</script>
+</head>
+<body>
+<div class="pane">
+	<div class="title">Channels</div>
+	<div class="record">
+		<div class="value"><input id="master" type="checkbox"></div>
+		<div class="caption"><label for="master">Master</label></div>
+	</div>
+	<div class="record">
+		<div class="value"><input id="square1" type="checkbox"></div>
+		<div class="caption"><label for="square1">Square 1</label></div>
+	</div>
+	<div class="record">
+		<div class="value"><input id="square2" type="checkbox"></div>
+		<div class="caption"><label for="square2">Square 2</label></div>
+	</div>
+	<div class="record">
+		<div class="value"><input id="wave" type="checkbox"></div>
+		<div class="caption"><label for="wave">Wave</label></div>
+	</div>
+	<div class="record">
+		<div class="value"><input id="noise" type="checkbox"></div>
+		<div class="caption"><label for="noise">Noise</label></div>
+	</div>
+</div>
+
+<div class="pane">
+	<div class="title">Effector</div>
+	<div class="record">
+		<div class="value"><input id="echo" type="checkbox"></div>
+		<div class="caption"><label for="echo">Echo</label></div>
+	</div>
+	<div class="record">
+		<div class="value"><input id="lowPass" type="checkbox"></div>
+		<div class="caption"><label for="lowPass">Low Pass</label></div>
+	</div>
+</div>
+</body>
+</html>

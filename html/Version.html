@@ -2,7 +2,6 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>TGB Dual MP Version</title>
 <link rel="stylesheet" href="css/Version.css">
 <script>
 let ipcRenderer = require("electron").ipcRenderer;
@@ -11,6 +10,20 @@ document.addEventListener("DOMContentLoaded", () => {
 	ok.addEventListener("click", () => {
 		ipcRenderer.send("VersionWindow.close");
 	});
+	
+	// disable drag & drop
+	document.body.ondragover = () => {
+		return false;
+	};
+	document.body.ondragleave = () => {
+		return false;
+	}
+	document.body.ondragend = () => {
+		return false;
+	}
+	document.body.ondrop = () => {
+		return false;
+	}
 });
 </script>
 <style>

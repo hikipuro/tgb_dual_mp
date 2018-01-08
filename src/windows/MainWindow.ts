@@ -7,9 +7,11 @@ import { MenuItem, ipcMain, IpcMessageEvent, MenuItemConstructorOptions } from "
 import { Constants } from "../Constants";
 import { Config } from "../config/Config";
 import { KeyConfig } from "../config/KeyConfig";
+import { SoundConfig } from "../config/SoundConfig";
 import { MainMenu } from "../MainMenu";
 import { OpenDialog } from "../dialogs/OpenDialog";
 import { KeyConfigWindow } from "./KeyConfigWindow";
+import { SoundConfigWindow } from "./SoundConfigWindow";
 import { VersionWindow } from "./VersionWindow";
 
 module Settings {
@@ -26,8 +28,10 @@ declare module "electron" {
 }
 
 export class MainWindow {
+	public static Settings = Settings;
 	public browserWindow: Electron.BrowserWindow = null;
 	protected _keyConfigWindow: KeyConfigWindow;
+	protected _soundConfigWindow: SoundConfigWindow;
 	protected _versionWindow: VersionWindow;
 	protected _config: Config;
 
@@ -207,16 +211,19 @@ export class MainWindow {
 
 		switch (id) {
 			case "file.load-slot1":
-				this.openFileOpenDialog();
+				this.showOpenFileDialog();
 				return;
 			case "option.key":
-				this.openKeyConfigWindow();
+				this.showKeyConfigWindow();
+				return;
+			case "option.sound":
+				this.showSoundConfigWindow();
 				return;
 			case "help.open-app-folder":
 				Electron.shell.openItem(Config.getCurrentPath());
 				return;
 			case "help.version":
-				this.openVersionWindow();
+				this.showVersionWindow();
 				return;
 		}
 
@@ -234,7 +241,7 @@ export class MainWindow {
 		this.browserWindow.setContentSize(width, height, false);
 	}
 
-	protected openFileOpenDialog() {
+	protected showOpenFileDialog() {
 		let dialog = new OpenDialog();
 		dialog.defaultPath = Config.getCurrentPath();
 		dialog.addFilter("Game Boy Rom Image", ["gb", "gbc", "zip"]);
@@ -249,7 +256,7 @@ export class MainWindow {
 		dialog.show();
 	}
 
-	protected openKeyConfigWindow(): void {
+	protected showKeyConfigWindow(): void {
 		if (this._keyConfigWindow != null) {
 			this._keyConfigWindow.show();
 			return;
@@ -269,7 +276,28 @@ export class MainWindow {
 		});
 	}
 
-	protected openVersionWindow(): void {
+	protected showSoundConfigWindow(): void {
+		if (this._soundConfigWindow != null) {
+			this._soundConfigWindow.show();
+			return;
+		}
+
+		this._soundConfigWindow = new SoundConfigWindow(this.browserWindow, this._config.sound);
+		this._soundConfigWindow.browserWindow.once("ready-to-show", () => {
+			this._soundConfigWindow.show();
+		});
+		this._soundConfigWindow.browserWindow.once("close", () => {
+			this._soundConfigWindow.removeAllListeners("update");
+			this._soundConfigWindow.destroy();
+			this._soundConfigWindow = null;
+		});
+		this._soundConfigWindow.on("update", (soundConfig: SoundConfig) => {
+			this._config.sound = soundConfig;
+			this.send("MainWindow.soundConfig", this._config);
+		});
+	}
+
+	protected showVersionWindow(): void {
 		if (this._versionWindow != null) {
 			this._versionWindow.show();
 			return;

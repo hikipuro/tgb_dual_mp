@@ -28,6 +28,10 @@ EMSCRIPTEN_KEEPALIVE unsigned char* getBytes();
 EMSCRIPTEN_KEEPALIVE short* getSoundBytes(int size);
 EMSCRIPTEN_KEEPALIVE void setKeys(int down, int up, int left, int right, int a, int b, int select, int start);
 
+EMSCRIPTEN_KEEPALIVE void enableSoundChannel(int ch, bool enable);
+EMSCRIPTEN_KEEPALIVE void enableSoundEcho(bool enable);
+EMSCRIPTEN_KEEPALIVE void enableSoundLowPass(bool enable);
+
 #ifdef __cplusplus
 	}
 #endif

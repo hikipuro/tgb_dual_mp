@@ -4,6 +4,7 @@ import { ipcMain, IpcMessageEvent } from "electron";
 import { MainMenu } from "./MainMenu";
 import { MainWindow } from "./windows/MainWindow";
 import { KeyConfigWindow } from "./windows/KeyConfigWindow";
+import { SoundConfigWindow } from "./windows/SoundConfigWindow";
 import { VersionWindow } from "./windows/VersionWindow";
 
 class NodeMain {
@@ -44,6 +45,15 @@ class NodeMain {
 		});
 		keyConfig.browserWindow.webContents.openDevTools();
 		keyConfig.show();
+		//*/
+
+		/*
+		const soundConfig = new SoundConfigWindow();
+		soundConfig.browserWindow.once("closed", () => {
+			this._app.quit();
+		});
+		soundConfig.browserWindow.webContents.openDevTools();
+		soundConfig.show();
 		//*/
 
 		/*

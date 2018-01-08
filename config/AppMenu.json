@@ -188,8 +188,7 @@
 			},
 			{
 				"id": "option.sound",
-				"label": "Sound Settings (&A)",
-				"enabled": false
+				"label": "Sound Settings (&A)"
 			},
 			{
 				"id": "option.speed",

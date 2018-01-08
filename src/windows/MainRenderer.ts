@@ -8,6 +8,8 @@ import { KeyCode } from "../KeyCode";
 import { TgbDual } from "../TgbDual";
 import { Config } from "../config/Config";
 import { Gamepads } from "../Gamepads";
+import { MainWindow } from "../windows/MainWindow";
+import { SoundConfig } from "src/config/SoundConfig";
 
 declare module "electron" {
 	interface MenuItem {
@@ -18,7 +20,7 @@ declare module "electron" {
 export class MainRenderer {
 	protected tgbDual: TgbDual;
 	protected config: Config;
-	protected readonly defaultTitle: string = document.title;
+	protected readonly defaultTitle: string = MainWindow.Settings.Title;
 	protected gamePads: Gamepads = new Gamepads();
 	protected commandLineArgs: string[] = [];
 	
@@ -46,6 +48,7 @@ export class MainRenderer {
 		this.tgbDual.pathConfig = this.config.path;
 		this.tgbDual.on("update", this.updateGamepad);
 		this.adjustScreenSize();
+		this.updateSoundConfig(this.config.sound);
 
 		if (this.commandLineArgs != null) {
 			//console.log("commandLineArgs", this.commandLineArgs);
@@ -120,6 +123,11 @@ export class MainRenderer {
 			this.config = Config.fromJSON(arg);
 			this.tgbDual.pathConfig = this.config.path;
 			console.log("MainWindow.getConfig", this.config);
+		});
+		ipcRenderer.on("MainWindow.soundConfig", (event: Electron.IpcMessageEvent, arg: any) => {
+			console.log("MainWindow.soundConfig", arg.sound);
+			this.config = Config.fromJSON(arg);
+			this.updateSoundConfig(this.config.sound);
 		});
 		/*
 		ipcRenderer.on("blur", (event: Electron.IpcMessageEvent, arg: any) => {
@@ -241,6 +249,20 @@ export class MainRenderer {
 			style.width = "100%";
 			style.height = null;
 		}
+	}
+
+	protected updateSoundConfig(soundConfig: SoundConfig): void {
+		this.tgbDual.setSound(
+			soundConfig.master,
+			soundConfig.square1,
+			soundConfig.square2,
+			soundConfig.wave,
+			soundConfig.noise
+		);
+		this.tgbDual.setSoundFilter(
+			soundConfig.echo,
+			soundConfig.lowPass
+		);
 	}
 
 	protected loadFile(filePath: string): void {

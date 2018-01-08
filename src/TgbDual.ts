@@ -32,6 +32,7 @@ export class TgbDual extends EventEmitter {
 
 	protected _isStarted: boolean = false;
 	protected _isPaused: boolean = false;
+	protected _isSoundMuted: boolean = false;
 	public isFastMode: boolean = false;
 	protected _prevTime: number = 0;
 	protected _firstSample: number = 0;
@@ -347,7 +348,7 @@ export class TgbDual extends EventEmitter {
 		const L = event.outputBuffer.getChannelData(0);
 		const R = event.outputBuffer.getChannelData(1);
 
-		if (!this._isStarted) {
+		if (!this._isStarted || this._isSoundMuted) {
 			for (let i = 0; i < bufferSize; i++) {
 				L[i] = 0;
 				R[i] = 0;
@@ -435,6 +436,20 @@ export class TgbDual extends EventEmitter {
 		TgbDual.API.setKeys(down, up, left, right, a, b, select, start);
 	}
 
+	public setSound(master: boolean, square1: boolean, square2: boolean, wave: boolean, noise: boolean) {
+		console.log("setSound", master);
+		this._isSoundMuted = !master;
+		TgbDual.API.enableSoundChannel(0, square1);
+		TgbDual.API.enableSoundChannel(1, square2);
+		TgbDual.API.enableSoundChannel(2, wave);
+		TgbDual.API.enableSoundChannel(3, noise);
+	}
+	
+	public setSoundFilter(echo: boolean, lowPass: boolean) {
+		TgbDual.API.enableSoundEcho(echo);
+		TgbDual.API.enableSoundLowPass(lowPass);
+	}
+
 	public getInfo(): TgbDual.RomInfo {
 		const romInfo = new TgbDual.RomInfo();
 		romInfo.cartName = TgbDual.API.getCartName();
@@ -473,6 +488,9 @@ export module TgbDual {
 		public static restoreState: (path: string) => void;
 		public static setSkip: (frame: number) => void;
 		public static getSram: () => number;
+		public static enableSoundChannel: (ch: number, enable: boolean) => void;
+		public static enableSoundEcho: (enable: boolean) => void;
+		public static enableSoundLowPass: (enable: boolean) => void;
 
 		public static init() {
 			this.initTgbDual = Module.cwrap(
@@ -512,6 +530,12 @@ export module TgbDual {
 				"setSkip", "void", ["number"]);
 			this.getSram = Module.cwrap(
 				"getSram", "number", []);
+			this.enableSoundChannel = Module.cwrap(
+				"enableSoundChannel", "void", ["number", "boolean"]);
+			this.enableSoundEcho = Module.cwrap(
+				"enableSoundEcho", "void", ["boolean"]);
+			this.enableSoundLowPass = Module.cwrap(
+				"enableSoundLowPass", "void", ["boolean"]);
 		}
 	}
 

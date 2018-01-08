@@ -4,28 +4,27 @@ import * as url from "url";
 
 import { ipcMain, IpcMessageEvent } from "electron";
 import { EventEmitter } from "events";
-import { KeyConfig } from "../config/KeyConfig";
-import { KeyCode } from "../KeyCode";
+import { SoundConfig } from "../config/SoundConfig";
 
 module Settings {
-	export const Width: number = 340;
-	export const Height: number = 248;
-	export const Title: string = "Key Settings";
-	export const Content: string = "../../html/KeyConfig.html";
+	export const Width: number = 175;
+	export const Height: number = 260;
+	export const Title: string = "Sound Settings";
+	export const Content: string = "../../html/SoundConfig.html";
 }
 
-export class KeyConfigWindow extends EventEmitter {
+export class SoundConfigWindow extends EventEmitter {
 	public static Settings = Settings;
 	public browserWindow: Electron.BrowserWindow = null;
-	public keyConfig: KeyConfig = new KeyConfig();
+	public soundConfig: SoundConfig = new SoundConfig();
 
-	constructor(parent: Electron.BrowserWindow = null, keyConfig: KeyConfig = null) {
+	constructor(parent: Electron.BrowserWindow = null, soundConfig: SoundConfig = null) {
 		super();
 
-		if (keyConfig != null) {
-			this.keyConfig = keyConfig;
+		if (soundConfig != null) {
+			this.soundConfig = soundConfig;
 		}
-		
+
 		this.initWindow(parent);
 		this.addIpcEvents();
 	}
@@ -47,11 +46,9 @@ export class KeyConfigWindow extends EventEmitter {
 			width: Settings.Width,
 			height: Settings.Height,
 			acceptFirstMouse: true,
-			//titleBarStyle: "hidden",
 			minimizable: false,
 			maximizable: false,
 			resizable: false,
-			//skipTaskbar: true,
 			fullscreenable: false,
 			autoHideMenuBar: true,
 			show: false
@@ -68,19 +65,18 @@ export class KeyConfigWindow extends EventEmitter {
 	}
 	
 	protected addIpcEvents(): void {
-		ipcMain.once("KeyConfigWindow.init", (event: IpcMessageEvent, arg: any): void => {
-			event.returnValue = this.keyConfig;
+		ipcMain.once("SoundConfigWindow.init", (event: IpcMessageEvent, arg: any): void => {
+			event.returnValue = this.soundConfig;
 		});
-		ipcMain.once("KeyConfigWindow.close", (event: IpcMessageEvent, arg: any): void => {
-			this.keyConfig = arg;
-			this.emit("close", this.keyConfig);
-			this.browserWindow.close();
+		ipcMain.on("SoundConfigWindow.update", (event: IpcMessageEvent, arg: any): void => {
+			this.soundConfig = arg;
+			this.emit("update", this.soundConfig);
 			event.returnValue = null;
 		});
 	}
 
 	protected removeIpcEvents(): void {
-		ipcMain.removeAllListeners("KeyConfigWindow.init");
-		ipcMain.removeAllListeners("KeyConfigWindow.close");
+		ipcMain.removeAllListeners("SoundConfigWindow.init");
+		ipcMain.removeAllListeners("SoundConfigWindow.update");
 	}
 }
