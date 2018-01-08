@@ -204,6 +204,9 @@ export class MainRenderer {
 		// keyboard input
 		document.onkeydown = (e: KeyboardEvent) => {
 			//e.preventDefault();
+			if (e.repeat) {
+				return;
+			}
 			const keyConfig = this.config.key;
 			const keyState = this.tgbDual.keyState;
 			switch (e.keyCode) {
@@ -216,10 +219,14 @@ export class MainRenderer {
 			case keyConfig.b.code:		keyState.B = true; break;
 			case keyConfig.a.code:		keyState.A = true; break;
 			case keyConfig.fast.code:	this.tgbDual.isFastMode = true; break;
+			case keyConfig.pause.code:	this.tgbDual.pause(); break;
 			}
 		};
 		document.onkeyup = (e: KeyboardEvent) => {
 			//e.preventDefault();
+			if (e.repeat) {
+				return;
+			}
 			const keyConfig = this.config.key;
 			const keyState = this.tgbDual.keyState;
 			switch (e.keyCode) {

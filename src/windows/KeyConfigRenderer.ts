@@ -97,13 +97,16 @@ class KeyInputElements {
 class SystemKeyInputElements {
 	public focusElement: HTMLInputElement = null;
 	public fast: HTMLInputElement = null;
+	public pause: HTMLInputElement = null;
 	public elements: HTMLInputElement[] = [];
 
 	constructor() {
 		this.fast = document.querySelector("#fast");
+		this.pause = document.querySelector("#pause");
 
 		this.elements.push(
-			this.fast
+			this.fast,
+			this.pause
 		);
 
 		this.elements.forEach((element: HTMLInputElement) => {
@@ -114,6 +117,7 @@ class SystemKeyInputElements {
 
 	public setLabel(keyConfig: KeyConfig): void {
 		this.fast.value = keyConfig.fast.label;
+		this.pause.value = keyConfig.pause.label;
 	}
 
 	public indexOf(element: HTMLInputElement): number {
