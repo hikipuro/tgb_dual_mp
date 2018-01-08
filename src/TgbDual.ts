@@ -185,6 +185,7 @@ export class TgbDual extends EventEmitter {
 		setTimeout(() => {
 			this._isStarted = true;
 			this._requestAnimationFrameHandle = requestAnimationFrame(this.update);
+			this.emit("start");
 		}, TgbDual.StartDelay);
 	}
 

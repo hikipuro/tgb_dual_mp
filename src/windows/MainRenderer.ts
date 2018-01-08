@@ -46,9 +46,11 @@ export class MainRenderer {
 		this.tgbDual = new TgbDual();
 		document.body.appendChild(this.tgbDual.element);
 		this.tgbDual.pathConfig = this.config.path;
+		this.tgbDual.on("start", () => {
+			this.updateSoundConfig(this.config.sound);
+		});
 		this.tgbDual.on("update", this.updateGamepad);
 		this.adjustScreenSize();
-		this.updateSoundConfig(this.config.sound);
 
 		if (this.commandLineArgs != null) {
 			//console.log("commandLineArgs", this.commandLineArgs);
