@@ -40,6 +40,7 @@ export class MainWindow {
 		this._config = Config.load();
 
 		this.initWindow(parent);
+		this.initMenu();
 		this.addIpcEvents();
 	}
 
@@ -151,6 +152,17 @@ export class MainWindow {
 		});
 	}
 
+	protected initMenu(): void {
+		const menu = MainMenu.Instance;
+		let item: MenuItem;
+		item = menu.findMenuItemById("option.screen.bg");
+		item.checked = this._config.screen.bg;
+		item = menu.findMenuItemById("option.screen.window");
+		item.checked = this._config.screen.window;
+		item = menu.findMenuItemById("option.screen.sprite");
+		item.checked = this._config.screen.sprite;
+	}
+
 	protected addIpcEvents(): void {
 		ipcMain.on("App.menu.click", this.onClickMenuItem);
 		ipcMain.on("MainWindow.init", (event: IpcMessageEvent, arg: any) => {
@@ -234,6 +246,14 @@ export class MainWindow {
 			this.setWindowSize(width, height);
 			return;
 		}
+		
+		if (id.indexOf("option.screen.") === 0) {
+			const layerName = id.split(".", 3)[2];
+			this._config.screen[layerName] = item.checked;
+			this.send("MainWindow.screenConfig", this._config);
+			return;
+		}
+
 		this.send("MainWindow.menu", item);
 	}
 

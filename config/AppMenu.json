@@ -238,22 +238,19 @@
 						"id": "option.screen.bg",
 						"label": "BG Layer",
 						"type": "checkbox",
-						"checked": true,
-						"enabled": false
+						"checked": true
 					},
 					{
 						"id": "option.screen.window",
 						"label": "Window Layer",
 						"type": "checkbox",
-						"checked": true,
-						"enabled": false
+						"checked": true
 					},
 					{
 						"id": "option.screen.sprite",
 						"label": "Sprite Layer",
 						"type": "checkbox",
-						"checked": true,
-						"enabled": false
+						"checked": true
 					},
 					{
 						"type": "separator"

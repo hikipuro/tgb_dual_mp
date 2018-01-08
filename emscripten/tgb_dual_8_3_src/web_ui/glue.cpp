@@ -536,6 +536,9 @@ void nextFrame()
 }
 
 void enableSoundChannel(int ch, bool enable) {
+	if (ch < 0 || ch > 3) {
+		return;
+	}
 	g_gb[0]->get_apu()->get_renderer()->set_enable(ch, enable);
 }
 
@@ -545,6 +548,13 @@ void enableSoundEcho(bool enable) {
 
 void enableSoundLowPass(bool enable) {
 	g_gb[0]->get_apu()->get_renderer()->set_lowpass(enable);
+}
+
+void enableScreenLayer(int layer, bool enable) {
+	if (layer < 0 || layer > 2) {
+		return;
+	}
+	g_gb[0]->get_lcd()->set_enable(layer, enable);
 }
 
 #ifdef __cplusplus

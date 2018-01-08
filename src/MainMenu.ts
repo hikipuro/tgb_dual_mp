@@ -11,7 +11,10 @@ module Settings {
 }
 
 export class MainMenu {
+	public static Instance: MainMenu = null;
+
 	constructor() {
+		MainMenu.Instance = this;
 		this.addIpcEvents();
 	}
 
@@ -83,8 +86,39 @@ export class MainMenu {
 			return true;
 		});
 	}
+
+	public findMenuItemById(id: string): Electron.MenuItem {
+		if (id == null || id === "") {
+			return null;
+		}
+		const menu = Electron.Menu.getApplicationMenu();
+		if (menu == null) {
+			return null;
+		}
+		return this._findMenuItemById(menu.items, id);
+	}
 	
-	protected disableAllSaveLoadState(): void {
+	protected _findMenuItemById(menuItems: Electron.MenuItem[], id: string): Electron.MenuItem {
+		if (menuItems == null) {
+			return null;
+		}
+		const length = menuItems.length;
+		for (let i = 0; i < length; i++) {
+			const item = menuItems[i];
+			if (item.id === id) {
+				return item;
+			}
+			if (item.submenu != null) {
+				const foundItem = this._findMenuItemById(item.submenu.items, id);
+				if (foundItem == null) {
+					continue;
+				}
+				return foundItem;
+			}
+		}
+	}
+	
+	public disableAllSaveLoadState(): void {
 		const menu = Electron.Menu.getApplicationMenu();
 		if (menu == null) {
 			return;

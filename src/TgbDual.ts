@@ -450,6 +450,29 @@ export class TgbDual extends EventEmitter {
 		TgbDual.API.enableSoundEcho(echo);
 		TgbDual.API.enableSoundLowPass(lowPass);
 	}
+	
+	public enableScreenLayer(layer: number | string, enable: boolean) {
+		console.log("enableScreenLayer", layer, enable);
+		let layerIndex = 0;
+		if (typeof layer === "string") {
+			switch (layer.toLowerCase()) {
+			case "bg":
+				layerIndex = 0;
+				break;
+			case "window":
+				layerIndex = 1;
+				break;
+			case "sprite":
+				layerIndex = 2;
+				break;
+			default:
+				return;
+			}
+		} else {
+			layerIndex = layer;
+		}
+		TgbDual.API.enableScreenLayer(layerIndex, enable);
+	}
 
 	public getInfo(): TgbDual.RomInfo {
 		const romInfo = new TgbDual.RomInfo();
@@ -492,6 +515,7 @@ export module TgbDual {
 		public static enableSoundChannel: (ch: number, enable: boolean) => void;
 		public static enableSoundEcho: (enable: boolean) => void;
 		public static enableSoundLowPass: (enable: boolean) => void;
+		public static enableScreenLayer: (layer: number, enable: boolean) => void;
 
 		public static init() {
 			this.initTgbDual = Module.cwrap(
@@ -537,6 +561,8 @@ export module TgbDual {
 				"enableSoundEcho", "void", ["boolean"]);
 			this.enableSoundLowPass = Module.cwrap(
 				"enableSoundLowPass", "void", ["boolean"]);
+			this.enableScreenLayer = Module.cwrap(
+				"enableScreenLayer", "void", ["number", "boolean"]);
 		}
 	}
 

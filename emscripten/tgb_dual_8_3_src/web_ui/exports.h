@@ -32,6 +32,8 @@ EMSCRIPTEN_KEEPALIVE void enableSoundChannel(int ch, bool enable);
 EMSCRIPTEN_KEEPALIVE void enableSoundEcho(bool enable);
 EMSCRIPTEN_KEEPALIVE void enableSoundLowPass(bool enable);
 
+EMSCRIPTEN_KEEPALIVE void enableScreenLayer(int layer, bool enable);
+
 #ifdef __cplusplus
 	}
 #endif

@@ -2,6 +2,7 @@ import * as Electron from "electron";
 import * as fs from "fs";
 import * as path from "path";
 import { KeyConfig } from "./KeyConfig";
+import { ScreenConfig } from "./ScreenConfig";
 import { SoundConfig } from "./SoundConfig";
 import { PathConfig } from "./PathConfig";
 import { WindowConfig } from "./WindowConfig";
@@ -9,12 +10,14 @@ import { WindowConfig } from "./WindowConfig";
 export class Config {
 	public static readonly Path: string = "config.json";
 	public key: KeyConfig;
+	public screen: ScreenConfig;
 	public sound: SoundConfig;
 	public path: PathConfig;
 	public window: WindowConfig;
 
 	constructor() {
 		this.key = new KeyConfig();
+		this.screen = new ScreenConfig();
 		this.sound = new SoundConfig();
 		this.path = new PathConfig();
 		this.window = new WindowConfig();
@@ -41,6 +44,7 @@ export class Config {
 		}
 		
 		config.key = KeyConfig.fromJSON(json.key);
+		config.screen = ScreenConfig.fromJSON(json.screen);
 		config.sound = SoundConfig.fromJSON(json.sound);
 		config.path = PathConfig.fromJSON(json.path);
 		config.window = WindowConfig.fromJSON(json.window);

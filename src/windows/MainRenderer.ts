@@ -9,7 +9,8 @@ import { TgbDual } from "../TgbDual";
 import { Config } from "../config/Config";
 import { Gamepads } from "../Gamepads";
 import { MainWindow } from "../windows/MainWindow";
-import { SoundConfig } from "src/config/SoundConfig";
+import { ScreenConfig } from "../config/ScreenConfig";
+import { SoundConfig } from "../config/SoundConfig";
 
 declare module "electron" {
 	interface MenuItem {
@@ -47,6 +48,7 @@ export class MainRenderer {
 		document.body.appendChild(this.tgbDual.element);
 		this.tgbDual.pathConfig = this.config.path;
 		this.tgbDual.on("start", () => {
+			this.updateScreenConfig(this.config.screen);
 			this.updateSoundConfig(this.config.sound);
 		});
 		this.tgbDual.on("update", this.updateGamepad);
@@ -104,9 +106,17 @@ export class MainRenderer {
 				return;
 			}
 
+			if (id.indexOf("option.screen.") === 0) {
+				const layerName = id.split(".", 3)[2];
+				this.tgbDual.enableScreenLayer(layerName, menu.checked);
+				return;
+			}
+
 			switch (id) {
 			case "file.reset-slot1":
 				this.tgbDual.reset();
+				this.updateScreenConfig(this.config.screen);
+				this.updateSoundConfig(this.config.sound);
 				break;
 			case "file.pause":
 				this.tgbDual.pause();
@@ -125,6 +135,11 @@ export class MainRenderer {
 			this.config = Config.fromJSON(arg);
 			this.tgbDual.pathConfig = this.config.path;
 			console.log("MainWindow.getConfig", this.config);
+		});
+		ipcRenderer.on("MainWindow.screenConfig", (event: Electron.IpcMessageEvent, arg: any) => {
+			console.log("MainWindow.screenConfig", arg.screen);
+			this.config = Config.fromJSON(arg);
+			this.updateScreenConfig(this.config.screen);
 		});
 		ipcRenderer.on("MainWindow.soundConfig", (event: Electron.IpcMessageEvent, arg: any) => {
 			console.log("MainWindow.soundConfig", arg.sound);
@@ -258,6 +273,12 @@ export class MainRenderer {
 			style.width = "100%";
 			style.height = null;
 		}
+	}
+
+	protected updateScreenConfig(screenConfig: ScreenConfig): void {
+		this.tgbDual.enableScreenLayer(0, this.config.screen.bg);
+		this.tgbDual.enableScreenLayer(1, this.config.screen.window);
+		this.tgbDual.enableScreenLayer(2, this.config.screen.sprite);
 	}
 
 	protected updateSoundConfig(soundConfig: SoundConfig): void {
