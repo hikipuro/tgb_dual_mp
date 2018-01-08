@@ -157,6 +157,8 @@ export class MainWindow {
 		let item: MenuItem;
 		item = menu.findMenuItemById("option.screen.aspect-ratio");
 		item.checked = this._config.screen.fixedAspectRatio;
+		item = menu.findMenuItemById("option.screen.smoothing");
+		item.checked = this._config.screen.smoothing;
 		item = menu.findMenuItemById("option.screen.bg");
 		item.checked = this._config.screen.bg;
 		item = menu.findMenuItemById("option.screen.window");
@@ -235,6 +237,10 @@ export class MainWindow {
 				return;
 			case "option.screen.aspect-ratio":
 				this._config.screen.fixedAspectRatio = item.checked;
+				this.send("MainWindow.menu", item);
+				return;
+			case "option.screen.smoothing":
+				this._config.screen.smoothing = item.checked;
 				this.send("MainWindow.menu", item);
 				return;
 			case "help.open-app-folder":

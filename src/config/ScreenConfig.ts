@@ -1,5 +1,6 @@
 export class ScreenConfig {
 	public fixedAspectRatio: boolean = true;
+	public smoothing: boolean = true;
 	public bg: boolean = true;
 	public window: boolean = true;
 	public sprite: boolean = true;

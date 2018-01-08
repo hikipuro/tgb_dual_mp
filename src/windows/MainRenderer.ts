@@ -53,6 +53,7 @@ export class MainRenderer {
 		});
 		this.tgbDual.on("update", this.updateGamepad);
 		this.adjustScreenSize();
+		this.updateScreenSmoothing();
 
 		if (this.commandLineArgs != null) {
 			//console.log("commandLineArgs", this.commandLineArgs);
@@ -123,6 +124,10 @@ export class MainRenderer {
 			case "option.screen.aspect-ratio":
 				this.config.screen.fixedAspectRatio = menu.checked;
 				this.adjustScreenSize();
+				break;
+			case "option.screen.smoothing":
+				this.config.screen.smoothing = menu.checked;
+				this.updateScreenSmoothing();
 				break;
 			}
 		});
@@ -276,6 +281,15 @@ export class MainRenderer {
 		} else {
 			style.width = "100%";
 			style.height = null;
+		}
+	}
+
+	protected updateScreenSmoothing(): void {
+		const style = this.tgbDual.element.style;
+		if (this.config.screen.smoothing) {
+			style.imageRendering = "auto";
+		} else {
+			style.imageRendering = "pixelated";
 		}
 	}
 

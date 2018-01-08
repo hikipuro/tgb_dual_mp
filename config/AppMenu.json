@@ -211,6 +211,12 @@
 						"checked": true
 					},
 					{
+						"id": "option.screen.smoothing",
+						"label": "Smoothing",
+						"type": "checkbox",
+						"checked": true
+					},
+					{
 						"type": "separator"
 					},
 					{
