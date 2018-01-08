@@ -287,9 +287,9 @@ export class MainRenderer {
 	protected updateScreenSmoothing(): void {
 		const style = this.tgbDual.element.style;
 		if (this.config.screen.smoothing) {
-			style.imageRendering = "auto";
+			style["imageRendering"] = "auto";
 		} else {
-			style.imageRendering = "pixelated";
+			style["imageRendering"] = "pixelated";
 		}
 	}
 
