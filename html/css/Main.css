@@ -22,28 +22,32 @@ body {
 	margin: 0;
 }
 
-#message {
+#message-outer {
 	position: absolute;
-	left: 0;
+	left: 50%;
 	bottom: 0;
-	height: 1.5em;
-	margin: 1px;
-	padding: 0px 0.5em;
+	display: -webkit-box;
+	-webkit-box-align: center;
+}
+
+#message {
+	position: relative;
+	left: -50%;
 	display: none;
-	justify-content: center;
-	align-items: center;
+	margin: 0 0.6em;
 	color: rgba(255, 255, 255, 1);
 	text-shadow: black 1px 1px 0px, black -1px 1px 0px,
-	black 1px -1px 0px, black -1px -1px 0px;
+				black 1px -1px 0px, black -1px -1px 0px;
 	font-size: 1em;
-	background-color: rgba(0, 0, 0, 0.3);
 	cursor: default;
 	user-select: none;
 	white-space: nowrap;
-	border-radius: 0.3em;
+	background-color: rgba(0, 0, 0, 0.3);
+	border-radius: 0.5em;
 }
 #message.show {
-	display: flex;
+	display: -webkit-box;
+	-webkit-box-align: center;
 	opacity: 0;
 	animation: show-message 3s ease 0s 1;
 }

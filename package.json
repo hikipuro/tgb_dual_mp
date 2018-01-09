@@ -5,8 +5,8 @@
   "main": "./dist/NodeMain.js",
   "scripts": {
     "clean": "rimraf dist",
-	"typedoc": "typedoc --out ./docs",
-	"package": "electron-packager . tgb_dual_mp --overwrite --platform=win32 --arch=x64 --version=1.8.1 --icon=icon.ico --asar"
+    "typedoc": "typedoc --out ./docs",
+    "package": "electron-packager . tgb_dual_mp --overwrite --platform=win32 --arch=x64 --version=1.8.1 --icon=icon.ico --asar"
   },
   "author": "",
   "license": "GPL 2.0",
@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "electron": "^1.8.1",
+    "electron-canvas-to-buffer": "^2.0.0",
     "node-zip": "^1.1.1"
   }
 }

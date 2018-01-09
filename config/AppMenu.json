@@ -277,7 +277,6 @@
 			{
 				"id": "option.type",
 				"label": "GB Type (&G)",
-				"enabled": true,
 				"submenu": [
 					{
 						"id": "option.type.gb",
@@ -322,7 +321,23 @@
 			{
 				"id": "option.record",
 				"label": "Record (&R)",
-				"enabled": false
+				"enabled": true,
+				"submenu": [
+					{
+						"id": "option.record.screen",
+						"label": "Screen (&G)"
+					},
+					{
+						"id": "option.record.sound",
+						"label": "Sound (&S)",
+						"enabled": false
+					},
+					{
+						"id": "option.record.movie",
+						"label": "Movie (&M)",
+						"enabled": false
+					}
+				]
 			},
 			{
 				"id": "option.special",

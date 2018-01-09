@@ -3,6 +3,7 @@ import { ipcRenderer, MenuItem } from "electron";
 import * as fs from "fs";
 import * as path from "path";
 import * as nodeZip from "node-zip";
+import * as canvasBuffer from "electron-canvas-to-buffer";
 
 import { KeyCode } from "../KeyCode";
 import { TgbDual } from "../TgbDual";
@@ -25,11 +26,13 @@ export class MainRenderer {
 	protected gamePads: Gamepads = new Gamepads();
 	protected commandLineArgs: string[] = [];
 	protected mainElement: HTMLElement;
+	protected messageOuterElement: HTMLElement;
 	protected messageElement: HTMLElement;
 	
 	constructor(commandLineArgs: string[]) {
 		this.commandLineArgs = commandLineArgs;
 		this.mainElement = document.getElementById("main");
+		this.messageOuterElement = document.getElementById("message-outer");
 		this.messageElement = document.getElementById("message");
 		this.messageElement.addEventListener("webkitAnimationEnd", () => {
 			this.messageElement.classList.remove("show");
@@ -150,6 +153,9 @@ export class MainRenderer {
 			case "option.screen.smoothing":
 				this.config.screen.smoothing = menu.checked;
 				this.updateScreenSmoothing();
+				break;
+			case "option.record.screen":
+				this.screenshot();
 				break;
 			}
 		});
@@ -335,21 +341,30 @@ export class MainRenderer {
 		const width = window.innerWidth;
 		const height = window.innerHeight;
 		const ratio = width / height;
+		//const outerStyle = this.messageOuterElement.style;
 		const style = this.messageElement.style;
 
 		const baseFontSize = 12;
-		const heightScale = 1.25;
-		let fontSize = 12;
+		const heightScale = 1.4;
+		let fontSize = baseFontSize;
 		if (TgbDual.ScreenRatio <= ratio) {
 			fontSize = ((width / (ratio * TgbDual.Width)) * baseFontSize);
 			style.fontSize = fontSize + "px";
+			style.padding = "0 " + (fontSize) + "px";
 			style.height = (fontSize * heightScale) + "px";
-			style.margin = (fontSize / 12) + "px";
+			//outerStyle.margin = (fontSize / baseFontSize) + "px";
+			//outerStyle.margin = "1px auto";
+			style.borderRadius = (fontSize / 1.5) + "px";
+			style.bottom = fontSize + "px";
 		} else {
 			fontSize = ((height / ((TgbDual.ScreenRatio / ratio) * TgbDual.Width)) * baseFontSize);
 			style.fontSize = fontSize + "px";
+			style.padding = "0 " + (fontSize) + "px";
 			style.height = (fontSize * heightScale) + "px";
-			style.margin = (fontSize / 12) + "px";
+			//outerStyle.margin = (fontSize / baseFontSize) + "px";
+			//outerStyle.margin = "1px auto";
+			style.borderRadius = (fontSize / 1.5) + "px";
+			style.bottom = fontSize + "px";
 		}
 	}
 
@@ -446,6 +461,37 @@ export class MainRenderer {
 			return true;
 		}
 		return false;
+	}
+
+	protected screenshot(): void {
+		let pathObject = this.getScreenshotFilePath();
+		if (pathObject == null) {
+			return;
+		}
+		const buffer = canvasBuffer(this.tgbDual.element, "image/png");
+		fs.writeFile(pathObject.path, buffer, (err) => {
+			this.showMessage("Screenshot: " + pathObject.number);
+		});
+	}
+
+	protected getScreenshotFilePath(): any {
+		const romPath = this.tgbDual.romPath;
+		if (romPath == null || romPath === "") {
+			return null;
+		}
+		const pathInfo = path.parse(romPath);
+		for (let i = 0; i < 1000; i++) {
+			const num = ("000" + i).slice(-3);
+			let imagePath = pathInfo.name + "_" + num + ".png";
+			imagePath = path.join(this.config.path.save, imagePath);
+			if (!fs.existsSync(imagePath)) {
+				return {
+					path: imagePath,
+					number: i
+				};
+			}
+		}
+		return null;
 	}
 	
 	protected updateGamepad = (): void => {
