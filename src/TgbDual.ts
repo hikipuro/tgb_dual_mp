@@ -2,7 +2,10 @@ import * as fs from "fs";
 import * as path from "path";
 import { EventEmitter } from "events";
 import { KeyCode } from "./KeyCode";
+import { SoundPlayer } from "./SoundPlayer";
 import { PathConfig } from "./config/PathConfig";
+import { WaveFileWriter } from "./WaveFileWriter";
+import { Config } from "./config/Config";
 const Module = require("../html/tgb_dual.js");
 
 let _isInitialized = false;
@@ -26,13 +29,11 @@ export class TgbDual extends EventEmitter {
 	protected _context: CanvasRenderingContext2D;
 	//protected imageData: ImageData;
 	protected _requestAnimationFrameHandle: number = 0;
-
-	protected _audioContext: AudioContext = null;
-	protected _processor: ScriptProcessorNode = null;
+	protected _soundPlayer: SoundPlayer;
+	protected _waveFileWriter: WaveFileWriter;
 
 	protected _isStarted: boolean = false;
 	protected _isPaused: boolean = false;
-	protected _isSoundMuted: boolean = false;
 	public isFastMode: boolean = false;
 	protected _prevTime: number = 0;
 	protected _firstSample: number = 0;
@@ -54,6 +55,10 @@ export class TgbDual extends EventEmitter {
 			return false;
 		}
 		return true;
+	}
+
+	public get isSoundRecording(): boolean {
+		return this._waveFileWriter.isRecording;
 	}
 
 	public get romInfo(): TgbDual.RomInfo {
@@ -99,9 +104,14 @@ export class TgbDual extends EventEmitter {
 		this._context.putImageData(this.imageData, 0, 0);
 		*/
 		this.clearScreen();
+
+		this._soundPlayer = new SoundPlayer();
+		this._soundPlayer.handler = this.onAudioProcess;
+		this._waveFileWriter = new WaveFileWriter();
 	}
 
 	public destroy(): void {
+		this._waveFileWriter.close();
 	}
 
 	protected update = (time: number): void => {
@@ -177,20 +187,13 @@ export class TgbDual extends EventEmitter {
 		}
 		console.log("start");
 		this._isPaused = false;
-
 		//TgbDual.API.setSkip(20);
 		
-		this._audioContext = new AudioContext();
-		this._processor = this._audioContext.createScriptProcessor(
-			TgbDual.AudioBufferSize, 0, 2
-		);
-		this._processor.addEventListener("audioprocess", this.onAudioProcess);
-		this._processor.connect(this._audioContext.destination);
-
 		this._prevTime = performance.now();
 		setTimeout(() => {
 			this._isStarted = true;
 			this._requestAnimationFrameHandle = requestAnimationFrame(this.update);
+			this._soundPlayer.play(TgbDual.AudioBufferSize);
 			this.emit("start");
 		}, TgbDual.StartDelay);
 	}
@@ -206,12 +209,7 @@ export class TgbDual extends EventEmitter {
 		this.pause();
 		this.saveSram();
 
-		const processor = this._processor;
-		processor.removeEventListener("audioprocess", this.onAudioProcess);
-		processor.disconnect(this._audioContext.destination);
-		this._processor = null;
-		this._audioContext.close();
-		this._audioContext = null;
+		this._soundPlayer.stop();
 
 		cancelAnimationFrame(this._requestAnimationFrameHandle);
 		this._requestAnimationFrameHandle = 0;
@@ -362,33 +360,31 @@ export class TgbDual extends EventEmitter {
 		TgbDual.API.setGBType(typeId);
 	}
 
-	protected onAudioProcess = (event: AudioProcessingEvent): void => {
+	public screenshot(): Buffer {
+		const dataURL = this.element.toDataURL("image/png");
+		const image = Electron.nativeImage.createFromDataURL(dataURL);
+		return image.toPNG();
+	}
+
+	public startSoundRecording(filePath: string): void {
+		this._waveFileWriter.start(filePath);
+	}
+
+	public stopSoundRecording(): void {
+		this._waveFileWriter.close();
+	}
+
+	protected onAudioProcess = (soundPlayer: SoundPlayer, event: AudioProcessingEvent): void => {
 		const bufferSize = TgbDual.AudioBufferSize;
-		const L = event.outputBuffer.getChannelData(0);
-		const R = event.outputBuffer.getChannelData(1);
 
-		if (!this._isStarted || this._isSoundMuted) {
-			for (let i = 0; i < bufferSize; i++) {
-				L[i] = 0;
-				R[i] = 0;
-			}
-			return;
-		}
-
-		if (this._isPaused) {
-			for (let i = 0; i < bufferSize; i++) {
-				L[i] = 0;
-				R[i] = 0;
-			}
+		if (!this._isStarted || this._isPaused) {
+			soundPlayer.writeEmptySound(event.outputBuffer);
 			return;
 		}
 
 		const result = TgbDual.API.getSoundBytes(bufferSize);
 		if (result === 0) {
-			for (let i = 0; i < bufferSize; i++) {
-				L[i] = 0;
-				R[i] = 0;
-			}
+			soundPlayer.writeEmptySound(event.outputBuffer);
 			return;
 		}
 
@@ -404,6 +400,24 @@ export class TgbDual extends EventEmitter {
 		//*/
 
 		let pointer = result;
+		const L = event.outputBuffer.getChannelData(0);
+		const R = event.outputBuffer.getChannelData(1);
+
+		if (this.isSoundRecording) {
+			let buffer = new Buffer(bufferSize * 4);
+			for (let i = 0; i < bufferSize; i++) {
+				const shortDataL = Module.getValue(pointer, "i16");
+				const shortDataR = Module.getValue(pointer + 2, "i16");
+				buffer.writeInt16LE(shortDataL, i * 4);
+				buffer.writeInt16LE(shortDataR, i * 4 + 2);
+				L[i] = shortDataL / 32768;
+				R[i] = shortDataR / 32768;
+				pointer += 4;
+			}
+			this._waveFileWriter.write(buffer);
+			return;
+		}
+		
 		for (let i = 0; i < bufferSize; i++) {
 			const shortDataL = Module.getValue(pointer, "i16");
 			const shortDataR = Module.getValue(pointer + 2, "i16");
@@ -457,7 +471,7 @@ export class TgbDual extends EventEmitter {
 
 	public setSound(master: boolean, square1: boolean, square2: boolean, wave: boolean, noise: boolean) {
 		console.log("setSound", master);
-		this._isSoundMuted = !master;
+		this._soundPlayer.isMuted = !master;
 		TgbDual.API.enableSoundChannel(0, square1);
 		TgbDual.API.enableSoundChannel(1, square2);
 		TgbDual.API.enableSoundChannel(2, wave);

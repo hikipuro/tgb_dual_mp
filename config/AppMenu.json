@@ -329,8 +329,7 @@
 					},
 					{
 						"id": "option.record.sound",
-						"label": "Sound (&S)",
-						"enabled": false
+						"label": "Sound (&S)"
 					},
 					{
 						"id": "option.record.movie",

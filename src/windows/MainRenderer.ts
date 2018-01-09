@@ -3,7 +3,6 @@ import { ipcRenderer, MenuItem } from "electron";
 import * as fs from "fs";
 import * as path from "path";
 import * as nodeZip from "node-zip";
-import * as canvasBuffer from "electron-canvas-to-buffer";
 
 import { KeyCode } from "../KeyCode";
 import { TgbDual } from "../TgbDual";
@@ -162,6 +161,9 @@ export class MainRenderer {
 				break;
 			case "option.record.screen":
 				this.screenshot();
+				break;
+			case "option.record.sound":
+				this.recordSound();
 				break;
 			}
 		});
@@ -474,7 +476,7 @@ export class MainRenderer {
 		if (pathObject == null) {
 			return;
 		}
-		const buffer = canvasBuffer(this.tgbDual.element, "image/png");
+		const buffer = this.tgbDual.screenshot();
 		fs.writeFile(pathObject.path, buffer, (err) => {
 			this.showMessage("Screenshot: " + pathObject.number);
 		});
@@ -493,6 +495,41 @@ export class MainRenderer {
 			if (!fs.existsSync(imagePath)) {
 				return {
 					path: imagePath,
+					number: i
+				};
+			}
+		}
+		return null;
+	}
+
+	protected recordSound(): void {
+		if (this.tgbDual.isSoundRecording) {
+			this.tgbDual.stopSoundRecording();
+			this.showMessage("Stop sound recording");
+			return;
+		}
+		let pathObject = this.getSoundRecordFilePath();
+		if (pathObject == null) {
+			return;
+		}
+		console.log(pathObject.path);
+		this.tgbDual.startSoundRecording(pathObject.path);
+		this.showMessage("Start sound recording: " + pathObject.number);
+	}
+
+	protected getSoundRecordFilePath(): any {
+		const romPath = this.tgbDual.romPath;
+		if (romPath == null || romPath === "") {
+			return null;
+		}
+		const pathInfo = path.parse(romPath);
+		for (let i = 0; i < 1000; i++) {
+			const num = ("000" + i).slice(-3);
+			let soundPath = pathInfo.name + "_" + num + ".wav";
+			soundPath = path.join(this.config.path.save, soundPath);
+			if (!fs.existsSync(soundPath)) {
+				return {
+					path: soundPath,
 					number: i
 				};
 			}
