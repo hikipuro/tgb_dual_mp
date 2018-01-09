@@ -37,6 +37,7 @@ export class TgbDual extends EventEmitter {
 	public isFastMode: boolean = false;
 	protected _prevTime: number = 0;
 	protected _firstSample: number = 0;
+	protected _updateCounter: number = 0;
 
 	public romPath: string = "";
 	protected _romInfo: TgbDual.RomInfo = null;
@@ -170,6 +171,14 @@ export class TgbDual extends EventEmitter {
 		imageData.data.set(data, 0);
 		this._context.putImageData(imageData, 0, 0);
 		imageData = null;
+
+		this._updateCounter++;
+		if (this._updateCounter > 120) {
+			this._updateCounter = 0;
+			if (global.gc) {
+				global.gc();
+			}
+		}
 	}
 
 	public clearScreen(): void {

@@ -16,6 +16,7 @@ class NodeMain {
 	constructor(app: Electron.App) {
 		this._app = app;
 		//this._app.disableHardwareAcceleration();
+		this._app.commandLine.appendSwitch("js-flags", "--expose-gc");
 		this._app.once("ready", this.onReady);
 		this._app.once("window-all-closed", this.onWindowAllClosed);
 	}
