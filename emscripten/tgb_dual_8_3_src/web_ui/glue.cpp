@@ -81,7 +81,7 @@ FILE* log_file;
 //	byte rom_size;
 //	byte ram_size;
 //	bool check_sum;
-//	int gb_type;
+int gb_type = 0;
 
 char* getCartName() {
 	return g_gb[0]->get_rom()->get_info()->cart_name;
@@ -272,10 +272,11 @@ void loadRom(int size, unsigned char* dat, int sramSize, unsigned char* sram)
 	
 	org_gbtype[num]=dat[0x143]&0x80;
 	
-	//if (config->gb_type==1)
-	//	dat[0x143]&=0x7f;
-	//else if (config->gb_type>=3)
-	//	dat[0x143]|=0x80;
+	if (gb_type == 1) {
+		dat[0x143] &= 0x7f;
+	} else if (gb_type >= 3) {
+		dat[0x143] |= 0x80;
+	}
 	
 	//g_gb[num]->set_use_gba(false);
 	g_gb[num]->load_rom(dat,size,ram,ram_size);
@@ -555,6 +556,14 @@ void enableScreenLayer(int layer, bool enable) {
 		return;
 	}
 	g_gb[0]->get_lcd()->set_enable(layer, enable);
+}
+
+void setGBType(int type) {
+	// Auto:0, GB:1, GBC:3, GBA:4
+	if (type < 0 || type > 4) {
+		return;
+	}
+	gb_type = type;
 }
 
 #ifdef __cplusplus

@@ -127,6 +127,41 @@ export class MainMenu {
 		}
 	}
 
+	public checkItem(id: string, checked: boolean): void {
+		const menuItem = this.findMenuItemById(id);
+		if (menuItem == null) {
+			return;
+		}
+		menuItem.checked = checked;
+	}
+
+	public selectGBType(menuItem: MenuItem): void {
+		const gb = this.findMenuItemById("option.type.gb");
+		const gbc = this.findMenuItemById("option.type.gbc");
+		const gba = this.findMenuItemById("option.type.gba");
+		const auto = this.findMenuItemById("option.type.auto");
+
+		gb.checked = false;
+		gbc.checked = false;
+		gba.checked = false;
+		auto.checked = false;
+
+		switch (menuItem.id) {
+		case gb.id:
+			gb.checked = true;
+			break;
+		case gbc.id:
+			gbc.checked = true;
+			break;
+		case gba.id:
+			gba.checked = true;
+			break;
+		case auto.id:
+			auto.checked = true;
+			break;
+		}
+	}
+
 	protected onClickMenuItem = (item: MenuItem, focusedWindow: Electron.BrowserWindow, event: Event): void => {
 		ipcMain.emit("App.menu.click", item, focusedWindow, event);
 	}

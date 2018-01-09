@@ -157,27 +157,16 @@ export class MainWindow {
 
 	protected initMenu(): void {
 		const menu = MainMenu.Instance;
-		let item: MenuItem;
-		item = menu.findMenuItemById("option.screen.aspect-ratio");
-		if (item != null) {
-			item.checked = this._config.screen.fixedAspectRatio;
-		}
-		item = menu.findMenuItemById("option.screen.smoothing");
-		if (item != null) {
-			item.checked = this._config.screen.smoothing;
-		}
-		item = menu.findMenuItemById("option.screen.bg");
-		if (item != null) {
-			item.checked = this._config.screen.bg;
-		}
-		item = menu.findMenuItemById("option.screen.window");
-		if (item != null) {
-			item.checked = this._config.screen.window;
-		}
-		item = menu.findMenuItemById("option.screen.sprite");
-		if (item != null) {
-			item.checked = this._config.screen.sprite;
-		}
+		menu.checkItem("option.screen.aspect-ratio", this._config.screen.fixedAspectRatio);
+		menu.checkItem("option.screen.smoothing", this._config.screen.smoothing);
+		menu.checkItem("option.screen.bg", this._config.screen.bg);
+		menu.checkItem("option.screen.window", this._config.screen.window);
+		menu.checkItem("option.screen.sprite", this._config.screen.sprite);
+
+		menu.checkItem("option.type.gb", this._config.misc.type === "gb");
+		menu.checkItem("option.type.gbc", this._config.misc.type === "gbc");
+		menu.checkItem("option.type.gba", this._config.misc.type === "gba");
+		menu.checkItem("option.type.auto", this._config.misc.type === "auto");
 	}
 
 	protected addIpcEvents(): void {
@@ -267,7 +256,7 @@ export class MainWindow {
 				return;
 		}
 
-		if (id.indexOf("option.screen.x") == 0) {
+		if (id.indexOf("option.screen.x") === 0) {
 			const scale = Number(id.substr(-1, 1));
 			const width = Constants.ScreenWidth * scale;
 			const height = Constants.ScreenHeight * scale;
@@ -283,6 +272,14 @@ export class MainWindow {
 			}
 			this._config.screen[layerName] = item.checked;
 			this.send("MainWindow.screenConfig", this._config);
+			return;
+		}
+
+		if (id.indexOf("option.type.") === 0) {
+			MainMenu.Instance.selectGBType(item);
+			const typeName = id.split(".", 3)[2];
+			this._config.misc.type = typeName;
+			this.send("MainWindow.miscConfig.type", this._config);
 			return;
 		}
 

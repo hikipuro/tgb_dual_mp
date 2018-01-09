@@ -206,13 +206,13 @@
 					},
 					{
 						"id": "option.screen.aspect-ratio",
-						"label": "Fixed aspect ratio",
+						"label": "Fixed aspect ratio (&A)",
 						"type": "checkbox",
 						"checked": true
 					},
 					{
 						"id": "option.screen.smoothing",
-						"label": "Smoothing",
+						"label": "Smoothing (&S)",
 						"type": "checkbox",
 						"checked": true
 					},
@@ -277,7 +277,30 @@
 			{
 				"id": "option.type",
 				"label": "GB Type (&G)",
-				"enabled": false
+				"enabled": true,
+				"submenu": [
+					{
+						"id": "option.type.gb",
+						"label": "GB (&G)",
+						"type": "checkbox"
+					},
+					{
+						"id": "option.type.gbc",
+						"label": "GBC (&C)",
+						"type": "checkbox"
+					},
+					{
+						"id": "option.type.gba",
+						"label": "GBA (&A)",
+						"type": "checkbox"
+					},
+					{
+						"id": "option.type.auto",
+						"label": "Auto (&A)",
+						"type": "checkbox",
+						"checked": true
+					}
+				]
 			},
 			{
 				"id": "option.emulator",

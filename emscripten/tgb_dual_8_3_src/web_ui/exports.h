@@ -34,6 +34,8 @@ EMSCRIPTEN_KEEPALIVE void enableSoundLowPass(bool enable);
 
 EMSCRIPTEN_KEEPALIVE void enableScreenLayer(int layer, bool enable);
 
+EMSCRIPTEN_KEEPALIVE void setGBType(int type);
+
 #ifdef __cplusplus
 	}
 #endif

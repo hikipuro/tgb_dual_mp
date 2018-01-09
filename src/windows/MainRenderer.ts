@@ -176,6 +176,11 @@ export class MainRenderer {
 			this.config = Config.fromJSON(arg);
 			this.tgbDual.pathConfig = this.config.path;
 		});
+		ipcRenderer.on("MainWindow.miscConfig.type", (event: Electron.IpcMessageEvent, arg: any) => {
+			console.log("MainWindow.miscConfig.type", arg);
+			this.config = Config.fromJSON(arg);
+			this.tgbDual.setGBType(this.config.misc.type);
+		});
 		/*
 		ipcRenderer.on("blur", (event: Electron.IpcMessageEvent, arg: any) => {
 			console.log("blur");
@@ -399,6 +404,7 @@ export class MainRenderer {
 
 		if (ext === ".gb" || ext === ".gbc") {
 			this.tgbDual.stop();
+			this.tgbDual.setGBType(this.config.misc.type);
 			if (this.tgbDual.loadFile(filePath)) {
 				this.tgbDual.start();
 				const romInfo = this.tgbDual.getInfo();
@@ -430,6 +436,7 @@ export class MainRenderer {
 			const data = zip.files[file].asNodeBuffer();
 			this.tgbDual.stop();
 			this.tgbDual.romPath = zipPath;
+			this.tgbDual.setGBType(this.config.misc.type);
 			this.tgbDual.loadRom(data);
 			this.tgbDual.start();
 

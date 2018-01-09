@@ -336,6 +336,25 @@ export class TgbDual extends EventEmitter {
 		Module.FS.unlink("/data/load_tmp.sav");
 	}
 
+	public setGBType(type: string): void {
+		let typeId: number = 1;
+		switch (type) {
+		case "gb":
+			typeId = 1;
+			break;
+		case "gbc":
+			typeId = 3;
+			break;
+		case "gba":
+			typeId = 4;
+			break;
+		default:
+			typeId = 0;
+			break;
+		}
+		TgbDual.API.setGBType(typeId);
+	}
+
 	protected isFileLoaded(): boolean {
 		if (this.romPath == null || this.romPath == "") {
 			return false;
@@ -515,6 +534,7 @@ export module TgbDual {
 		public static enableSoundEcho: (enable: boolean) => void;
 		public static enableSoundLowPass: (enable: boolean) => void;
 		public static enableScreenLayer: (layer: number, enable: boolean) => void;
+		public static setGBType: (type: number) => void;
 
 		public static init() {
 			this.initTgbDual = Module.cwrap(
@@ -562,6 +582,8 @@ export module TgbDual {
 				"enableSoundLowPass", "void", ["boolean"]);
 			this.enableScreenLayer = Module.cwrap(
 				"enableScreenLayer", "void", ["number", "boolean"]);
+			this.setGBType = Module.cwrap(
+				"setGBType", "void", ["number"]);
 		}
 	}
 
