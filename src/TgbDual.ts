@@ -72,7 +72,6 @@ export class TgbDual extends EventEmitter {
 		this.element = document.createElement("canvas");
 		this.element.width = TgbDual.Width;
 		this.element.height = TgbDual.Height;
-		this.element.style.height = "100%";
 		this._context = this.element.getContext("2d");
 		this._context.imageSmoothingEnabled = false;
 		this._context.webkitImageSmoothingEnabled = false;

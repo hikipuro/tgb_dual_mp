@@ -7,6 +7,11 @@
 let Electron = require("electron");
 let Module = require("../dist/windows/MainRenderer.js");
 
+Electron.webFrame.setZoomLevel(0);
+//Electron.webFrame.setZoomLevelLimits(0, 0);
+Electron.webFrame.setVisualZoomLevelLimits(1, 1);
+Electron.webFrame.setLayoutZoomLevelLimits(0, 0);
+
 let mainRenderer = null;
 document.addEventListener("DOMContentLoaded", () => {
 	let commandLineArgs = Electron.ipcRenderer.sendSync("MainWindow.init");
@@ -16,5 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </head>
 <body>
+<div id="main">
+	<div id="message"></div>
+</div>
 </body>
 </html>

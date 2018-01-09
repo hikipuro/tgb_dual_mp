@@ -24,9 +24,17 @@ export class MainRenderer {
 	protected readonly defaultTitle: string = MainWindow.Settings.Title;
 	protected gamePads: Gamepads = new Gamepads();
 	protected commandLineArgs: string[] = [];
+	protected mainElement: HTMLElement;
+	protected messageElement: HTMLElement;
 	
 	constructor(commandLineArgs: string[]) {
 		this.commandLineArgs = commandLineArgs;
+		this.mainElement = document.getElementById("main");
+		this.messageElement = document.getElementById("message");
+		this.messageElement.addEventListener("webkitAnimationEnd", () => {
+			this.messageElement.classList.remove("show");
+		});
+
 		this.initIPC();
 		this.initWindowEvents();
 		this.initDocumentEvents();
@@ -45,7 +53,12 @@ export class MainRenderer {
 
 	protected createNewTgbDual(): void {
 		this.tgbDual = new TgbDual();
-		document.body.appendChild(this.tgbDual.element);
+		this.tgbDual.element.style.width = "100%";
+		this.tgbDual.element.style.height = "100%";
+		this.mainElement.insertBefore(
+			this.tgbDual.element,
+			this.mainElement.firstChild
+		);
 		this.tgbDual.pathConfig = this.config.path;
 		this.tgbDual.on("start", () => {
 			this.updateScreenConfig(this.config.screen);
@@ -94,6 +107,7 @@ export class MainRenderer {
 				console.log("save", fileNumber);
 				this.tgbDual.saveState(fileNumber);
 				ipcRenderer.send("MainWindow.updateSaveLoadStateMenu", this.tgbDual.romPath);
+				this.showMessage("Save state: " + fileNumber);
 				return;
 			}
 
@@ -104,6 +118,7 @@ export class MainRenderer {
 				const fileNumber = Number(id.substr(-1, 1));
 				console.log("restore", fileNumber);
 				this.tgbDual.restoreState(fileNumber);
+				this.showMessage("Load state: " + fileNumber);
 				return;
 			}
 
@@ -112,14 +127,21 @@ export class MainRenderer {
 				this.tgbDual.reset();
 				this.updateScreenConfig(this.config.screen);
 				this.updateSoundConfig(this.config.sound);
+				this.showMessage("Reset");
 				break;
 			case "file.pause":
 				this.tgbDual.pause();
+				if (this.tgbDual.isPaused) {
+					this.showMessage("Pause");
+				} else {
+					this.showMessage("Resume");
+				}
 				break;
 			case "file.release-slot1":
 				this.tgbDual.stop();
 				document.title = this.defaultTitle;
 				ipcRenderer.send("MainWindow.updateSaveLoadStateMenu", null);
+				this.showMessage("Release");
 				break;
 			case "option.screen.aspect-ratio":
 				this.config.screen.fixedAspectRatio = menu.checked;
@@ -238,8 +260,18 @@ export class MainRenderer {
 			case keyConfig.select.code:	keyState.Select = true; break;
 			case keyConfig.b.code:		keyState.B = true; break;
 			case keyConfig.a.code:		keyState.A = true; break;
-			case keyConfig.fast.code:	this.tgbDual.isFastMode = true; break;
-			case keyConfig.pause.code:	this.tgbDual.pause(); break;
+			case keyConfig.fast.code:
+				this.tgbDual.isFastMode = true;
+				this.showMessage("Fast mode: on");
+				break;
+			case keyConfig.pause.code:
+				this.tgbDual.pause();
+				if (this.tgbDual.isPaused) {
+					this.showMessage("Pause");
+				} else {
+					this.showMessage("Resume");
+				}
+				break;
 			}
 		};
 		document.onkeyup = (e: KeyboardEvent) => {
@@ -258,7 +290,10 @@ export class MainRenderer {
 			case keyConfig.select.code:	keyState.Select = false; break;
 			case keyConfig.b.code:		keyState.B = false; break;
 			case keyConfig.a.code:		keyState.A = false; break;
-			case keyConfig.fast.code:	this.tgbDual.isFastMode = false; break;
+			case keyConfig.fast.code:
+				this.tgbDual.isFastMode = false;
+				this.showMessage("Fast mode: off");
+				break;
 			}
 		};
 	}
@@ -267,7 +302,9 @@ export class MainRenderer {
 		const width = window.innerWidth;
 		const height = window.innerHeight;
 		const ratio = width / height;
-		const style = this.tgbDual.element.style;
+		const style = this.mainElement.style;
+
+		this.adjustMessageTextSize();
 
 		if (!this.config.screen.fixedAspectRatio) {
 			style.width = "100%";
@@ -276,12 +313,45 @@ export class MainRenderer {
 		}
 
 		if (TgbDual.ScreenRatio <= ratio) {
-			style.width = null;
+			style.width = ((TgbDual.ScreenRatio / ratio) * 100) + "%";
 			style.height = "100%";
 		} else {
 			style.width = "100%";
-			style.height = null;
+			style.height = ((ratio / TgbDual.ScreenRatio) * 100) + "%";
 		}
+	}
+
+	protected adjustMessageTextSize(): void {
+		const width = window.innerWidth;
+		const height = window.innerHeight;
+		const ratio = width / height;
+		const style = this.messageElement.style;
+
+		const baseFontSize = 12;
+		const heightScale = 1.25;
+		let fontSize = 12;
+		if (TgbDual.ScreenRatio <= ratio) {
+			fontSize = ((width / (ratio * TgbDual.Width)) * baseFontSize);
+			style.fontSize = fontSize + "px";
+			style.height = (fontSize * heightScale) + "px";
+			style.margin = (fontSize / 12) + "px";
+		} else {
+			fontSize = ((height / ((TgbDual.ScreenRatio / ratio) * TgbDual.Width)) * baseFontSize);
+			style.fontSize = fontSize + "px";
+			style.height = (fontSize * heightScale) + "px";
+			style.margin = (fontSize / 12) + "px";
+		}
+	}
+
+	protected showMessage(text: string) {
+		if (text == null || text === "") {
+			return;
+		}
+		this.messageElement.innerText = text;
+		this.messageElement.classList.remove("show");
+		// reset animation
+		this.messageElement.offsetWidth;
+		this.messageElement.classList.add("show");
 	}
 
 	protected updateScreenSmoothing(): void {

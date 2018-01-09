@@ -156,15 +156,25 @@ export class MainWindow {
 		const menu = MainMenu.Instance;
 		let item: MenuItem;
 		item = menu.findMenuItemById("option.screen.aspect-ratio");
-		item.checked = this._config.screen.fixedAspectRatio;
+		if (item != null) {
+			item.checked = this._config.screen.fixedAspectRatio;
+		}
 		item = menu.findMenuItemById("option.screen.smoothing");
-		item.checked = this._config.screen.smoothing;
+		if (item != null) {
+			item.checked = this._config.screen.smoothing;
+		}
 		item = menu.findMenuItemById("option.screen.bg");
-		item.checked = this._config.screen.bg;
+		if (item != null) {
+			item.checked = this._config.screen.bg;
+		}
 		item = menu.findMenuItemById("option.screen.window");
-		item.checked = this._config.screen.window;
+		if (item != null) {
+			item.checked = this._config.screen.window;
+		}
 		item = menu.findMenuItemById("option.screen.sprite");
-		item.checked = this._config.screen.sprite;
+		if (item != null) {
+			item.checked = this._config.screen.sprite;
+		}
 	}
 
 	protected addIpcEvents(): void {
