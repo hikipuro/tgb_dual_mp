@@ -5,6 +5,7 @@ import { MainMenu } from "./MainMenu";
 import { MainWindow } from "./windows/MainWindow";
 import { KeyConfigWindow } from "./windows/KeyConfigWindow";
 import { SoundConfigWindow } from "./windows/SoundConfigWindow";
+import { PathConfigWindow } from "./windows/PathConfigWindow";
 import { VersionWindow } from "./windows/VersionWindow";
 
 class NodeMain {
@@ -57,6 +58,15 @@ class NodeMain {
 		//*/
 
 		/*
+		const pathConfig = new PathConfigWindow();
+		pathConfig.browserWindow.once("closed", () => {
+			this._app.quit();
+		});
+		pathConfig.browserWindow.webContents.openDevTools();
+		pathConfig.show();
+		//*/
+
+		/*
 		const version = new VersionWindow();
 		version.browserWindow.once("closed", () => {
 			this._app.quit();
@@ -72,7 +82,9 @@ class NodeMain {
 			if (this._mainWindow != null) {
 				this._mainWindow.log(...args);
 			}
-			event.returnValue = null;
+			if (event != null) {
+				event.returnValue = null;
+			}
 		});
 	}
 	

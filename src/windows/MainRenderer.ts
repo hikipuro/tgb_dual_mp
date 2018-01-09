@@ -171,6 +171,11 @@ export class MainRenderer {
 			this.config = Config.fromJSON(arg);
 			this.updateSoundConfig(this.config.sound);
 		});
+		ipcRenderer.on("MainWindow.pathConfig", (event: Electron.IpcMessageEvent, arg: any) => {
+			console.log("MainWindow.pathConfig", arg.path);
+			this.config = Config.fromJSON(arg);
+			this.tgbDual.pathConfig = this.config.path;
+		});
 		/*
 		ipcRenderer.on("blur", (event: Electron.IpcMessageEvent, arg: any) => {
 			console.log("blur");

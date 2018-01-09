@@ -286,8 +286,7 @@
 			},
 			{
 				"id": "option.directory",
-				"label": "Directory Settings (&D)",
-				"enabled": false
+				"label": "Directory Settings (&D)"
 			},
 			{
 				"type": "separator"

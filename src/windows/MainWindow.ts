@@ -8,10 +8,12 @@ import { Constants } from "../Constants";
 import { Config } from "../config/Config";
 import { KeyConfig } from "../config/KeyConfig";
 import { SoundConfig } from "../config/SoundConfig";
+import { PathConfig } from "../config/PathConfig";
 import { MainMenu } from "../MainMenu";
 import { OpenDialog } from "../dialogs/OpenDialog";
 import { KeyConfigWindow } from "./KeyConfigWindow";
 import { SoundConfigWindow } from "./SoundConfigWindow";
+import { PathConfigWindow } from "./PathConfigWindow";
 import { VersionWindow } from "./VersionWindow";
 
 module Settings {
@@ -32,6 +34,7 @@ export class MainWindow {
 	public browserWindow: Electron.BrowserWindow = null;
 	protected _keyConfigWindow: KeyConfigWindow;
 	protected _soundConfigWindow: SoundConfigWindow;
+	protected _pathConfigWindow: PathConfigWindow;
 	protected _versionWindow: VersionWindow;
 	protected _config: Config;
 
@@ -253,6 +256,9 @@ export class MainWindow {
 				this._config.screen.smoothing = item.checked;
 				this.send("MainWindow.menu", item);
 				return;
+			case "option.directory":
+				this.showPathConfigWindow();
+				return;
 			case "help.open-app-folder":
 				Electron.shell.openItem(Config.getCurrentPath());
 				return;
@@ -321,6 +327,7 @@ export class MainWindow {
 			this._keyConfigWindow.show();
 		});
 		this._keyConfigWindow.browserWindow.once("close", () => {
+			this._keyConfigWindow.removeAllListeners("close");
 			this._keyConfigWindow.destroy();
 			this._keyConfigWindow = null;
 		});
@@ -348,6 +355,27 @@ export class MainWindow {
 		this._soundConfigWindow.on("update", (soundConfig: SoundConfig) => {
 			this._config.sound = soundConfig;
 			this.send("MainWindow.soundConfig", this._config);
+		});
+	}
+
+	protected showPathConfigWindow(): void {
+		if (this._pathConfigWindow != null) {
+			this._pathConfigWindow.show();
+			return;
+		}
+
+		this._pathConfigWindow = new PathConfigWindow(this.browserWindow, this._config.path);
+		this._pathConfigWindow.browserWindow.once("ready-to-show", () => {
+			this._pathConfigWindow.show();
+		});
+		this._pathConfigWindow.browserWindow.once("close", () => {
+			this._pathConfigWindow.removeAllListeners("close");
+			this._pathConfigWindow.destroy();
+			this._pathConfigWindow = null;
+		});
+		this._pathConfigWindow.on("close", (pathConfig: PathConfig) => {
+			this._config.path = pathConfig;
+			this.send("MainWindow.pathConfig", this._config);
 		});
 	}
 

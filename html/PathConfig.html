@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="css/PathConfig.css">
+<script>
+let Electron = require("electron");
+let Module = require("../dist/windows/PathConfigRenderer.js");
+
+let renderer = null;
+document.addEventListener("DOMContentLoaded", () => {
+	let args = Electron.ipcRenderer.sendSync("PathConfigWindow.init");
+	renderer = new Module.PathConfigRenderer(
+		args.languageJson, args.pathConfig
+	);
+});
+</script>
+</head>
+<body>
+<div class="main">
+	<div class="record">
+		<div class="caption">Save</div>
+		<div class="value"><input id="save" type="text"></div>
+		<button id="selectSave" class="select">...</button>
+	</div>
+	<div class="record">
+		<div class="caption">Media</div>
+		<div class="value"><input id="media" type="text" disabled></div>
+		<button id="selectMedia" class="select" disabled>...</button>
+	</div>
+	
+	<button id="ok">OK</button>
+</div>
+</body>
+</html>

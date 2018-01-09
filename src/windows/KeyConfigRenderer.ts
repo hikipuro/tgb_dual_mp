@@ -178,7 +178,8 @@ export class KeyConfigRenderer {
 		keySlot1.setLabel(keyConfig);
 		systemKey.setLabel(keyConfig);
 
-		buttonOK.addEventListener("click", () => {
+		buttonOK.addEventListener("click", function handler() {
+			buttonOK.removeEventListener("click", handler);
 			ipcRenderer.send("KeyConfigWindow.close", keyConfig);
 		});
 
