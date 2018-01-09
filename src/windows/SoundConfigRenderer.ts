@@ -4,9 +4,10 @@ import { SoundConfigWindow } from "../windows/SoundConfigWindow";
 import { RendererUtility } from "../RendererUtility";
 
 export class SoundConfigRenderer {
-	constructor(soundConfig: SoundConfig) {
+	constructor(languageJson: any, soundConfig: SoundConfig) {
 		RendererUtility.overrideConsoleLog();
 		soundConfig = SoundConfig.fromJSON(soundConfig);
+		this.translateText(languageJson);
 
 		const master = document.querySelector("#master") as HTMLInputElement;
 		const square1 = document.querySelector("#square1") as HTMLInputElement;
@@ -77,6 +78,37 @@ export class SoundConfigRenderer {
 		}
 		document.body.ondrop = () => {
 			return false;
+		}
+	}
+	
+	protected translateText(languageJson: any): void {
+		if (languageJson == null || languageJson.sound == null) {
+			return;
+		}
+
+		const json = languageJson.sound;
+		if (json.title != null) {
+			document.title = json.title;
+		}
+		
+		const elements = {
+			channels: document.querySelector("#channels"),
+			effectors: document.querySelector("#effectors"),
+			master: document.querySelector("#master-label"),
+			square1: document.querySelector("#square1-label"),
+			square2: document.querySelector("#square2-label"),
+			wave: document.querySelector("#wave-label"),
+			noise: document.querySelector("#noise-label"),
+			echo: document.querySelector("#echo-label"),
+			lowPass: document.querySelector("#lowPass-label")
+		};
+		
+		for (const name in elements) {
+			console.log(name, json[name]);
+			if (json[name] == null) {
+				continue;
+			}
+			elements[name].innerText = json[name];
 		}
 	}
 }

@@ -77,4 +77,14 @@ export class Config {
 		const path = Electron.app.getAppPath();
 		return path.indexOf("default_app.asar") >= 0;
 	}
+	
+	public static getLanguageJson(): any {
+		const LanguagesPath: string = "../../languages/";
+		const locale: string = Electron.app.getLocale();
+		const languageFile: string = path.join(__dirname, LanguagesPath, locale + ".json");
+		if (!fs.existsSync(languageFile)) {
+			return null;
+		}
+		return JSON.parse(fs.readFileSync(languageFile, "utf8"));
+	}
 }

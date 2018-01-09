@@ -34,5 +34,17 @@
 		"help": "ヘルプ (&H)",
 		"help.open-app-folder": "アプリのフォルダを開く (&O)",
 		"help.version": "バージョン情報 (&V)"
+	},
+	"sound": {
+		"title": "サウンド設定",
+		"channels": "チャンネル",
+		"master": "主音声",
+		"square1": "矩形波 1",
+		"square2": "矩形波 2",
+		"wave": "波形メモリ",
+		"noise": "ノイズ",
+		"effectors": "エフェクタ",
+		"echo": "エコー",
+		"lowPass": "ローパス"
 	}
 }

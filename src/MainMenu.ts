@@ -4,10 +4,10 @@ import * as url from "url";
 import * as fs from "fs";
 
 import { MenuItem, ipcMain, IpcMessageEvent, MenuItemConstructorOptions } from "electron";
+import { Config } from "./config/Config";
 
 module Settings {
 	export const Content: string = "../config/AppMenu.json";
-	export const LanguagesPath: string = "../languages/";
 }
 
 export class MainMenu {
@@ -25,7 +25,7 @@ export class MainMenu {
 	public createMenu(): Electron.Menu {
 		const appMenuFile = path.join(__dirname, Settings.Content);
 		const templateMenu = JSON.parse(fs.readFileSync(appMenuFile, "utf8"));
-		const languageJson = this.getLanguageJson();
+		const languageJson = Config.getLanguageJson();
 
 		this.translateMenuText(templateMenu, languageJson);
 		this.addClickEventAllMenuItems(templateMenu, this.onClickMenuItem);
@@ -44,15 +44,6 @@ export class MainMenu {
 
 	protected removeIpcEvents(): void {
 		ipcMain.removeAllListeners("App.menu.call");
-	}
-	
-	protected getLanguageJson(): any {
-		const locale: string = Electron.app.getLocale();
-		const languageFile: string = path.join(__dirname, Settings.LanguagesPath, locale + ".json");
-		if (!fs.existsSync(languageFile)) {
-			return null;
-		}
-		return JSON.parse(fs.readFileSync(languageFile, "utf8"));
 	}
 
 	protected translateMenuText(templateMenu: MenuItemConstructorOptions[], languageJson: any): void {

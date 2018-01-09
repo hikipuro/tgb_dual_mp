@@ -4,6 +4,7 @@ import * as url from "url";
 
 import { ipcMain, IpcMessageEvent } from "electron";
 import { EventEmitter } from "events";
+import { Config } from "../config/Config";
 import { SoundConfig } from "../config/SoundConfig";
 
 module Settings {
@@ -66,7 +67,11 @@ export class SoundConfigWindow extends EventEmitter {
 	
 	protected addIpcEvents(): void {
 		ipcMain.once("SoundConfigWindow.init", (event: IpcMessageEvent, arg: any): void => {
-			event.returnValue = this.soundConfig;
+			const languageJson = Config.getLanguageJson();
+			event.returnValue = {
+				languageJson: languageJson,
+				soundConfig: this.soundConfig
+			}
 		});
 		ipcMain.on("SoundConfigWindow.update", (event: IpcMessageEvent, arg: any): void => {
 			this.soundConfig = arg;
