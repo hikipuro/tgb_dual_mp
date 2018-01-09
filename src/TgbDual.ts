@@ -49,6 +49,13 @@ export class TgbDual extends EventEmitter {
 		return this._isPaused;
 	}
 
+	public get isFileLoaded(): boolean {
+		if (this.romPath == null || this.romPath == "") {
+			return false;
+		}
+		return true;
+	}
+
 	public get romInfo(): TgbDual.RomInfo {
 		return this._romInfo;
 	}
@@ -189,7 +196,7 @@ export class TgbDual extends EventEmitter {
 	}
 
 	public stop(): void {
-		if (!this.isFileLoaded()) {
+		if (!this.isFileLoaded) {
 			return;
 		}
 		if (this._requestAnimationFrameHandle === 0) {
@@ -218,7 +225,7 @@ export class TgbDual extends EventEmitter {
 	}
 
 	public saveSram(): void {
-		if (!this.isFileLoaded()) {
+		if (!this.isFileLoaded) {
 			return;
 		}
 		if (this.pathConfig == null) {
@@ -265,7 +272,7 @@ export class TgbDual extends EventEmitter {
 	}
 
 	public reset(): void {
-		if (!this.isFileLoaded()) {
+		if (!this.isFileLoaded) {
 			return;
 		}
 		TgbDual.API.reset();
@@ -274,7 +281,7 @@ export class TgbDual extends EventEmitter {
 	}
 
 	public pause(): void {
-		if (!this.isFileLoaded()) {
+		if (!this.isFileLoaded) {
 			return;
 		}
 		this._isPaused = !this._isPaused;
@@ -353,13 +360,6 @@ export class TgbDual extends EventEmitter {
 			break;
 		}
 		TgbDual.API.setGBType(typeId);
-	}
-
-	protected isFileLoaded(): boolean {
-		if (this.romPath == null || this.romPath == "") {
-			return false;
-		}
-		return true;
 	}
 
 	protected onAudioProcess = (event: AudioProcessingEvent): void => {

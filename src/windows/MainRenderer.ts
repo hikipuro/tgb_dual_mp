@@ -127,24 +127,30 @@ export class MainRenderer {
 
 			switch (id) {
 			case "file.reset-slot1":
-				this.tgbDual.reset();
-				this.updateScreenConfig(this.config.screen);
-				this.updateSoundConfig(this.config.sound);
-				this.showMessage("Reset");
+				if (this.tgbDual.isFileLoaded) {
+					this.tgbDual.reset();
+					this.updateScreenConfig(this.config.screen);
+					this.updateSoundConfig(this.config.sound);
+					this.showMessage("Reset");
+				}
 				break;
 			case "file.pause":
-				this.tgbDual.pause();
-				if (this.tgbDual.isPaused) {
-					this.showMessage("Pause");
-				} else {
-					this.showMessage("Resume");
+				if (this.tgbDual.isFileLoaded) {
+					this.tgbDual.pause();
+					if (this.tgbDual.isPaused) {
+						this.showMessage("Pause");
+					} else {
+						this.showMessage("Resume");
+					}
 				}
 				break;
 			case "file.release-slot1":
-				this.tgbDual.stop();
-				document.title = this.defaultTitle;
-				ipcRenderer.send("MainWindow.updateSaveLoadStateMenu", null);
-				this.showMessage("Release");
+				if (this.tgbDual.isFileLoaded) {
+					this.tgbDual.stop();
+					document.title = this.defaultTitle;
+					ipcRenderer.send("MainWindow.updateSaveLoadStateMenu", null);
+					this.showMessage("Release");
+				}
 				break;
 			case "option.screen.aspect-ratio":
 				this.config.screen.fixedAspectRatio = menu.checked;
