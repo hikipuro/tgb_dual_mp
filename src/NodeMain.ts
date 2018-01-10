@@ -18,13 +18,56 @@ class NodeMain {
 		this._app = app;
 		//this._app.disableHardwareAcceleration();
 		//this._app.commandLine.appendSwitch("js-flags", "--expose-gc");
-		this._app.once("ready", this.onReady);
-		this._app.once("window-all-closed", this.onWindowAllClosed);
+		this.addAppEvents();
+	}
+
+	protected addAppEvents(): void {
+		const app = this._app;
+		app.once("ready", this.onReady);
+		app.once("window-all-closed", this.onWindowAllClosed);
+		app.on("browser-window-focus", (e: Event, window: Electron.BrowserWindow) => {
+			if (this._mainWindow == null) {
+				return;
+			}
+			this._mainWindow.send("MainWindow.focus");
+		});
+		app.on("browser-window-blur", () => {
+			if (this._mainWindow == null) {
+				return;
+			}
+			const window = Electron.BrowserWindow.getFocusedWindow();
+			if (window == null) {
+				this._mainWindow.send("MainWindow.blur");
+			}
+		});
+	}
+	
+	protected removeAppEvents(): void {
+		const app = this._app;
+		app.removeAllListeners("ready");
+		app.removeAllListeners("window-all-closed");
+		app.removeAllListeners("browser-window-focus");
+		app.removeAllListeners("browser-window-blur");
+	}
+
+	protected addIpcEvents(): void {
+		// this log event can use in all windows
+		ipcMain.on("App.log", (event: IpcMessageEvent, ...args: any[]) => {
+			if (this._mainWindow != null) {
+				this._mainWindow.log(...args);
+			}
+			if (event != null) {
+				event.returnValue = null;
+			}
+		});
+	}
+
+	protected removeIpcEvents(): void {
+		ipcMain.removeAllListeners("App.log");
 	}
 
 	protected onReady = () => {
 		this.addIpcEvents();
-
 		//*
 		this._mainMenu = new MainMenu();
 		const menu = this._mainMenu.createMenu();
@@ -87,27 +130,12 @@ class NodeMain {
 		//*/
 	}
 
-	protected addIpcEvents(): void {
-		// this log event can use in all windows
-		ipcMain.on("App.log", (event: IpcMessageEvent, ...args: any[]) => {
-			if (this._mainWindow != null) {
-				this._mainWindow.log(...args);
-			}
-			if (event != null) {
-				event.returnValue = null;
-			}
-		});
-	}
-	
-	protected removeIpcEvents(): void {
-		ipcMain.removeAllListeners("App.log");
-	}
-
 	protected onWindowAllClosed = () => {
+		this.removeAppEvents();
 		this.removeIpcEvents();
-		if (process.platform != "darwin") {
+		//if (process.platform != "darwin") {
 			this._app.quit();
-		}
+		//}
 	}
 }
 

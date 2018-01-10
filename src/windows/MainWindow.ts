@@ -145,10 +145,6 @@ export class MainWindow {
 		this.browserWindow.on("show", () => {
 			this.send("show");
 		});
-
-		this.browserWindow.on("unresponsive", () => {
-			this.send("blur");
-		});
 		//*/
 		this.browserWindow.once("close", () => {
 			this.removeIpcEvents();

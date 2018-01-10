@@ -29,6 +29,7 @@ export class MainRenderer {
 	protected messageElement: HTMLElement;
 	protected fpsElement: HTMLElement;
 	protected isFastMode: boolean = false;
+	protected isPausedWithLostFocus: boolean = false;
 
 	constructor(commandLineArgs: string[]) {
 		this.commandLineArgs = commandLineArgs;
@@ -40,7 +41,7 @@ export class MainRenderer {
 		});
 		this.fpsElement = document.getElementById("fps");
 
-		this.initIPC();
+		this.addIpcEvents();
 		this.initWindowEvents();
 		this.initDocumentEvents();
 		this.config = ipcRenderer.sendSync("MainWindow.getConfig");
@@ -97,7 +98,7 @@ export class MainRenderer {
 		}
 	}
 
-	protected initIPC(): void {
+	protected addIpcEvents(): void {
 		ipcRenderer.on("MainWindow.log", (event: Electron.IpcMessageEvent, ...args) => {
 			console.log(...args);
 		});
@@ -201,11 +202,25 @@ export class MainRenderer {
 			this.config = Config.fromJSON(arg);
 			this.tgbDual.setGBType(this.config.misc.type);
 		});
-		/*
-		ipcRenderer.on("blur", (event: Electron.IpcMessageEvent, arg: any) => {
-			console.log("blur");
+		
+		ipcRenderer.on("MainWindow.focus", (event: Electron.IpcMessageEvent, arg: any) => {
+			console.log("MainWindow.focus");
+			if (this.tgbDual.isPaused) {
+				if (this.isPausedWithLostFocus) {
+					this.tgbDual.togglePause();
+				}
+			}
+			this.isPausedWithLostFocus = false;
+		});
+		ipcRenderer.on("MainWindow.blur", (event: Electron.IpcMessageEvent, arg: any) => {
+			console.log("MainWindow.blur");
+			if (!this.tgbDual.isPaused) {
+				this.isPausedWithLostFocus = true;
+				this.tgbDual.togglePause();
+			}
 		});
 
+		/*
 		ipcRenderer.on("suspend", (event: Electron.IpcMessageEvent, arg: any) => {
 			console.log("suspend");
 		});
@@ -219,6 +234,20 @@ export class MainRenderer {
 			console.log("show");
 		});
 		//*/
+	}
+
+	protected removeIpcEvents(): void {
+		ipcRenderer.removeAllListeners("MainWindow.log");
+		ipcRenderer.removeAllListeners("MainWindow.menu");
+		ipcRenderer.removeAllListeners("MainWindow.load");
+		ipcRenderer.removeAllListeners("MainWindow.getConfig");
+		ipcRenderer.removeAllListeners("MainWindow.screenConfig");
+		ipcRenderer.removeAllListeners("MainWindow.soundConfig");
+		ipcRenderer.removeAllListeners("MainWindow.speedConfig");
+		ipcRenderer.removeAllListeners("MainWindow.pathConfig");
+		ipcRenderer.removeAllListeners("MainWindow.miscConfig.type");
+		ipcRenderer.removeAllListeners("MainWindow.focus");
+		ipcRenderer.removeAllListeners("MainWindow.blur");
 	}
 
 	protected initWindowEvents(): void {
@@ -237,11 +266,11 @@ export class MainRenderer {
 
 		// window close
 		window.onbeforeunload = (e: BeforeUnloadEvent) => {
-			if (this.tgbDual == null) {
-				return;
+			this.removeIpcEvents();
+			if (this.tgbDual != null) {
+				this.tgbDual.stop();
+				this.tgbDual.destroy();
 			}
-			this.tgbDual.stop();
-			this.tgbDual.destroy();
 		};
 
 		// gamepad (debug)
