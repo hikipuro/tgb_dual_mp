@@ -1,24 +1,30 @@
-export class CanvasRenderer {
+import { EventEmitter } from "events";
+
+export class CanvasRenderer extends EventEmitter {
 	public isPaused: boolean = false;
-	public handler: (time: number) => void;
+	public update: (time: number) => void;
+	public render: () => void;
 	protected _element: HTMLCanvasElement;
 	protected _context: CanvasRenderingContext2D;
 	protected _requestAnimationFrameHandle: number = 0;
 
 	protected _fps: number = 60;
 	protected _prevTime: number = 0;
+	protected _prevTime2: number = 0;
 	protected _prevTimeDiff: number = 0;
 	protected _fpsCount: number = 0;
 	protected _elapsed: number = 0;
 
 	constructor(width: number, height: number) {
+		super();
 		this._element = document.createElement("canvas");
 		this._element.width = width;
 		this._element.height = height;
 		this._context = this._element.getContext("2d");
 		this._context.imageSmoothingEnabled = false;
 		this._context.webkitImageSmoothingEnabled = false;
-		this.handler = (time: number): boolean => { return false; };
+		this.update = (time: number): void => { };
+		this.render = (): void => { };
 	}
 
 	public get element(): HTMLCanvasElement {
@@ -40,12 +46,14 @@ export class CanvasRenderer {
 	public set fps(value: number) {
 		this._fps = value;
 		this._prevTime = performance.now();
+		this._prevTime2 = this._prevTime;
 		this._prevTimeDiff = 0;
 	}
 
 	public start(): void {
 		this._prevTime = performance.now();
-		this._requestAnimationFrameHandle = requestAnimationFrame(this.update);
+		this._prevTime2 = this._prevTime;
+		this._requestAnimationFrameHandle = requestAnimationFrame(this.onUpdate);
 	}
 	
 	public stop(): void {
@@ -86,31 +94,57 @@ export class CanvasRenderer {
 		this._context.putImageData(imageData, 0, 0);
 	}
 
-	protected update = (time: number): void => {
+	protected onUpdate = (time: number): void => {
+		const now = performance.now();
+		let diff = now - this._prevTime;
+		this._elapsed += diff;
+
 		if (this.isPaused) {
-			this._requestAnimationFrameHandle = requestAnimationFrame(this.update);
-			return;
-		}
-		if (this._fps === 60) {
-			this.handler(time);
-			this._requestAnimationFrameHandle = requestAnimationFrame(this.update);
+			this._prevTime = now;
+			this._prevTime2 += diff;
+			if (this._elapsed > 1000) {
+				this._elapsed -= 1000;
+				this.emit("fps", this._fpsCount);
+				this._fpsCount = 0;
+			}
+			this._requestAnimationFrameHandle = requestAnimationFrame(this.onUpdate);
 			return;
 		}
 
-		const now = performance.now();
-		let diff = now - this._prevTime;
+		if (this._fps === 60) {
+			this.update(time);
+			this.render();
+			this._fpsCount++;
+			this._prevTime = now;
+			if (this._elapsed > 1000) {
+				this._elapsed -= 1000;
+				this.emit("fps", this._fpsCount);
+				this._fpsCount = 0;
+			}
+			this._requestAnimationFrameHandle = requestAnimationFrame(this.onUpdate);
+			return;
+		}
+
+		this._prevTime = now;
+		if (this._elapsed > 1000) {
+			this._elapsed -= 1000;
+			this.emit("fps", this._fpsCount);
+			console.log(this._fpsCount);
+			this._fpsCount = 0;
+		}
+
+		diff = now - this._prevTime2;
 		const frameTime = 1000 / this._fps;
 		//console.log(now - this._prevTime, 1000 / this.fps);
 		if (diff + this._prevTimeDiff <= frameTime - 2) {
-			this._requestAnimationFrameHandle = requestAnimationFrame(this.update);
+			this._requestAnimationFrameHandle = requestAnimationFrame(this.onUpdate);
 			return;
 		}
-		this._prevTime += diff;
-		this._elapsed += diff;
+		this._prevTime2 += diff;
 		diff +=  this._prevTimeDiff;
 		let count = 0;
 		while (diff > 0) {
-			this.handler(time);
+			this.update(time);
 			diff -= frameTime;
 			this._fpsCount++;
 			count++;
@@ -118,12 +152,8 @@ export class CanvasRenderer {
 				break;
 			}
 		}
+		this.render();
 		this._prevTimeDiff = diff;
-		if (this._elapsed > 1000) {
-			this._elapsed -= 1000;
-			//console.log("fps", this._fpsCount);
-			this._fpsCount = 0;
-		}
-		this._requestAnimationFrameHandle = requestAnimationFrame(this.update);
+		this._requestAnimationFrameHandle = requestAnimationFrame(this.onUpdate);
 	}
 }

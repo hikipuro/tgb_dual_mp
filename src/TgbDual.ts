@@ -73,7 +73,11 @@ export class TgbDual extends EventEmitter {
 		this._canvasRenderer = new CanvasRenderer(
 			TgbDual.Width, TgbDual.Height
 		);
-		this._canvasRenderer.handler = this.render;
+		this._canvasRenderer.update = this.onCanvasUpdate;
+		this._canvasRenderer.render = this.onCanvasRender;
+		this._canvasRenderer.on("fps", (fps: number) => {
+			this.emit("fps", fps);
+		});
 		this._canvasRenderer.clear();
 
 		this._soundPlayer = new SoundPlayer();
@@ -107,7 +111,7 @@ export class TgbDual extends EventEmitter {
 		if (!this._canvasRenderer.isStarted) {
 			return;
 		}
-		this.pause();
+		this.togglePause();
 		this.saveSram();
 
 		this._canvasRenderer.stop();
@@ -174,7 +178,7 @@ export class TgbDual extends EventEmitter {
 		this._canvasRenderer.isPaused = false;
 	}
 
-	public pause(): void {
+	public togglePause(): void {
 		if (!this.isFileLoaded) {
 			return;
 		}
@@ -368,7 +372,7 @@ export class TgbDual extends EventEmitter {
 		});
 	}
 
-	protected render = (time: number): void => {
+	protected onCanvasUpdate = (time: number): void => {
 		/*
 		if (this.isFastMode) {
 			TgbDual.API.nextFrame();
@@ -387,10 +391,10 @@ export class TgbDual extends EventEmitter {
 		this.emit("update");
 		this.setKeys(this.keyState);
 		TgbDual.API.nextFrame();
-		this.updateScreen();
+		//this.updateScreen();
 	}
 
-	protected updateScreen(): void {
+	protected onCanvasRender = (): void => {
 		if (this.frameSkip > 0) {
 			this._frameSkipCount++;
 			if (this._frameSkipCount <= this.frameSkip) {

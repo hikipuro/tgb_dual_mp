@@ -8,7 +8,7 @@ import { SpeedConfig } from "../config/SpeedConfig";
 
 module Settings {
 	export const Width: number = 200;
-	export const Height: number = 210;
+	export const Height: number = 235;
 	export const Title: string = "Speed Settings";
 	export const Content: string = "../../html/SpeedConfig.html";
 }

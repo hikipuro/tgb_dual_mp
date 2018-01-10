@@ -27,6 +27,7 @@ export class MainRenderer {
 	protected mainElement: HTMLElement;
 	protected messageOuterElement: HTMLElement;
 	protected messageElement: HTMLElement;
+	protected fpsElement: HTMLElement;
 	protected isFastMode: boolean = false;
 	
 	constructor(commandLineArgs: string[]) {
@@ -37,6 +38,7 @@ export class MainRenderer {
 		this.messageElement.addEventListener("webkitAnimationEnd", () => {
 			this.messageElement.classList.remove("show");
 		});
+		this.fpsElement = document.getElementById("fps");
 
 		this.initIPC();
 		this.initWindowEvents();
@@ -66,8 +68,10 @@ export class MainRenderer {
 		this.tgbDual.on("start", () => {
 			this.updateScreenConfig(this.config.screen);
 			this.updateSoundConfig(this.config.sound);
+			this.updateSpeedConfig();
 		});
 		this.tgbDual.on("update", this.updateGamepad);
+		this.tgbDual.on("fps", this.updateFps);
 		this.adjustScreenSize();
 		this.updateScreenSmoothing();
 
@@ -136,7 +140,7 @@ export class MainRenderer {
 				break;
 			case "file.pause":
 				if (this.tgbDual.isFileLoaded) {
-					this.tgbDual.pause();
+					this.tgbDual.togglePause();
 					if (this.tgbDual.isPaused) {
 						this.showMessage("Pause");
 					} else {
@@ -148,6 +152,8 @@ export class MainRenderer {
 				if (this.tgbDual.isFileLoaded) {
 					this.tgbDual.stop();
 					document.title = this.defaultTitle;
+					this.fpsElement.innerText = "0";
+					this.fpsElement.style.display = "none";
 					ipcRenderer.send("MainWindow.updateSaveLoadStateMenu", null);
 					this.showMessage("Release");
 				}
@@ -291,12 +297,16 @@ export class MainRenderer {
 			case keyConfig.b.code:		keyState.B = true; break;
 			case keyConfig.a.code:		keyState.A = true; break;
 			case keyConfig.fast.code:
-				this.isFastMode = true;
-				this.updateSpeedConfig();
-				this.showMessage("Fast mode: on");
+				if (!this.tgbDual.isPaused) {
+					this.isFastMode = true;
+					this.updateSpeedConfig();
+					this.showMessage("Fast mode: on");
+				}
 				break;
 			case keyConfig.pause.code:
-				this.tgbDual.pause();
+				this.isFastMode = false;
+				this.updateSpeedConfig();
+				this.tgbDual.togglePause();
 				if (this.tgbDual.isPaused) {
 					this.showMessage("Pause");
 				} else {
@@ -322,9 +332,11 @@ export class MainRenderer {
 			case keyConfig.b.code:		keyState.B = false; break;
 			case keyConfig.a.code:		keyState.A = false; break;
 			case keyConfig.fast.code:
-				this.isFastMode = false;
-				this.updateSpeedConfig();
-				this.showMessage("Fast mode: off");
+				if (!this.tgbDual.isPaused && this.isFastMode) {
+					this.isFastMode = false;
+					this.updateSpeedConfig();
+					this.showMessage("Fast mode: off");
+				}
 				break;
 			}
 		};
@@ -359,6 +371,7 @@ export class MainRenderer {
 		const ratio = width / height;
 		//const outerStyle = this.messageOuterElement.style;
 		const style = this.messageElement.style;
+		const fpsStyle = this.fpsElement.style;
 
 		const baseFontSize = 12;
 		const heightScale = 1.4;
@@ -372,6 +385,7 @@ export class MainRenderer {
 			//outerStyle.margin = "1px auto";
 			style.borderRadius = (fontSize / 1.5) + "px";
 			style.bottom = fontSize + "px";
+			fpsStyle.fontSize = fontSize + "px";
 		} else {
 			fontSize = ((height / ((TgbDual.ScreenRatio / ratio) * TgbDual.Width)) * baseFontSize);
 			style.fontSize = fontSize + "px";
@@ -381,6 +395,7 @@ export class MainRenderer {
 			//outerStyle.margin = "1px auto";
 			style.borderRadius = (fontSize / 1.5) + "px";
 			style.bottom = fontSize + "px";
+			fpsStyle.fontSize = fontSize + "px";
 		}
 	}
 
@@ -425,13 +440,15 @@ export class MainRenderer {
 	}
 
 	protected updateSpeedConfig(): void {
+		const speed = this.config.speed;
+		this.fpsElement.style.display = speed.showFps ? "block" : "none";
 		if (this.isFastMode) {
-			this.tgbDual.fps = this.config.speed.fastFps;
-			this.tgbDual.frameSkip = this.config.speed.fastFrameSkip;
+			this.tgbDual.fps = speed.fastFps;
+			this.tgbDual.frameSkip = speed.fastFrameSkip;
 			return;
 		}
-		this.tgbDual.fps = this.config.speed.fps;
-		this.tgbDual.frameSkip = this.config.speed.frameSkip;
+		this.tgbDual.fps = speed.fps;
+		this.tgbDual.frameSkip = speed.frameSkip;
 	}
 
 	protected loadFile(filePath: string): void {
@@ -554,6 +571,13 @@ export class MainRenderer {
 		}
 		return null;
 	}
+
+	protected updateFps = (fps: number): void => {
+		if (this.fpsElement.style.display === "none") {
+			return;
+		}
+		this.fpsElement.innerText = String(fps);
+	} 
 	
 	protected updateGamepad = (): void => {
 		const keyState = this.tgbDual.keyState;

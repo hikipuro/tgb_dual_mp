@@ -12,11 +12,13 @@ export class SpeedConfigRenderer {
 		const fps = document.querySelector("#fps") as HTMLInputElement;
 		const fastFrameSkip = document.querySelector("#fastFrameSkip") as HTMLInputElement;
 		const fastFps = document.querySelector("#fastFps") as HTMLInputElement;
+		const showFps = document.querySelector("#showFps") as HTMLInputElement;
 
 		frameSkip.value = String(speedConfig.frameSkip);
 		fps.value = String(speedConfig.fps);
 		fastFrameSkip.value = String(speedConfig.fastFrameSkip);
 		fastFps.value = String(speedConfig.fastFps);
+		showFps.checked = speedConfig.showFps;
 
 		function onInput(e: Event) {
 			const element = e.srcElement as HTMLInputElement;
@@ -35,6 +37,10 @@ export class SpeedConfigRenderer {
 		fps.addEventListener("input", onInput);
 		fastFrameSkip.addEventListener("input", onInput);
 		fastFps.addEventListener("input", onInput);
+		showFps.addEventListener("change", () => {
+			speedConfig.showFps = showFps.checked;
+			renderer.applyConfig(speedConfig);
+		});
 		
 		// disable drag & drop
 		document.body.ondragover = () => {

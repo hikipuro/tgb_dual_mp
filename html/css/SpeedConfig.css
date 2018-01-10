@@ -5,7 +5,6 @@ html, input, button {
 
 input {
 	padding: 0;
-	height: 16px;
 }
 
 body {
@@ -20,7 +19,7 @@ body {
 	border: 1px ridge #888;
 	width: 180px;
 	height: 90px;
-	margin-bottom: 10px;
+	margin-bottom: 8px;
 }
 
 .title {
@@ -46,4 +45,24 @@ body {
 
 .value input {
 	width: 70px;
+	height: 16px;
+}
+
+.record-single {
+	display: block;
+	margin: 0 4px;
+}
+
+.caption-single {
+	display: inline-block;
+	vertical-align: top;
+	height: 20px;
+	margin-left: 4px;
+}
+
+.value-single {
+	display: inline-block;
+	vertical-align: top;
+	width: 20px;
+	height: 20px;
 }

@@ -3,6 +3,7 @@ export class SpeedConfig {
 	public frameSkip: number = 0;
 	public fastFps: number = 300;
 	public fastFrameSkip: number = 9;
+	public showFps: boolean = false;
 
 	public static fromJSON(json: any): SpeedConfig {
 		const speedConfig = new SpeedConfig();
