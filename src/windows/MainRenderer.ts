@@ -196,6 +196,7 @@ export class MainRenderer {
 			console.log("MainWindow.pathConfig", arg.path);
 			this.config = Config.fromJSON(arg);
 			this.tgbDual.pathConfig = this.config.path;
+			ipcRenderer.send("MainWindow.updateSaveLoadStateMenu", this.tgbDual.romPath);
 		});
 		ipcRenderer.on("MainWindow.miscConfig.type", (event: Electron.IpcMessageEvent, arg: any) => {
 			console.log("MainWindow.miscConfig.type", arg);
