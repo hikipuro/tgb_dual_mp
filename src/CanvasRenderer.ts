@@ -18,6 +18,10 @@ export class CanvasRenderer {
 		return this._element;
 	}
 
+	public get context(): CanvasRenderingContext2D {
+		return this._context;
+	}
+
 	public get isStarted(): boolean {
 		return this._requestAnimationFrameHandle !== 0;
 	}

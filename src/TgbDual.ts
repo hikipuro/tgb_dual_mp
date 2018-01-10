@@ -432,12 +432,15 @@ export class TgbDual extends EventEmitter {
 			return;
 		}
 		
+		pointer /= 2;
+		const data = Module.HEAP16.subarray(pointer, pointer + bufferSize * 2);
+		pointer = 0;
 		for (let i = 0; i < bufferSize; i++) {
-			const shortDataL = Module.getValue(pointer, "i16");
-			const shortDataR = Module.getValue(pointer + 2, "i16");
+			const shortDataL = data[pointer];
+			const shortDataR = data[pointer + 1];
 			L[i] = shortDataL / 32768;
 			R[i] = shortDataR / 32768;
-			pointer += 4;
+			pointer += 2;
 		}
 	}
 }
