@@ -9,7 +9,7 @@ import { SoundConfig } from "../config/SoundConfig";
 
 module Settings {
 	export const Width: number = 175;
-	export const Height: number = 260;
+	export const Height: number = 295;
 	export const Title: string = "Sound Settings";
 	export const Content: string = "../../html/SoundConfig.html";
 }

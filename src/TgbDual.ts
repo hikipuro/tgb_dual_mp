@@ -316,6 +316,10 @@ export class TgbDual extends EventEmitter {
 		TgbDual.API.setKeys(down, up, left, right, a, b, select, start);
 	}
 
+	public setSoundVolume(value: number): void {
+		this._soundPlayer.volume = value / 100;
+	}
+
 	public setSound(master: boolean, square1: boolean, square2: boolean, wave: boolean, noise: boolean) {
 		console.log("setSound", master);
 		this._soundPlayer.isMuted = !master;

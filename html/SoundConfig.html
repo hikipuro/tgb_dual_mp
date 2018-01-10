@@ -18,6 +18,13 @@ document.addEventListener("DOMContentLoaded", () => {
 </head>
 <body>
 <div class="pane">
+	<div class="record">
+		<div id="volume-label" class="caption-volume">Volume</div>
+		<div class="value"><input id="volume" type="number" min="0" max="100"></div>
+	</div>
+</div>
+
+<div class="pane">
 	<div id="channels" class="title">Channels</div>
 	<div class="record">
 		<div class="value"><input id="master" type="checkbox"></div>

@@ -18,7 +18,7 @@ body {
 	vertical-align: top;
 	border: 1px ridge #888;
 	width: 155px;
-	margin-bottom: 1em;
+	margin-bottom: 8px;
 }
 
 .title {
@@ -37,6 +37,14 @@ body {
 	vertical-align: top;
 	height: 19px;
 	margin-left: 4px;
+}
+
+.caption-volume {
+	display: inline-block;
+	vertical-align: middle;
+	height: 19px;
+	margin-left: 4px;
+	margin-right: 8px;
 }
 
 .value {

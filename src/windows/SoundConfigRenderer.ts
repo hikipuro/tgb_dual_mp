@@ -9,6 +9,7 @@ export class SoundConfigRenderer {
 		soundConfig = SoundConfig.fromJSON(soundConfig);
 		this.translateText(languageJson);
 
+		const volume = document.querySelector("#volume") as HTMLInputElement;
 		const master = document.querySelector("#master") as HTMLInputElement;
 		const square1 = document.querySelector("#square1") as HTMLInputElement;
 		const square2 = document.querySelector("#square2") as HTMLInputElement;
@@ -17,6 +18,7 @@ export class SoundConfigRenderer {
 		const echo = document.querySelector("#echo") as HTMLInputElement;
 		const lowPass = document.querySelector("#lowPass") as HTMLInputElement;
 
+		volume.value = String(soundConfig.volume);
 		master.checked = soundConfig.master;
 		square1.checked = soundConfig.square1;
 		square2.checked = soundConfig.square2;
@@ -25,6 +27,14 @@ export class SoundConfigRenderer {
 		echo.checked = soundConfig.echo;
 		lowPass.checked = soundConfig.lowPass;
 
+		volume.addEventListener("input", () => {
+			console.log("SoundConfig.volume", volume.value);
+			let value = Number(volume.value);
+			value = Math.max(Number(volume.min), value);
+			value = Math.min(Number(volume.max), value);
+			volume.value = String(value);
+			updateConfig();
+		});
 		master.addEventListener("change", () => {
 			console.log("SoundConfig.master", master.checked);
 			updateConfig();
@@ -56,6 +66,7 @@ export class SoundConfigRenderer {
 		
 		function updateConfig(): void {
 			let soundConfig = new SoundConfig();
+			soundConfig.volume = Number(volume.value);
 			soundConfig.master = master.checked;
 			soundConfig.square1 = square1.checked;
 			soundConfig.square2 = square2.checked;
@@ -94,6 +105,7 @@ export class SoundConfigRenderer {
 		const elements = {
 			channels: document.querySelector("#channels"),
 			effectors: document.querySelector("#effectors"),
+			volume: document.querySelector("#volume-label"),
 			master: document.querySelector("#master-label"),
 			square1: document.querySelector("#square1-label"),
 			square2: document.querySelector("#square2-label"),

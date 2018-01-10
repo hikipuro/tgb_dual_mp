@@ -440,6 +440,7 @@ export class MainRenderer {
 	}
 
 	protected updateSoundConfig(soundConfig: SoundConfig): void {
+		this.tgbDual.setSoundVolume(soundConfig.volume);
 		this.tgbDual.setSound(
 			soundConfig.master,
 			soundConfig.square1,

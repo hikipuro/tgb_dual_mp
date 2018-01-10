@@ -1,4 +1,5 @@
 export class SoundConfig {
+	public volume: number = 100;
 	public master: boolean = true;
 	public square1: boolean = true;
 	public square2: boolean = true;
