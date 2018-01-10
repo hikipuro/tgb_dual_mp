@@ -107,9 +107,6 @@ export class MainRenderer {
 			const id = menu.id;
 
 			if (id.indexOf("file.save-state.") === 0) {
-				if (this.tgbDual.isPaused) {
-					return;
-				}
 				const fileNumber = Number(id.substr(-1, 1));
 				console.log("save", fileNumber);
 				this.tgbDual.saveState(fileNumber);
@@ -119,9 +116,6 @@ export class MainRenderer {
 			}
 
 			if (id.indexOf("file.load-state.") === 0) {
-				if (this.tgbDual.isPaused) {
-					return;
-				}
 				const fileNumber = Number(id.substr(-1, 1));
 				console.log("restore", fileNumber);
 				this.tgbDual.restoreState(fileNumber);
