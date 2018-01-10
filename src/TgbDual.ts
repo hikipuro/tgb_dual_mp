@@ -20,9 +20,11 @@ export class TgbDual extends EventEmitter {
 	protected _soundPlayer: SoundPlayer;
 	protected _waveFileWriter: WaveFileWriter;
 
-	public isFastMode: boolean = false;
 	protected _prevTime: number = 0;
 	//protected _updateCounter: number = 0;
+
+	public frameSkip: number = 0;
+	protected _frameSkipCount: number = 0;
 
 	public romPath: string = "";
 	protected _romInfo: TgbDual.RomInfo = null;
@@ -53,6 +55,14 @@ export class TgbDual extends EventEmitter {
 
 	public get romInfo(): TgbDual.RomInfo {
 		return this._romInfo;
+	}
+
+	public get fps(): number {
+		return this._canvasRenderer.fps;
+	}
+
+	public set fps(value: number) {
+		this._canvasRenderer.fps = value;
 	}
 
 	constructor() {
@@ -358,7 +368,8 @@ export class TgbDual extends EventEmitter {
 		});
 	}
 
-	protected render = (time: number): boolean => {
+	protected render = (time: number): void => {
+		/*
 		if (this.isFastMode) {
 			TgbDual.API.nextFrame();
 			if (this._prevTime + 17 >= performance.now()) {
@@ -371,6 +382,7 @@ export class TgbDual extends EventEmitter {
 			this._prevTime = performance.now();
 			return;
 		}
+		*/
 
 		this.emit("update");
 		this.setKeys(this.keyState);
@@ -379,6 +391,13 @@ export class TgbDual extends EventEmitter {
 	}
 
 	protected updateScreen(): void {
+		if (this.frameSkip > 0) {
+			this._frameSkipCount++;
+			if (this._frameSkipCount <= this.frameSkip) {
+				return;
+			}
+			this._frameSkipCount = 0;
+		}
 		let pointer = TgbDual.API.getBytes();
 		const len = TgbDual.Width * TgbDual.Height * 4;
 		const data = Module.HEAPU8.subarray(pointer, pointer + len);

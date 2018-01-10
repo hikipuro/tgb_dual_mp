@@ -5,6 +5,7 @@ import { MainMenu } from "./MainMenu";
 import { MainWindow } from "./windows/MainWindow";
 import { KeyConfigWindow } from "./windows/KeyConfigWindow";
 import { SoundConfigWindow } from "./windows/SoundConfigWindow";
+import { SpeedConfigWindow } from "./windows/SpeedConfigWindow";
 import { PathConfigWindow } from "./windows/PathConfigWindow";
 import { VersionWindow } from "./windows/VersionWindow";
 
@@ -56,6 +57,15 @@ class NodeMain {
 		});
 		soundConfig.browserWindow.webContents.openDevTools();
 		soundConfig.show();
+		//*/
+
+		/*
+		const speedConfig = new SpeedConfigWindow();
+		speedConfig.browserWindow.once("closed", () => {
+			this._app.quit();
+		});
+		speedConfig.browserWindow.webContents.openDevTools();
+		speedConfig.show();
 		//*/
 
 		/*

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="css/SpeedConfig.css">
+<script>
+let Electron = require("electron");
+let Module = require("../dist/windows/SpeedConfigRenderer.js");
+
+let renderer = null;
+document.addEventListener("DOMContentLoaded", () => {
+	let speedConfig = Electron.ipcRenderer.sendSync("SpeedConfigWindow.init");
+	renderer = new Module.SpeedConfigRenderer(speedConfig);
+});
+</script>
+</head>
+<body>
+<div class="pane">
+	<div class="title">Normal Mode</div>
+	<div class="record">
+		<div class="caption">Frame Skip</div>
+		<div class="value"><input id="frameSkip" type="number" min="0" max="9"></div>
+	</div>
+	<div class="record">
+		<div class="caption">FPS</div>
+		<div class="value"><input id="fps" type="number" min="1" max="300"></div>
+	</div>
+</div>
+
+<div class="pane">
+	<div class="title">Fast Mode</div>
+	<div class="record">
+		<div class="caption">Frame Skip</div>
+		<div class="value"><input id="fastFrameSkip" type="number" min="0" max="9"></div>
+	</div>
+	<div class="record">
+		<div class="caption">FPS</div>
+		<div class="value"><input id="fastFps" type="number" min="1" max="300"></div>
+	</div>
+</div>
+</body>
+</html>

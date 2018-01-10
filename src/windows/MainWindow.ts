@@ -8,11 +8,13 @@ import { Constants } from "../Constants";
 import { Config } from "../config/Config";
 import { KeyConfig } from "../config/KeyConfig";
 import { SoundConfig } from "../config/SoundConfig";
+import { SpeedConfig } from "../config/SpeedConfig";
 import { PathConfig } from "../config/PathConfig";
 import { MainMenu } from "../MainMenu";
 import { OpenDialog } from "../dialogs/OpenDialog";
 import { KeyConfigWindow } from "./KeyConfigWindow";
 import { SoundConfigWindow } from "./SoundConfigWindow";
+import { SpeedConfigWindow } from "./SpeedConfigWindow";
 import { PathConfigWindow } from "./PathConfigWindow";
 import { VersionWindow } from "./VersionWindow";
 
@@ -34,6 +36,7 @@ export class MainWindow {
 	public browserWindow: Electron.BrowserWindow = null;
 	protected _keyConfigWindow: KeyConfigWindow;
 	protected _soundConfigWindow: SoundConfigWindow;
+	protected _speedConfigWindow: SpeedConfigWindow;
 	protected _pathConfigWindow: PathConfigWindow;
 	protected _versionWindow: VersionWindow;
 	protected _config: Config;
@@ -237,6 +240,9 @@ export class MainWindow {
 			case "option.sound":
 				this.showSoundConfigWindow();
 				return;
+			case "option.speed":
+				this.showSpeedConfigWindow();
+				return;
 			case "option.screen.aspect-ratio":
 				this._config.screen.fixedAspectRatio = item.checked;
 				this.send("MainWindow.menu", item);
@@ -352,6 +358,27 @@ export class MainWindow {
 		this._soundConfigWindow.on("update", (soundConfig: SoundConfig) => {
 			this._config.sound = soundConfig;
 			this.send("MainWindow.soundConfig", this._config);
+		});
+	}
+
+	protected showSpeedConfigWindow(): void {
+		if (this._speedConfigWindow != null) {
+			this._speedConfigWindow.show();
+			return;
+		}
+
+		this._speedConfigWindow = new SpeedConfigWindow(this.browserWindow, this._config.speed);
+		this._speedConfigWindow.browserWindow.once("ready-to-show", () => {
+			this._speedConfigWindow.show();
+		});
+		this._speedConfigWindow.browserWindow.once("close", () => {
+			this._speedConfigWindow.removeAllListeners("apply");
+			this._speedConfigWindow.destroy();
+			this._speedConfigWindow = null;
+		});
+		this._speedConfigWindow.on("apply", (speedConfig: SpeedConfig) => {
+			this._config.speed = speedConfig;
+			this.send("MainWindow.speedConfig", this._config);
 		});
 	}
 

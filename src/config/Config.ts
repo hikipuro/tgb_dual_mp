@@ -6,6 +6,7 @@ import { ScreenConfig } from "./ScreenConfig";
 import { SoundConfig } from "./SoundConfig";
 import { PathConfig } from "./PathConfig";
 import { WindowConfig } from "./WindowConfig";
+import { SpeedConfig } from "./SpeedConfig";
 import { MiscConfig } from "./MiscConfig";
 
 export class Config {
@@ -15,6 +16,7 @@ export class Config {
 	public sound: SoundConfig;
 	public path: PathConfig;
 	public window: WindowConfig;
+	public speed: SpeedConfig;
 	public misc: MiscConfig;
 
 	constructor() {
@@ -23,6 +25,7 @@ export class Config {
 		this.sound = new SoundConfig();
 		this.path = new PathConfig();
 		this.window = new WindowConfig();
+		this.speed = new SpeedConfig();
 		this.misc = new MiscConfig();
 	}
 
@@ -51,6 +54,7 @@ export class Config {
 		config.sound = SoundConfig.fromJSON(json.sound);
 		config.path = PathConfig.fromJSON(json.path);
 		config.window = WindowConfig.fromJSON(json.window);
+		config.speed = SpeedConfig.fromJSON(json.speed);
 		config.misc = MiscConfig.fromJSON(json.misc);
 		return config;
 	}

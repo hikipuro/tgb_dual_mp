@@ -192,8 +192,7 @@
 			},
 			{
 				"id": "option.speed",
-				"label": "Speed Settings (&S)",
-				"enabled": false
+				"label": "Speed Settings (&S)"
 			},
 			{
 				"id": "option.screen",

@@ -27,6 +27,7 @@ export class MainRenderer {
 	protected mainElement: HTMLElement;
 	protected messageOuterElement: HTMLElement;
 	protected messageElement: HTMLElement;
+	protected isFastMode: boolean = false;
 	
 	constructor(commandLineArgs: string[]) {
 		this.commandLineArgs = commandLineArgs;
@@ -185,6 +186,11 @@ export class MainRenderer {
 			this.config = Config.fromJSON(arg);
 			this.updateSoundConfig(this.config.sound);
 		});
+		ipcRenderer.on("MainWindow.speedConfig", (event: Electron.IpcMessageEvent, arg: any) => {
+			console.log("MainWindow.speedConfig", arg.speed);
+			this.config = Config.fromJSON(arg);
+			this.updateSpeedConfig();
+		});
 		ipcRenderer.on("MainWindow.pathConfig", (event: Electron.IpcMessageEvent, arg: any) => {
 			console.log("MainWindow.pathConfig", arg.path);
 			this.config = Config.fromJSON(arg);
@@ -285,7 +291,8 @@ export class MainRenderer {
 			case keyConfig.b.code:		keyState.B = true; break;
 			case keyConfig.a.code:		keyState.A = true; break;
 			case keyConfig.fast.code:
-				this.tgbDual.isFastMode = true;
+				this.isFastMode = true;
+				this.updateSpeedConfig();
 				this.showMessage("Fast mode: on");
 				break;
 			case keyConfig.pause.code:
@@ -315,7 +322,8 @@ export class MainRenderer {
 			case keyConfig.b.code:		keyState.B = false; break;
 			case keyConfig.a.code:		keyState.A = false; break;
 			case keyConfig.fast.code:
-				this.tgbDual.isFastMode = false;
+				this.isFastMode = false;
+				this.updateSpeedConfig();
 				this.showMessage("Fast mode: off");
 				break;
 			}
@@ -414,6 +422,16 @@ export class MainRenderer {
 			soundConfig.echo,
 			soundConfig.lowPass
 		);
+	}
+
+	protected updateSpeedConfig(): void {
+		if (this.isFastMode) {
+			this.tgbDual.fps = this.config.speed.fastFps;
+			this.tgbDual.frameSkip = this.config.speed.fastFrameSkip;
+			return;
+		}
+		this.tgbDual.fps = this.config.speed.fps;
+		this.tgbDual.frameSkip = this.config.speed.frameSkip;
 	}
 
 	protected loadFile(filePath: string): void {

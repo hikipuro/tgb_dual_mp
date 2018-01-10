@@ -1,11 +1,11 @@
 export class CanvasRenderer {
-	public fps: number = 60;
 	public isPaused: boolean = false;
-	public handler: (time: number) => boolean;
+	public handler: (time: number) => void;
 	protected _element: HTMLCanvasElement;
 	protected _context: CanvasRenderingContext2D;
 	protected _requestAnimationFrameHandle: number = 0;
 
+	protected _fps: number = 60;
 	protected _prevTime: number = 0;
 	protected _prevTimeDiff: number = 0;
 	protected _fpsCount: number = 0;
@@ -31,6 +31,16 @@ export class CanvasRenderer {
 
 	public get isStarted(): boolean {
 		return this._requestAnimationFrameHandle !== 0;
+	}
+
+	public get fps(): number {
+		return this._fps;
+	}
+
+	public set fps(value: number) {
+		this._fps = value;
+		this._prevTime = performance.now();
+		this._prevTimeDiff = 0;
 	}
 
 	public start(): void {
@@ -81,7 +91,7 @@ export class CanvasRenderer {
 			this._requestAnimationFrameHandle = requestAnimationFrame(this.update);
 			return;
 		}
-		if (this.fps === 60) {
+		if (this._fps === 60) {
 			this.handler(time);
 			this._requestAnimationFrameHandle = requestAnimationFrame(this.update);
 			return;
@@ -89,7 +99,7 @@ export class CanvasRenderer {
 
 		const now = performance.now();
 		let diff = now - this._prevTime;
-		const frameTime = 1000 / this.fps;
+		const frameTime = 1000 / this._fps;
 		//console.log(now - this._prevTime, 1000 / this.fps);
 		if (diff + this._prevTimeDiff <= frameTime - 2) {
 			this._requestAnimationFrameHandle = requestAnimationFrame(this.update);
@@ -98,10 +108,15 @@ export class CanvasRenderer {
 		this._prevTime += diff;
 		this._elapsed += diff;
 		diff +=  this._prevTimeDiff;
+		let count = 0;
 		while (diff > 0) {
 			this.handler(time);
 			diff -= frameTime;
 			this._fpsCount++;
+			count++;
+			if (count > 5) {
+				break;
+			}
 		}
 		this._prevTimeDiff = diff;
 		if (this._elapsed > 1000) {
