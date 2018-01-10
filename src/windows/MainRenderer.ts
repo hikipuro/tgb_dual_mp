@@ -29,7 +29,7 @@ export class MainRenderer {
 	protected messageElement: HTMLElement;
 	protected fpsElement: HTMLElement;
 	protected isFastMode: boolean = false;
-	
+
 	constructor(commandLineArgs: string[]) {
 		this.commandLineArgs = commandLineArgs;
 		this.mainElement = document.getElementById("main");
@@ -105,7 +105,7 @@ export class MainRenderer {
 			console.log("MainWindow.menu", menu);
 
 			const id = menu.id;
-			
+
 			if (id.indexOf("file.save-state.") === 0) {
 				if (this.tgbDual.isPaused) {
 					return;
@@ -130,48 +130,48 @@ export class MainRenderer {
 			}
 
 			switch (id) {
-			case "file.reset-slot1":
-				if (this.tgbDual.isFileLoaded) {
-					this.tgbDual.reset();
-					this.updateScreenConfig(this.config.screen);
-					this.updateSoundConfig(this.config.sound);
-					this.showMessage("Reset");
-				}
-				break;
-			case "file.pause":
-				if (this.tgbDual.isFileLoaded) {
-					this.tgbDual.togglePause();
-					if (this.tgbDual.isPaused) {
-						this.showMessage("Pause");
-					} else {
-						this.showMessage("Resume");
+				case "file.reset-slot1":
+					if (this.tgbDual.isFileLoaded) {
+						this.tgbDual.reset();
+						this.updateScreenConfig(this.config.screen);
+						this.updateSoundConfig(this.config.sound);
+						this.showMessage("Reset");
 					}
-				}
-				break;
-			case "file.release-slot1":
-				if (this.tgbDual.isFileLoaded) {
-					this.tgbDual.stop();
-					document.title = this.defaultTitle;
-					this.fpsElement.innerText = "0";
-					this.fpsElement.style.display = "none";
-					ipcRenderer.send("MainWindow.updateSaveLoadStateMenu", null);
-					this.showMessage("Release");
-				}
-				break;
-			case "option.screen.aspect-ratio":
-				this.config.screen.fixedAspectRatio = menu.checked;
-				this.adjustScreenSize();
-				break;
-			case "option.screen.smoothing":
-				this.config.screen.smoothing = menu.checked;
-				this.updateScreenSmoothing();
-				break;
-			case "option.record.screen":
-				this.screenshot();
-				break;
-			case "option.record.sound":
-				this.recordSound();
-				break;
+					break;
+				case "file.pause":
+					if (this.tgbDual.isFileLoaded) {
+						this.tgbDual.togglePause();
+						if (this.tgbDual.isPaused) {
+							this.showMessage("Pause");
+						} else {
+							this.showMessage("Resume");
+						}
+					}
+					break;
+				case "file.release-slot1":
+					if (this.tgbDual.isFileLoaded) {
+						this.tgbDual.stop();
+						document.title = this.defaultTitle;
+						this.updateFps(0);
+						this.fpsElement.style.display = "none";
+						ipcRenderer.send("MainWindow.updateSaveLoadStateMenu", null);
+						this.showMessage("Release");
+					}
+					break;
+				case "option.screen.aspect-ratio":
+					this.config.screen.fixedAspectRatio = menu.checked;
+					this.adjustScreenSize();
+					break;
+				case "option.screen.smoothing":
+					this.config.screen.smoothing = menu.checked;
+					this.updateScreenSmoothing();
+					break;
+				case "option.record.screen":
+					this.screenshot();
+					break;
+				case "option.record.sound":
+					this.recordSound();
+					break;
 			}
 		});
 		ipcRenderer.on("MainWindow.load", (event: Electron.IpcMessageEvent, arg: any) => {
@@ -235,12 +235,12 @@ export class MainRenderer {
 				this.tgbDual.stop();
 			}
 		}
-		
+
 		// window resize
 		window.onresize = () => {
 			this.adjustScreenSize();
 		}
-		
+
 		// window close
 		window.onbeforeunload = (e: BeforeUnloadEvent) => {
 			if (this.tgbDual == null) {
@@ -253,8 +253,8 @@ export class MainRenderer {
 		// gamepad (debug)
 		window.addEventListener("gamepadconnected", (e: GamepadEvent) => {
 			console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
-			e.gamepad.index, e.gamepad.id,
-			e.gamepad.buttons.length, e.gamepad.axes.length);
+				e.gamepad.index, e.gamepad.id,
+				e.gamepad.buttons.length, e.gamepad.axes.length);
 		});
 	}
 
@@ -278,7 +278,7 @@ export class MainRenderer {
 			const file = e.dataTransfer.files[0];
 			this.loadFile(file.path);
 		}
-		
+
 		// keyboard input
 		document.onkeydown = (e: KeyboardEvent) => {
 			//e.preventDefault();
@@ -288,31 +288,31 @@ export class MainRenderer {
 			const keyConfig = this.config.key;
 			const keyState = this.tgbDual.keyState;
 			switch (e.keyCode) {
-			case keyConfig.up.code:		keyState.Up = true; break;
-			case keyConfig.down.code:	keyState.Down = true; break;
-			case keyConfig.left.code:	keyState.Left = true; break;
-			case keyConfig.right.code:	keyState.Right = true; break;
-			case keyConfig.start.code:	keyState.Start = true; break;
-			case keyConfig.select.code:	keyState.Select = true; break;
-			case keyConfig.b.code:		keyState.B = true; break;
-			case keyConfig.a.code:		keyState.A = true; break;
-			case keyConfig.fast.code:
-				if (!this.tgbDual.isPaused) {
-					this.isFastMode = true;
+				case keyConfig.up.code: keyState.Up = true; break;
+				case keyConfig.down.code: keyState.Down = true; break;
+				case keyConfig.left.code: keyState.Left = true; break;
+				case keyConfig.right.code: keyState.Right = true; break;
+				case keyConfig.start.code: keyState.Start = true; break;
+				case keyConfig.select.code: keyState.Select = true; break;
+				case keyConfig.b.code: keyState.B = true; break;
+				case keyConfig.a.code: keyState.A = true; break;
+				case keyConfig.fast.code:
+					if (!this.tgbDual.isPaused) {
+						this.isFastMode = true;
+						this.updateSpeedConfig();
+						this.showMessage("Fast mode: on");
+					}
+					break;
+				case keyConfig.pause.code:
+					this.isFastMode = false;
 					this.updateSpeedConfig();
-					this.showMessage("Fast mode: on");
-				}
-				break;
-			case keyConfig.pause.code:
-				this.isFastMode = false;
-				this.updateSpeedConfig();
-				this.tgbDual.togglePause();
-				if (this.tgbDual.isPaused) {
-					this.showMessage("Pause");
-				} else {
-					this.showMessage("Resume");
-				}
-				break;
+					this.tgbDual.togglePause();
+					if (this.tgbDual.isPaused) {
+						this.showMessage("Pause");
+					} else {
+						this.showMessage("Resume");
+					}
+					break;
 			}
 		};
 		document.onkeyup = (e: KeyboardEvent) => {
@@ -323,21 +323,21 @@ export class MainRenderer {
 			const keyConfig = this.config.key;
 			const keyState = this.tgbDual.keyState;
 			switch (e.keyCode) {
-			case keyConfig.up.code:		keyState.Up = false; break;
-			case keyConfig.down.code:	keyState.Down = false; break;
-			case keyConfig.left.code:	keyState.Left = false; break;
-			case keyConfig.right.code:	keyState.Right = false; break;
-			case keyConfig.start.code:	keyState.Start = false; break;
-			case keyConfig.select.code:	keyState.Select = false; break;
-			case keyConfig.b.code:		keyState.B = false; break;
-			case keyConfig.a.code:		keyState.A = false; break;
-			case keyConfig.fast.code:
-				if (!this.tgbDual.isPaused && this.isFastMode) {
-					this.isFastMode = false;
-					this.updateSpeedConfig();
-					this.showMessage("Fast mode: off");
-				}
-				break;
+				case keyConfig.up.code: keyState.Up = false; break;
+				case keyConfig.down.code: keyState.Down = false; break;
+				case keyConfig.left.code: keyState.Left = false; break;
+				case keyConfig.right.code: keyState.Right = false; break;
+				case keyConfig.start.code: keyState.Start = false; break;
+				case keyConfig.select.code: keyState.Select = false; break;
+				case keyConfig.b.code: keyState.B = false; break;
+				case keyConfig.a.code: keyState.A = false; break;
+				case keyConfig.fast.code:
+					if (!this.tgbDual.isPaused && this.isFastMode) {
+						this.isFastMode = false;
+						this.updateSpeedConfig();
+						this.showMessage("Fast mode: off");
+					}
+					break;
 			}
 		};
 	}
@@ -403,11 +403,25 @@ export class MainRenderer {
 		if (text == null || text === "") {
 			return;
 		}
-		this.messageElement.innerText = text;
+		text = "<span class='emoji'>" + this.getRandomAnimalEmoji() + "</span> " + text;
+		this.messageElement.innerHTML = text;
 		this.messageElement.classList.remove("show");
 		// reset animation
 		this.messageElement.offsetWidth;
 		this.messageElement.classList.add("show");
+	}
+
+	protected getRandomAnimalEmoji(): string {
+		function getRandomInt(min, max) {
+			return Math.floor(Math.random() * (max - min + 1)) + min;
+		}
+		const list = [
+			"🐶", "🐱", "🐭", "🐹", "🐰", "🦊",
+			"🐻", "🐼", "🐨", "🐯", "🦁", "🐮",
+			"🐷", "🐸", "🐵", "🐺", "🐗", "🐴", "🦄"
+		];
+		const index = getRandomInt(0, list.length - 1);
+		return list[index];
 	}
 
 	protected updateScreenSmoothing(): void {
@@ -442,6 +456,7 @@ export class MainRenderer {
 	protected updateSpeedConfig(): void {
 		const speed = this.config.speed;
 		this.fpsElement.style.display = speed.showFps ? "block" : "none";
+		this.updateFps(0);
 		if (this.isFastMode) {
 			this.tgbDual.fps = speed.fastFps;
 			this.tgbDual.frameSkip = speed.fastFrameSkip;
@@ -472,7 +487,7 @@ export class MainRenderer {
 			}
 		}
 	}
-	
+
 	protected loadZipFile(zipPath: string): boolean {
 		if (!fs.existsSync(zipPath)) {
 			return false;
@@ -576,9 +591,10 @@ export class MainRenderer {
 		if (this.fpsElement.style.display === "none") {
 			return;
 		}
-		this.fpsElement.innerText = String(fps);
-	} 
-	
+		//const text = "<span class='emoji'>📽</span> " + String(fps);
+		this.fpsElement.innerHTML = String(fps);
+	}
+
 	protected updateGamepad = (): void => {
 		const keyState = this.tgbDual.keyState;
 		const gamePads = this.gamePads;
@@ -589,43 +605,43 @@ export class MainRenderer {
 		} else if (gamePads.isKeyUp(0, 1)) {
 			keyState.A = false;
 		}
-		
+
 		if (gamePads.isKeyDown(0, 0)) {
 			keyState.B = true;
 		} else if (gamePads.isKeyUp(0, 0)) {
 			keyState.B = false;
 		}
-		
+
 		if (gamePads.isKeyDown(0, 2)) {
 			keyState.Select = true;
 		} else if (gamePads.isKeyUp(0, 2)) {
 			keyState.Select = false;
 		}
-		
+
 		if (gamePads.isKeyDown(0, 3)) {
 			keyState.Start = true;
 		} else if (gamePads.isKeyUp(0, 3)) {
 			keyState.Start = false;
 		}
-		
+
 		if (gamePads.isKeyDown(0, 12)) {
 			keyState.Up = true;
 		} else if (gamePads.isKeyUp(0, 12)) {
 			keyState.Up = false;
 		}
-		
+
 		if (gamePads.isKeyDown(0, 13)) {
 			keyState.Down = true;
 		} else if (gamePads.isKeyUp(0, 13)) {
 			keyState.Down = false;
 		}
-		
+
 		if (gamePads.isKeyDown(0, 14)) {
 			keyState.Left = true;
 		} else if (gamePads.isKeyUp(0, 14)) {
 			keyState.Left = false;
 		}
-		
+
 		if (gamePads.isKeyDown(0, 15)) {
 			keyState.Right = true;
 		} else if (gamePads.isKeyUp(0, 15)) {

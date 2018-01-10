@@ -45,6 +45,10 @@ body {
 	background-color: rgba(0, 0, 0, 0.3);
 	border-radius: 0.5em;
 }
+#message .emoji {
+	font-size: 100%;
+	text-shadow: none;
+}
 #message.show {
 	display: -webkit-box;
 	-webkit-box-align: center;
@@ -75,6 +79,7 @@ body {
 }
 
 #fps {
+	font-family: sans-serif;
 	position: relative;
 	display: none;
 	padding: 0.1em 0.4em;
@@ -87,4 +92,8 @@ body {
 	white-space: nowrap;
 	background-color: rgba(0, 0, 0, 0.3);
 	border-radius: 0.5em;
+}
+#fps .emoji {
+	font-size: 100%;
+	text-shadow: none;
 }
