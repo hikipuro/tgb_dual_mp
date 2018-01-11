@@ -480,8 +480,10 @@ export class MainRenderer {
 
 	protected updateSpeedConfig(): void {
 		const speed = this.config.speed;
-		this.fpsElement.style.display = speed.showFps ? "block" : "none";
-		this.updateFps(0);
+		if (this.tgbDual.isFileLoaded) {
+			this.fpsElement.style.display = speed.showFps ? "block" : "none";
+		}
+		this.updateFps(this.tgbDual.lastFps);
 		if (this.isFastMode) {
 			this.tgbDual.fps = speed.fastFps;
 			this.tgbDual.frameSkip = speed.fastFrameSkip;

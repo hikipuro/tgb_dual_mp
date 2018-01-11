@@ -71,7 +71,8 @@
 		"fast": "高速モード",
 		"frameSkip": "フレームスキップ",
 		"fastFrameSkip": "フレームスキップ",
-		"showFps": "FPSの表示"
+		"showFps": "FPSの表示",
+		"reset": "リセット"
 	},
 	"path": {
 		"title": "ディレクトリ設定",

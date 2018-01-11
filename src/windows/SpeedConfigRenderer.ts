@@ -14,6 +14,7 @@ export class SpeedConfigRenderer {
 		const fastFrameSkip = document.querySelector("#fastFrameSkip") as HTMLInputElement;
 		const fastFps = document.querySelector("#fastFps") as HTMLInputElement;
 		const showFps = document.querySelector("#showFps") as HTMLInputElement;
+		const reset = document.querySelector("#reset") as HTMLInputElement;
 
 		frameSkip.value = String(speedConfig.frameSkip);
 		fps.value = String(speedConfig.fps);
@@ -39,6 +40,16 @@ export class SpeedConfigRenderer {
 		fastFrameSkip.addEventListener("input", onInput);
 		fastFps.addEventListener("input", onInput);
 		showFps.addEventListener("change", () => {
+			speedConfig.showFps = showFps.checked;
+			renderer.applyConfig(speedConfig);
+		});
+		reset.addEventListener("click", () => {
+			const speedConfig = new SpeedConfig();
+			frameSkip.value = String(speedConfig.frameSkip);
+			fps.value = String(speedConfig.fps);
+			fastFrameSkip.value = String(speedConfig.fastFrameSkip);
+			fastFps.value = String(speedConfig.fastFps);
+			//showFps.checked = speedConfig.showFps;
 			speedConfig.showFps = showFps.checked;
 			renderer.applyConfig(speedConfig);
 		});
@@ -79,7 +90,8 @@ export class SpeedConfigRenderer {
 			fast: document.querySelector("#fast-label"),
 			fastFrameSkip: document.querySelector("#fastFrameSkip-label"),
 			fastFps: document.querySelector("#fastFps-label"),
-			showFps: document.querySelector("#showFps-label")
+			showFps: document.querySelector("#showFps-label"),
+			reset: document.querySelector("#reset")
 		};
 		
 		for (const name in elements) {

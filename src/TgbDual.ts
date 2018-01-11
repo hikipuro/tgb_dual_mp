@@ -25,6 +25,7 @@ export class TgbDual extends EventEmitter {
 
 	public frameSkip: number = 0;
 	protected _frameSkipCount: number = 0;
+	public lastFps: number = 0;
 
 	public romPath: string = "";
 	protected _romInfo: TgbDual.RomInfo = null;
@@ -76,6 +77,7 @@ export class TgbDual extends EventEmitter {
 		this._canvasRenderer.update = this.onCanvasUpdate;
 		this._canvasRenderer.render = this.onCanvasRender;
 		this._canvasRenderer.on("fps", (fps: number) => {
+			this.lastFps = fps;
 			this.emit("fps", fps);
 		});
 		this._canvasRenderer.clear();

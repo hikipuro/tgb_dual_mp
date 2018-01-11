@@ -48,21 +48,29 @@ body {
 	height: 16px;
 }
 
-.record-single {
+.record-fps {
 	display: block;
 	margin: 0 4px;
 }
 
-.caption-single {
+.caption-fps {
 	display: inline-block;
 	vertical-align: top;
 	height: 20px;
 	margin-left: 4px;
 }
 
-.value-single {
+.value-fps {
 	display: inline-block;
 	vertical-align: top;
 	width: 20px;
 	height: 20px;
+}
+
+#reset {
+	width: 7em;
+	height: 1.8em;
+	position: absolute;
+	right: 9px;
+	bottom: 8px;
 }
