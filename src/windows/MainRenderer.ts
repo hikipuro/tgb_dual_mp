@@ -127,9 +127,7 @@ export class MainRenderer {
 			switch (id) {
 				case "file.reset-slot1":
 					if (this.tgbDual.isFileLoaded) {
-						this.tgbDual.reset();
-						this.updateScreenConfig(this.config.screen);
-						this.updateSoundConfig(this.config.sound);
+						this.loadFile(this.tgbDual.romPath);
 						this.showMessage("Reset");
 					}
 					break;
@@ -499,6 +497,9 @@ export class MainRenderer {
 
 		if (ext === ".zip") {
 			this.loadZipFile(filePath);
+			this.updateScreenConfig(this.config.screen);
+			this.updateSoundConfig(this.config.sound);
+			this.updateSpeedConfig();
 			return;
 		}
 
@@ -510,6 +511,10 @@ export class MainRenderer {
 				const romInfo = this.tgbDual.getInfo();
 				document.title = romInfo.cartName;
 				console.log("romInfo", romInfo, romInfo.cartName.length);
+				
+				this.updateScreenConfig(this.config.screen);
+				this.updateSoundConfig(this.config.sound);
+				this.updateSpeedConfig();
 				ipcRenderer.send("MainWindow.updateSaveLoadStateMenu", filePath);
 			}
 		}
