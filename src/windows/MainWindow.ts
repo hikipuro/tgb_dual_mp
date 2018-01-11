@@ -79,6 +79,8 @@ export class MainWindow {
 			useContentSize: true,
 			width: this._config.window.width,
 			height: this._config.window.height,
+			x: this._config.window.x,
+			y: this._config.window.y,
 			minWidth: Constants.ScreenWidth,
 			minHeight: Constants.ScreenHeight,
 			acceptFirstMouse: true,
@@ -150,6 +152,7 @@ export class MainWindow {
 			this.removeIpcEvents();
 
 			// save config.json
+			this.saveWindowPosition();
 			this._config.save();
 		});
 	}
@@ -290,6 +293,12 @@ export class MainWindow {
 
 	protected setWindowSize(width: number, height: number): void {
 		this.browserWindow.setContentSize(width, height, false);
+	}
+
+	protected saveWindowPosition(): void {
+		const position = this.browserWindow.getPosition();
+		this._config.window.x = position[0];
+		this._config.window.y = position[1];
 	}
 
 	protected showOpenFileDialog() {

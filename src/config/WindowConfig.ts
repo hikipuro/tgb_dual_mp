@@ -4,6 +4,8 @@ import { Constants } from "../Constants";
 export class WindowConfig {
 	public width: number = Constants.ScreenWidth * 3;
 	public height: number = Constants.ScreenHeight * 3;
+	public x: number = null;
+	public y: number = null;
 
 	public static fromJSON(json: any): WindowConfig {
 		const windowConfig = new WindowConfig();
