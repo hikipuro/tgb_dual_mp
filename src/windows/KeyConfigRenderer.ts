@@ -97,15 +97,18 @@ class KeyInputElements {
 class SystemKeyInputElements {
 	public focusElement: HTMLInputElement = null;
 	public fast: HTMLInputElement = null;
+	public autoFire: HTMLInputElement = null;
 	public pause: HTMLInputElement = null;
 	public elements: HTMLInputElement[] = [];
 
 	constructor() {
 		this.fast = document.querySelector("#fast");
+		this.autoFire = document.querySelector("#autoFire");
 		this.pause = document.querySelector("#pause");
 
 		this.elements.push(
 			this.fast,
+			this.autoFire,
 			this.pause
 		);
 
@@ -117,6 +120,7 @@ class SystemKeyInputElements {
 
 	public setLabel(keyConfig: KeyConfig): void {
 		this.fast.value = keyConfig.fast.label;
+		this.autoFire.value = keyConfig.autoFire.label;
 		this.pause.value = keyConfig.pause.label;
 	}
 
@@ -171,18 +175,12 @@ export class KeyConfigRenderer {
 		keyConfig = KeyConfig.fromJSON(keyConfig);
 		this.translateText(languageJson);
 
-		const buttonOK = document.querySelector("#ok");
 		const keySlot1 = new KeyInputElements("#slot1-");
 		const systemKey = new SystemKeyInputElements();
 
 		//console.log("keyConfig", keyConfig);
 		keySlot1.setLabel(keyConfig);
 		systemKey.setLabel(keyConfig);
-
-		buttonOK.addEventListener("click", function handler() {
-			buttonOK.removeEventListener("click", handler);
-			ipcRenderer.send("KeyConfigWindow.close", keyConfig);
-		});
 
 		document.addEventListener("keydown", (e: KeyboardEvent) => {
 			e.preventDefault();
@@ -200,6 +198,7 @@ export class KeyConfigRenderer {
 					keySlot1.blur();
 					systemKey.fast.focus();
 				}
+				updateConfig();
 			} else if (systemKey.focusElement != null) {
 				let id = systemKey.getFocusElementSubId();
 				keyConfig.setValue(id, e.keyCode, key);
@@ -207,6 +206,7 @@ export class KeyConfigRenderer {
 				if (!systemKey.focusNext()) {
 					systemKey.blur();
 				}
+				updateConfig();
 			}
 		});
 		document.addEventListener("keyup", (e: KeyboardEvent) => {
@@ -215,6 +215,10 @@ export class KeyConfigRenderer {
 		document.addEventListener("keypress", (e: KeyboardEvent) => {
 			e.preventDefault();
 		});
+		
+		function updateConfig(): void {
+			ipcRenderer.send("KeyConfigWindow.apply", keyConfig);
+		}
 		
 		
 		// disable drag & drop
@@ -258,6 +262,7 @@ export class KeyConfigRenderer {
 			right1: document.querySelector("#slot1-right-label"),
 			system: document.querySelector("#system-label"),
 			fast: document.querySelector("#fast-label"),
+			autoFire: document.querySelector("#autoFire-label"),
 			pause: document.querySelector("#pause-label")
 		};
 		

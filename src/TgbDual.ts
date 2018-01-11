@@ -307,14 +307,15 @@ export class TgbDual extends EventEmitter {
 	}
 
 	public setKeys(keyState: TgbDual.KeyState): void {
-		const down = keyState.Down ? 1 : 0;
-		const up = keyState.Up ? 1 : 0;
-		const left = keyState.Left ? 1 : 0;
-		const right = keyState.Right ? 1 : 0;
-		const a = keyState.A ? 1 : 0;
-		const b = keyState.B ? 1 : 0;
-		const select = keyState.Select ? 1 : 0;
-		const start = keyState.Start ? 1 : 0;
+		keyState.update();
+		const down = keyState.down ? 1 : 0;
+		const up = keyState.up ? 1 : 0;
+		const left = keyState.left ? 1 : 0;
+		const right = keyState.right ? 1 : 0;
+		const a = keyState.a ? 1 : 0;
+		const b = keyState.b ? 1 : 0;
+		const select = keyState.select ? 1 : 0;
+		const start = keyState.start ? 1 : 0;
 		TgbDual.API.setKeys(down, up, left, right, a, b, select, start);
 	}
 
@@ -558,14 +559,56 @@ export module TgbDual {
 	}
 
 	export class KeyState {
-		public A: boolean = false;
-		public B: boolean = false;
-		public Start: boolean = false;
-		public Select: boolean = false;
-		public Up: boolean = false;
-		public Down: boolean = false;
-		public Left: boolean = false;
-		public Right: boolean = false;
+		public start: boolean = false;
+		public select: boolean = false;
+		public up: boolean = false;
+		public down: boolean = false;
+		public left: boolean = false;
+		public right: boolean = false;
+		public autoFire: boolean = false;
+
+		public get a(): boolean {
+			const value = this._a;
+			if (!this.autoFire) {
+				return value;
+			}
+			if (!value) {
+				return false;
+			}
+			return this._autoFireState;
+		}
+		public set a(value: boolean) {
+			this._a = value;
+		}
+		
+		public get b(): boolean {
+			const value = this._b;
+			if (!this.autoFire) {
+				return value;
+			}
+			if (!value) {
+				return false;
+			}
+			return this._autoFireState;
+		}
+		public set b(value: boolean) {
+			this._b = value;
+		}
+		
+		protected _a: boolean = false;
+		protected _b: boolean = false;
+		protected _autoFireState: boolean = false;
+
+		public toggleAutoFire(): void {
+			this.autoFire = !this.autoFire;
+		}
+
+		public update(): void {
+			if (!this.autoFire) {
+				return;
+			}
+			this._autoFireState = !this._autoFireState;
+		}
 	}
 
 	export class RomInfo {

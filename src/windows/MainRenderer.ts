@@ -310,19 +310,27 @@ export class MainRenderer {
 			const keyConfig = this.config.key;
 			const keyState = this.tgbDual.keyState;
 			switch (e.keyCode) {
-				case keyConfig.up.code: keyState.Up = true; break;
-				case keyConfig.down.code: keyState.Down = true; break;
-				case keyConfig.left.code: keyState.Left = true; break;
-				case keyConfig.right.code: keyState.Right = true; break;
-				case keyConfig.start.code: keyState.Start = true; break;
-				case keyConfig.select.code: keyState.Select = true; break;
-				case keyConfig.b.code: keyState.B = true; break;
-				case keyConfig.a.code: keyState.A = true; break;
+				case keyConfig.up.code: keyState.up = true; break;
+				case keyConfig.down.code: keyState.down = true; break;
+				case keyConfig.left.code: keyState.left = true; break;
+				case keyConfig.right.code: keyState.right = true; break;
+				case keyConfig.start.code: keyState.start = true; break;
+				case keyConfig.select.code: keyState.select = true; break;
+				case keyConfig.b.code: keyState.b = true; break;
+				case keyConfig.a.code: keyState.a = true; break;
 				case keyConfig.fast.code:
 					if (!this.tgbDual.isPaused) {
 						this.isFastMode = true;
 						this.updateSpeedConfig();
 						this.showMessage("Fast mode: on");
+					}
+					break;
+				case keyConfig.autoFire.code:
+					keyState.toggleAutoFire();
+					if (keyState.autoFire) {
+						this.showMessage("Auto fire: on");
+					} else {
+						this.showMessage("Auto fire: off");
 					}
 					break;
 				case keyConfig.pause.code:
@@ -345,14 +353,14 @@ export class MainRenderer {
 			const keyConfig = this.config.key;
 			const keyState = this.tgbDual.keyState;
 			switch (e.keyCode) {
-				case keyConfig.up.code: keyState.Up = false; break;
-				case keyConfig.down.code: keyState.Down = false; break;
-				case keyConfig.left.code: keyState.Left = false; break;
-				case keyConfig.right.code: keyState.Right = false; break;
-				case keyConfig.start.code: keyState.Start = false; break;
-				case keyConfig.select.code: keyState.Select = false; break;
-				case keyConfig.b.code: keyState.B = false; break;
-				case keyConfig.a.code: keyState.A = false; break;
+				case keyConfig.up.code: keyState.up = false; break;
+				case keyConfig.down.code: keyState.down = false; break;
+				case keyConfig.left.code: keyState.left = false; break;
+				case keyConfig.right.code: keyState.right = false; break;
+				case keyConfig.start.code: keyState.start = false; break;
+				case keyConfig.select.code: keyState.select = false; break;
+				case keyConfig.b.code: keyState.b = false; break;
+				case keyConfig.a.code: keyState.a = false; break;
 				case keyConfig.fast.code:
 					if (!this.tgbDual.isPaused && this.isFastMode) {
 						this.isFastMode = false;
@@ -639,51 +647,51 @@ export class MainRenderer {
 
 		gamePads.update();
 		if (gamePads.isKeyDown(0, 1)) {
-			keyState.A = true;
+			keyState.a = true;
 		} else if (gamePads.isKeyUp(0, 1)) {
-			keyState.A = false;
+			keyState.a = false;
 		}
 
 		if (gamePads.isKeyDown(0, 0)) {
-			keyState.B = true;
+			keyState.b = true;
 		} else if (gamePads.isKeyUp(0, 0)) {
-			keyState.B = false;
+			keyState.b = false;
 		}
 
 		if (gamePads.isKeyDown(0, 2)) {
-			keyState.Select = true;
+			keyState.select = true;
 		} else if (gamePads.isKeyUp(0, 2)) {
-			keyState.Select = false;
+			keyState.select = false;
 		}
 
 		if (gamePads.isKeyDown(0, 3)) {
-			keyState.Start = true;
+			keyState.start = true;
 		} else if (gamePads.isKeyUp(0, 3)) {
-			keyState.Start = false;
+			keyState.start = false;
 		}
 
 		if (gamePads.isKeyDown(0, 12)) {
-			keyState.Up = true;
+			keyState.up = true;
 		} else if (gamePads.isKeyUp(0, 12)) {
-			keyState.Up = false;
+			keyState.up = false;
 		}
 
 		if (gamePads.isKeyDown(0, 13)) {
-			keyState.Down = true;
+			keyState.down = true;
 		} else if (gamePads.isKeyUp(0, 13)) {
-			keyState.Down = false;
+			keyState.down = false;
 		}
 
 		if (gamePads.isKeyDown(0, 14)) {
-			keyState.Left = true;
+			keyState.left = true;
 		} else if (gamePads.isKeyUp(0, 14)) {
-			keyState.Left = false;
+			keyState.left = false;
 		}
 
 		if (gamePads.isKeyDown(0, 15)) {
-			keyState.Right = true;
+			keyState.right = true;
 		} else if (gamePads.isKeyUp(0, 15)) {
-			keyState.Right = false;
+			keyState.right = false;
 		}
 	};
 }

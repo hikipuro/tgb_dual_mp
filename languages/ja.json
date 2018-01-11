@@ -45,11 +45,14 @@
 	"key": {
 		"title": "ボタン設定",
 		"system": "システム",
+		"start1": "スタート",
+		"select1": "セレクト",
 		"up1": "上",
 		"down1": "下",
 		"left1": "左",
 		"right1": "右",
 		"fast": "高速",
+		"autoFire": "連打",
 		"pause": "一時停止"
 	},
 	"sound": {

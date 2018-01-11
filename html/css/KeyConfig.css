@@ -63,11 +63,3 @@ body {
 	margin-left: 4px;
 	position: relative;
 }
-
-button.ok {
-	width: 8em;
-	height: 1.8em;
-	position: absolute;
-	right: 0;
-	bottom: 0;
-}

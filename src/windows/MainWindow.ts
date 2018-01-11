@@ -335,11 +335,11 @@ export class MainWindow {
 			this._keyConfigWindow.show();
 		});
 		this._keyConfigWindow.browserWindow.once("close", () => {
-			this._keyConfigWindow.removeAllListeners("close");
+			this._keyConfigWindow.removeAllListeners("apply");
 			this._keyConfigWindow.destroy();
 			this._keyConfigWindow = null;
 		});
-		this._keyConfigWindow.once("close", (keyConfig: KeyConfig) => {
+		this._keyConfigWindow.on("apply", (keyConfig: KeyConfig) => {
 			this._config.key = keyConfig;
 			this.send("MainWindow.getConfig", this._config);
 		});

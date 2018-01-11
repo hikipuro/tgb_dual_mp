@@ -28,6 +28,7 @@ export class KeyConfig {
 	public left: KeyInfo = new KeyInfo(KeyCode.Left, "ArrowLeft");
 	public right: KeyInfo = new KeyInfo(KeyCode.Right, "ArrowRight");
 	public fast: KeyInfo = new KeyInfo(KeyCode.Tab, "Tab");
+	public autoFire: KeyInfo = new KeyInfo(KeyCode.A, "A");
 	public pause: KeyInfo = new KeyInfo(KeyCode.P, "P");
 
 	public setValue(id: string, code: number, label: string): void {
