@@ -166,10 +166,11 @@ class SystemKeyInputElements {
 }
 
 export class KeyConfigRenderer {
-	constructor(keyConfig: KeyConfig) {
+	constructor(languageJson: any, keyConfig: KeyConfig) {
 		RendererUtility.overrideConsoleLog();
-
 		keyConfig = KeyConfig.fromJSON(keyConfig);
+		this.translateText(languageJson);
+
 		const buttonOK = document.querySelector("#ok");
 		const keySlot1 = new KeyInputElements("#slot1-");
 		const systemKey = new SystemKeyInputElements();
@@ -233,5 +234,39 @@ export class KeyConfigRenderer {
 
 	protected capitalize(text: string): string {
 		return text.charAt(0).toUpperCase() + text.slice(1);
+	}
+	
+	protected translateText(languageJson: any): void {
+		if (languageJson == null || languageJson.key == null) {
+			return;
+		}
+
+		const json = languageJson.key;
+		if (json.title != null) {
+			document.title = json.title;
+		}
+		
+		const elements = {
+			slot1: document.querySelector("#slot1-label"),
+			a1: document.querySelector("#slot1-a-label"),
+			b1: document.querySelector("#slot1-b-label"),
+			start1: document.querySelector("#slot1-start-label"),
+			select1: document.querySelector("#slot1-select-label"),
+			up1: document.querySelector("#slot1-up-label"),
+			down1: document.querySelector("#slot1-down-label"),
+			left1: document.querySelector("#slot1-left-label"),
+			right1: document.querySelector("#slot1-right-label"),
+			system: document.querySelector("#system-label"),
+			fast: document.querySelector("#fast-label"),
+			pause: document.querySelector("#pause-label")
+		};
+		
+		for (const name in elements) {
+			console.log(name, json[name]);
+			if (json[name] == null) {
+				continue;
+			}
+			elements[name].innerText = json[name];
+		}
 	}
 }

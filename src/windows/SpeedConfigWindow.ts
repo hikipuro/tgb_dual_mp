@@ -4,10 +4,11 @@ import * as url from "url";
 
 import { ipcMain, IpcMessageEvent } from "electron";
 import { EventEmitter } from "events";
+import { Config } from "../config/Config";
 import { SpeedConfig } from "../config/SpeedConfig";
 
 module Settings {
-	export const Width: number = 200;
+	export const Width: number = 230;
 	export const Height: number = 235;
 	export const Title: string = "Speed Settings";
 	export const Content: string = "../../html/SpeedConfig.html";
@@ -68,7 +69,11 @@ export class SpeedConfigWindow extends EventEmitter {
 	
 	protected addIpcEvents(): void {
 		ipcMain.once("SpeedConfigWindow.init", (event: IpcMessageEvent, arg: any): void => {
-			event.returnValue = this.speedConfig;
+			const languageJson = Config.getLanguageJson();
+			event.returnValue = {
+				languageJson: languageJson,
+				speedConfig: this.speedConfig
+			};
 		});
 		ipcMain.on("SpeedConfigWindow.apply", (event: IpcMessageEvent, arg: any): void => {
 			this.speedConfig = arg;

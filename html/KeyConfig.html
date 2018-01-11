@@ -9,69 +9,71 @@ let Module = require("../dist/windows/KeyConfigRenderer.js");
 
 let renderer = null;
 document.addEventListener("DOMContentLoaded", () => {
-	let keyConfig = Electron.ipcRenderer.sendSync("KeyConfigWindow.init");
-	renderer = new Module.KeyConfigRenderer(keyConfig);
+	let args = Electron.ipcRenderer.sendSync("KeyConfigWindow.init");
+	renderer = new Module.KeyConfigRenderer(
+		args.languageJson, args.keyConfig
+	);
 });
 </script>
 </head>
 <body>
 <div class="slot">
-	<div class="title">Slot1</div>
+	<div id="slot1-label" class="title">Slot1</div>
 	<div class="record">
-		<div class="caption">A</div>
+		<div id="slot1-a-label" class="caption">A</div>
 		<div class="value"><input id="slot1-a" type="text"></div>
 	</div>
 	<div class="record">
-		<div class="caption">B</div>
+		<div id="slot1-b-label" class="caption">B</div>
 		<div class="value"><input id="slot1-b" type="text"></div>
 	</div>
 	<div class="record">
-		<div class="caption">Start</div>
+		<div id="slot1-start-label" class="caption">Start</div>
 		<div class="value"><input id="slot1-start" type="text"></div>
 	</div>
 	<div class="record">
-		<div class="caption">Select</div>
+		<div id="slot1-select-label" class="caption">Select</div>
 		<div class="value"><input id="slot1-select" type="text"></div>
 	</div>
 	<div class="record">
-		<div class="caption">Up</div>
+		<div id="slot1-up-label" class="caption">Up</div>
 		<div class="value"><input id="slot1-up" type="text"></div>
 	</div>
 	<div class="record">
-		<div class="caption">Down</div>
+		<div id="slot1-down-label" class="caption">Down</div>
 		<div class="value"><input id="slot1-down" type="text"></div>
 	</div>
 	<div class="record">
-		<div class="caption">Left</div>
+		<div id="slot1-left-label" class="caption">Left</div>
 		<div class="value"><input id="slot1-left" type="text"></div>
 	</div>
 	<div class="record">
-		<div class="caption">Right</div>
+		<div id="slot1-right-label" class="caption">Right</div>
 		<div class="value"><input id="slot1-right" type="text"></div>
 	</div>
 </div>
 
 <div class="right">
 	<div class="system">
-		<div class="title">System</div>
+		<div id="system-label" class="title">System</div>
 		<div class="record">
-			<div class="caption">Fast</div>
+			<div id="fast-label" class="caption">Fast</div>
 			<div class="value"><input id="fast" type="text"></div>
 		</div>
 		<div class="record">
-			<div class="caption">Save</div>
+			<div id="save-label" class="caption">Save</div>
 			<div class="value"><input type="text" disabled></div>
 		</div>
 		<div class="record">
-			<div class="caption">Load</div>
+			<div id="load-label" class="caption">Load</div>
 			<div class="value"><input type="text" disabled></div>
 		</div>
 		<div class="record">
-			<div class="caption">Auto Fire</div>
+			<div id="autoFire-label" class="caption">Auto Fire</div>
 			<div class="value"><input type="text" disabled></div>
 		</div>
 		<div class="record">
-			<div class="caption">Pause</div>
+			<div id="pause-label" class="caption">Pause</div>
 			<div class="value"><input id="pause" type="text"></div>
 		</div>
 	</div>

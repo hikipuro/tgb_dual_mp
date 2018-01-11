@@ -71,7 +71,7 @@ export class SoundConfigWindow extends EventEmitter {
 			event.returnValue = {
 				languageJson: languageJson,
 				soundConfig: this.soundConfig
-			}
+			};
 		});
 		ipcMain.on("SoundConfigWindow.update", (event: IpcMessageEvent, arg: any): void => {
 			this.soundConfig = arg;

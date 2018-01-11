@@ -82,7 +82,7 @@ export class PathConfigWindow extends EventEmitter {
 			event.returnValue = {
 				languageJson: languageJson,
 				pathConfig: this.pathConfig
-			}
+			};
 		});
 		ipcMain.on("PathConfigWindow.close", (event: IpcMessageEvent, arg: any): void => {
 			this.newPathConfig = arg;

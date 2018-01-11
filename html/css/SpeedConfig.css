@@ -17,7 +17,7 @@ body {
 	display: inline-block;
 	vertical-align: top;
 	border: 1px ridge #888;
-	width: 180px;
+	width: 210px;
 	height: 90px;
 	margin-bottom: 8px;
 }
@@ -35,7 +35,7 @@ body {
 
 .caption {
 	display: inline-block;
-	width: 80px;
+	width: 110px;
 	margin-left: 4px;
 }
 

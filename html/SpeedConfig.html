@@ -9,38 +9,40 @@ let Module = require("../dist/windows/SpeedConfigRenderer.js");
 
 let renderer = null;
 document.addEventListener("DOMContentLoaded", () => {
-	let speedConfig = Electron.ipcRenderer.sendSync("SpeedConfigWindow.init");
-	renderer = new Module.SpeedConfigRenderer(speedConfig);
+	let args = Electron.ipcRenderer.sendSync("SpeedConfigWindow.init");
+	renderer = new Module.SpeedConfigRenderer(
+		args.languageJson, args.speedConfig
+	);
 });
 </script>
 </head>
 <body>
 <div class="pane">
-	<div class="title">Normal Mode</div>
+	<div id="normal-label" class="title">Normal Mode</div>
 	<div class="record">
-		<div class="caption">Frame Skip</div>
+		<div id="frameSkip-label" class="caption">Frame Skip</div>
 		<div class="value"><input id="frameSkip" type="number" min="0" max="9"></div>
 	</div>
 	<div class="record">
-		<div class="caption">FPS</div>
+		<div id="fps-label" class="caption">FPS</div>
 		<div class="value"><input id="fps" type="number" min="1" max="300"></div>
 	</div>
 </div>
 
 <div class="pane">
-	<div class="title">Fast Mode</div>
+	<div id="fast-label" class="title">Fast Mode</div>
 	<div class="record">
-		<div class="caption">Frame Skip</div>
+		<div id="fastFrameSkip-label" class="caption">Frame Skip</div>
 		<div class="value"><input id="fastFrameSkip" type="number" min="0" max="9"></div>
 	</div>
 	<div class="record">
-		<div class="caption">FPS</div>
+		<div id="fastFps-label" class="caption">FPS</div>
 		<div class="value"><input id="fastFps" type="number" min="1" max="300"></div>
 	</div>
 </div>
 <div class="record-single">
 	<div class="value-single"><input id="showFps" type="checkbox"></div>
-	<div class="caption-single"><label for="showFps">Show FPS</label></div>
+	<div class="caption-single"><label id="showFps-label" for="showFps">Show FPS</label></div>
 </div>
 </body>
 </html>

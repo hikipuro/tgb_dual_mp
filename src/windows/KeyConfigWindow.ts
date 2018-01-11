@@ -4,6 +4,7 @@ import * as url from "url";
 
 import { ipcMain, IpcMessageEvent } from "electron";
 import { EventEmitter } from "events";
+import { Config } from "../config/Config";
 import { KeyConfig } from "../config/KeyConfig";
 import { KeyCode } from "../KeyCode";
 
@@ -69,7 +70,11 @@ export class KeyConfigWindow extends EventEmitter {
 	
 	protected addIpcEvents(): void {
 		ipcMain.once("KeyConfigWindow.init", (event: IpcMessageEvent, arg: any): void => {
-			event.returnValue = this.keyConfig;
+			const languageJson = Config.getLanguageJson();
+			event.returnValue = {
+				languageJson: languageJson,
+				keyConfig: this.keyConfig
+			};
 		});
 		ipcMain.once("KeyConfigWindow.close", (event: IpcMessageEvent, arg: any): void => {
 			this.keyConfig = arg;

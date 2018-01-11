@@ -74,5 +74,18 @@ export class PathConfigRenderer {
 		if (json.title != null) {
 			document.title = json.title;
 		}
+		
+		const elements = {
+			save: document.querySelector("#save-label"),
+			media: document.querySelector("#media-label")
+		};
+		
+		for (const name in elements) {
+			console.log(name, json[name]);
+			if (json[name] == null) {
+				continue;
+			}
+			elements[name].innerText = json[name];
+		}
 	}
 }
