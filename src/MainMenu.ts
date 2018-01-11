@@ -12,6 +12,7 @@ module Settings {
 
 export class MainMenu {
 	public static Instance: MainMenu = null;
+	public menu: Electron.Menu = null;
 
 	constructor() {
 		MainMenu.Instance = this;
@@ -29,8 +30,8 @@ export class MainMenu {
 
 		this.translateMenuText(templateMenu, languageJson);
 		this.addClickEventAllMenuItems(templateMenu, this.onClickMenuItem);
-		const menu = Electron.Menu.buildFromTemplate(templateMenu);
-		return menu;
+		this.menu = Electron.Menu.buildFromTemplate(templateMenu);
+		return this.menu;
 	}
 
 	protected addIpcEvents(): void {
@@ -78,47 +79,15 @@ export class MainMenu {
 		});
 	}
 
-	public findMenuItemById(id: string): Electron.MenuItem {
-		if (id == null || id === "") {
-			return null;
-		}
-		const menu = Electron.Menu.getApplicationMenu();
-		if (menu == null) {
-			return null;
-		}
-		return this._findMenuItemById(menu.items, id);
-	}
-	
-	protected _findMenuItemById(menuItems: Electron.MenuItem[], id: string): Electron.MenuItem {
-		if (menuItems == null) {
-			return null;
-		}
-		const length = menuItems.length;
-		for (let i = 0; i < length; i++) {
-			const item = menuItems[i];
-			if (item.id === id) {
-				return item;
-			}
-			if (item.submenu != null) {
-				const foundItem = this._findMenuItemById(item.submenu.items, id);
-				if (foundItem == null) {
-					continue;
-				}
-				return foundItem;
-			}
-		}
-	}
-	
 	public disableAllSaveLoadState(): void {
-		const menu = Electron.Menu.getApplicationMenu();
-		if (menu == null) {
+		if (this.menu == null) {
 			return;
 		}
 		for (let i = 1; i < 10; i++) {
 			const loadItemId = "file.load-state." + i;
-			const loadItem = menu.getMenuItemById(loadItemId);
+			const loadItem = this.menu.getMenuItemById(loadItemId);
 			const saveItemId = "file.save-state." + i;
-			const saveItem = menu.getMenuItemById(saveItemId);
+			const saveItem = this.menu.getMenuItemById(saveItemId);
 			if (loadItem == null || saveItem == null) {
 				continue;
 			}
@@ -128,7 +97,7 @@ export class MainMenu {
 	}
 
 	public checkItem(id: string, checked: boolean): void {
-		const menuItem = this.findMenuItemById(id);
+		const menuItem = this.menu.getMenuItemById(id);
 		if (menuItem == null) {
 			return;
 		}
@@ -136,10 +105,10 @@ export class MainMenu {
 	}
 
 	public selectGBType(menuItem: MenuItem): void {
-		const gb = this.findMenuItemById("option.type.gb");
-		const gbc = this.findMenuItemById("option.type.gbc");
-		const gba = this.findMenuItemById("option.type.gba");
-		const auto = this.findMenuItemById("option.type.auto");
+		const gb = this.menu.getMenuItemById("option.type.gb");
+		const gbc = this.menu.getMenuItemById("option.type.gbc");
+		const gba = this.menu.getMenuItemById("option.type.gba");
+		const auto = this.menu.getMenuItemById("option.type.auto");
 
 		gb.checked = false;
 		gbc.checked = false;
