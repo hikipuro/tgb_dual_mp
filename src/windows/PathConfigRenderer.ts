@@ -16,13 +16,19 @@ export class PathConfigRenderer {
 		const buttonOK = document.querySelector("#ok") as HTMLButtonElement;
 
 		save.value = pathConfig.save;
-		//media.value = pathConfig.media;
+		media.value = pathConfig.media;
 
 		save.addEventListener("input", () => {
 			pathConfig.save = save.value;
 		});
 		selectSave.addEventListener("click", () => {
 			ipcRenderer.send("PathConfigWindow.selectSavePath", pathConfig);
+		});
+		media.addEventListener("input", () => {
+			pathConfig.media = media.value;
+		});
+		selectMedia.addEventListener("click", () => {
+			ipcRenderer.send("PathConfigWindow.selectMediaPath", pathConfig);
 		});
 		buttonOK.addEventListener("click", function handler() {
 			buttonOK.removeEventListener("click", handler);
@@ -33,6 +39,16 @@ export class PathConfigRenderer {
 			pathConfig = PathConfig.fromJSON(arg);
 			save.value = pathConfig.save;
 		});
+		ipcRenderer.on("PathConfigWindow.selectMediaPath", (event: Electron.IpcMessageEvent, arg: any) => {
+			pathConfig = PathConfig.fromJSON(arg);
+			media.value = pathConfig.media;
+		});
+		
+		// window close
+		window.onbeforeunload = (e: BeforeUnloadEvent) => {
+			ipcRenderer.removeAllListeners("PathConfigWindow.selectSavePath");
+			ipcRenderer.removeAllListeners("PathConfigWindow.selectMediaPath");
+		};
 		
 		// disable drag & drop
 		document.body.ondragover = () => {

@@ -4,6 +4,7 @@ config.json
 test
 dist
 save
+media
 
 # Logs
 logs

@@ -18,6 +18,9 @@ export class SoundConfig {
 			if (!soundConfig.hasOwnProperty(name)) {
 				continue;
 			}
+			if (json[name] == null) {
+				continue;
+			}
 			soundConfig[name] = json[name];
 		}
 		return soundConfig;

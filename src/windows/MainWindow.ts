@@ -180,7 +180,7 @@ export class MainWindow {
 		});
 		ipcMain.on("MainWindow.updateSaveLoadStateMenu", (event: IpcMessageEvent, arg: any) => {
 			if (arg == null || arg === "") {
-				MainMenu.call("disableAllSaveLoadState");
+				MainMenu.Instance.disableAllSaveLoadState();
 				return;
 			}
 			let filePath: string = arg;
@@ -190,7 +190,7 @@ export class MainWindow {
 
 			const menu = Electron.Menu.getApplicationMenu();
 			if (menu == null) {
-				MainMenu.call("disableAllSaveLoadState");
+				MainMenu.Instance.disableAllSaveLoadState();
 				return;
 			}
 

@@ -3,10 +3,12 @@ import { Config } from "./Config";
 
 export class PathConfig {
 	public save: string = null;
+	public media: string = null;
 	public roms: string = "";
 
 	constructor() {
 		this.save = path.join(Config.getCurrentPath(), "save");
+		this.media = path.join(Config.getCurrentPath(), "media");
 	}
 
 	public static fromJSON(json: any): PathConfig {
@@ -17,6 +19,9 @@ export class PathConfig {
 
 		for (var name in pathConfig) {
 			if (!pathConfig.hasOwnProperty(name)) {
+				continue;
+			}
+			if (json[name] == null) {
 				continue;
 			}
 			pathConfig[name] = json[name];

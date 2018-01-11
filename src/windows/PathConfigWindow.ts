@@ -89,6 +89,9 @@ export class PathConfigWindow extends EventEmitter {
 			if (fs.existsSync(this.newPathConfig.save)) {
 				this.pathConfig.save = this.newPathConfig.save;
 			}
+			if (fs.existsSync(this.newPathConfig.media)) {
+				this.pathConfig.media = this.newPathConfig.media;
+			}
 			this.emit("close", this.pathConfig);
 			this.browserWindow.close();
 			event.returnValue = null;
@@ -111,11 +114,30 @@ export class PathConfigWindow extends EventEmitter {
 			dialog.show();
 			event.returnValue = null;
 		});
+		ipcMain.on("PathConfigWindow.selectMediaPath", (event: IpcMessageEvent, arg: any): void => {
+			this.newPathConfig = arg;
+			let dialog = new OpenDialog();
+	
+			dialog.defaultPath = this.newPathConfig.save;
+			dialog.properties.openDirectory = true;
+			dialog.on("select", (filenames: string[]) => {
+				if (filenames.length <= 0) {
+					return;
+				}
+				const path = filenames[0];
+				this.newPathConfig.media = path;
+				this.send("PathConfigWindow.selectMediaPath", this.newPathConfig);
+				dialog = null;
+			});
+			dialog.show();
+			event.returnValue = null;
+		});
 	}
 
 	protected removeIpcEvents(): void {
 		ipcMain.removeAllListeners("PathConfigWindow.init");
 		ipcMain.removeAllListeners("PathConfigWindow.close");
 		ipcMain.removeAllListeners("PathConfigWindow.selectSavePath");
+		ipcMain.removeAllListeners("PathConfigWindow.selectMediaPath");
 	}
 }

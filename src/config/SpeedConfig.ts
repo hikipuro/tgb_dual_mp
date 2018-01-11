@@ -15,6 +15,9 @@ export class SpeedConfig {
 			if (!speedConfig.hasOwnProperty(name)) {
 				continue;
 			}
+			if (json[name] == null) {
+				continue;
+			}
 			speedConfig[name] = json[name];
 		}
 		return speedConfig;

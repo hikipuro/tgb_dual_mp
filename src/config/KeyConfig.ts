@@ -44,6 +44,9 @@ export class KeyConfig {
 			if (!keyConfig.hasOwnProperty(name)) {
 				continue;
 			}
+			if (json[name] == null) {
+				continue;
+			}
 			const keyInfo = KeyInfo.fromJSON(json[name]);
 			if (keyInfo != null) {
 				keyConfig[name] = keyInfo;

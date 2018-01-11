@@ -15,6 +15,9 @@ export class ScreenConfig {
 			if (!screenConfig.hasOwnProperty(name)) {
 				continue;
 			}
+			if (json[name] == null) {
+				continue;
+			}
 			screenConfig[name] = json[name];
 		}
 		return screenConfig;

@@ -15,6 +15,9 @@ export class WindowConfig {
 			if (!windowConfig.hasOwnProperty(name)) {
 				continue;
 			}
+			if (json[name] == null) {
+				continue;
+			}
 			windowConfig[name] = json[name];
 		}
 		return windowConfig;

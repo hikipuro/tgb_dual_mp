@@ -547,6 +547,9 @@ export class MainRenderer {
 	}
 
 	protected screenshot(): void {
+		if (!fs.existsSync(this.config.path.media)) {
+			fs.mkdirSync(this.config.path.media);
+		}
 		let pathObject = this.getScreenshotFilePath();
 		if (pathObject == null) {
 			return;
@@ -566,7 +569,7 @@ export class MainRenderer {
 		for (let i = 0; i < 1000; i++) {
 			const num = ("000" + i).slice(-3);
 			let imagePath = pathInfo.name + "_" + num + ".png";
-			imagePath = path.join(this.config.path.save, imagePath);
+			imagePath = path.join(this.config.path.media, imagePath);
 			if (!fs.existsSync(imagePath)) {
 				return {
 					path: imagePath,
@@ -578,6 +581,9 @@ export class MainRenderer {
 	}
 
 	protected recordSound(): void {
+		if (!fs.existsSync(this.config.path.media)) {
+			fs.mkdirSync(this.config.path.media);
+		}
 		if (this.tgbDual.isSoundRecording) {
 			this.tgbDual.stopSoundRecording();
 			this.showMessage("Stop sound recording");
@@ -601,7 +607,7 @@ export class MainRenderer {
 		for (let i = 0; i < 1000; i++) {
 			const num = ("000" + i).slice(-3);
 			let soundPath = pathInfo.name + "_" + num + ".wav";
-			soundPath = path.join(this.config.path.save, soundPath);
+			soundPath = path.join(this.config.path.media, soundPath);
 			if (!fs.existsSync(soundPath)) {
 				return {
 					path: soundPath,

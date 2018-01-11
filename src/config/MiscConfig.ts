@@ -13,6 +13,9 @@ export class MiscConfig {
 			if (!miscConfig.hasOwnProperty(name)) {
 				continue;
 			}
+			if (json[name] == null) {
+				continue;
+			}
 			miscConfig[name] = json[name];
 		}
 
