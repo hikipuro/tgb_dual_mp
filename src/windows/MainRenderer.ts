@@ -298,6 +298,9 @@ export class MainRenderer {
 				return;
 			}
 			const file = e.dataTransfer.files[0];
+			if (file == null) {
+				return;
+			}
 			this.loadFile(file.path);
 		}
 
