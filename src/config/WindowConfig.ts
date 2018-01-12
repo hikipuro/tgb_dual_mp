@@ -6,12 +6,16 @@ export class WindowConfig {
 	public height: number = Constants.ScreenHeight * 3;
 	public x: number = null;
 	public y: number = null;
+	public showKey: boolean = false;
 	public keyX: number = null;
 	public keyY: number = null;
+	public showSound: boolean = false;
 	public soundX: number = null;
 	public soundY: number = null;
+	public showSpeed: boolean = false;
 	public speedX: number = null;
 	public speedY: number = null;
+	public showPath: boolean = false;
 	public pathX: number = null;
 	public pathY: number = null;
 

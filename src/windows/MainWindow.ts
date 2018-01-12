@@ -56,6 +56,19 @@ export class MainWindow {
 		if (Config.isDevMode() && Settings.DevTools) {
 			this.browserWindow.webContents.openDevTools();
 		}
+
+		if (this._config.window.showKey) {
+			this.showKeyConfigWindow();
+		}
+		if (this._config.window.showSound) {
+			this.showSoundConfigWindow();
+		}
+		if (this._config.window.showSpeed) {
+			this.showSpeedConfigWindow();
+		}
+		if (this._config.window.showPath) {
+			this.showPathConfigWindow();
+		}
 	}
 
 	public destroy(): void {
@@ -153,6 +166,7 @@ export class MainWindow {
 			this.removeIpcEvents();
 
 			// save config.json
+			this.saveWindowVisibility();
 			this.saveWindowPosition();
 			this._config.save();
 		});
@@ -304,6 +318,26 @@ export class MainWindow {
 
 	protected setWindowSize(width: number, height: number): void {
 		this.browserWindow.setContentSize(width, height, false);
+	}
+
+	protected saveWindowVisibility(): void {
+		this._config.window.showKey = false;
+		this._config.window.showSound = false;
+		this._config.window.showSpeed = false;
+		this._config.window.showPath = false;
+
+		if (this._keyConfigWindow != null) {
+			this._config.window.showKey = true;
+		}
+		if (this._soundConfigWindow != null) {
+			this._config.window.showSound = true;
+		}
+		if (this._speedConfigWindow != null) {
+			this._config.window.showSpeed = true;
+		}
+		if (this._pathConfigWindow != null) {
+			this._config.window.showPath = true;
+		}
 	}
 
 	protected saveWindowPosition(): void {
