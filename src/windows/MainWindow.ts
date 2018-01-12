@@ -7,6 +7,7 @@ import { MenuItem, ipcMain, IpcMessageEvent, MenuItemConstructorOptions } from "
 import { Constants } from "../Constants";
 import { Config } from "../config/Config";
 import { KeyConfig } from "../config/KeyConfig";
+import { GamepadConfig } from "../config/GamepadConfig";
 import { SoundConfig } from "../config/SoundConfig";
 import { SpeedConfig } from "../config/SpeedConfig";
 import { PathConfig } from "../config/PathConfig";
@@ -382,8 +383,9 @@ export class MainWindow {
 			this._keyConfigWindow.destroy();
 			this._keyConfigWindow = null;
 		});
-		this._keyConfigWindow.on("apply", (keyConfig: KeyConfig) => {
+		this._keyConfigWindow.on("apply", (keyConfig: KeyConfig, gamepadConfig: GamepadConfig) => {
 			this._config.key = keyConfig;
+			this._config.gamepad = gamepadConfig;
 			this.send("MainWindow.getConfig", this._config);
 		});
 	}

@@ -2,6 +2,7 @@ import * as Electron from "electron";
 import * as fs from "fs";
 import * as path from "path";
 import { KeyConfig } from "./KeyConfig";
+import { GamepadConfig } from "./GamepadConfig";
 import { ScreenConfig } from "./ScreenConfig";
 import { SoundConfig } from "./SoundConfig";
 import { PathConfig } from "./PathConfig";
@@ -12,6 +13,7 @@ import { MiscConfig } from "./MiscConfig";
 export class Config {
 	public static readonly Path: string = "config.json";
 	public key: KeyConfig;
+	public gamepad: GamepadConfig;
 	public screen: ScreenConfig;
 	public sound: SoundConfig;
 	public path: PathConfig;
@@ -21,6 +23,7 @@ export class Config {
 
 	constructor() {
 		this.key = new KeyConfig();
+		this.gamepad = new GamepadConfig();
 		this.screen = new ScreenConfig();
 		this.sound = new SoundConfig();
 		this.path = new PathConfig();
@@ -50,6 +53,7 @@ export class Config {
 		}
 		
 		config.key = KeyConfig.fromJSON(json.key);
+		config.gamepad = GamepadConfig.fromJSON(json.gamepad);
 		config.screen = ScreenConfig.fromJSON(json.screen);
 		config.sound = SoundConfig.fromJSON(json.sound);
 		config.path = PathConfig.fromJSON(json.path);

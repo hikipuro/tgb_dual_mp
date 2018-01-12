@@ -14,6 +14,26 @@ body {
 	overflow: hidden;
 }
 
+.device {
+	display: inline-block;
+	vertical-align: top;
+	margin-bottom: 4px;
+}
+
+.device .value {
+	display: inline-block;
+	vertical-align: top;
+}
+
+.device .value input {
+	width: auto;
+	height: auto;
+}
+
+.device .caption {
+	margin-right: 4px;
+}
+
 .slot {
 	display: inline-block;
 	vertical-align: top;

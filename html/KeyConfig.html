@@ -11,12 +11,18 @@ let renderer = null;
 document.addEventListener("DOMContentLoaded", () => {
 	let args = Electron.ipcRenderer.sendSync("KeyConfigWindow.init");
 	renderer = new Module.KeyConfigRenderer(
-		args.languageJson, args.keyConfig
+		args.languageJson, args.keyConfig, args.gamepadConfig
 	);
 });
 </script>
 </head>
 <body>
+<div class="device">
+	<div class="value"><input id="keyboard" name="device" type="radio" checked></div>
+	<div class="caption"><label id="keyboard-label" for="keyboard">Keyboard</label></div>
+	<div class="value"><input id="gamepad" name="device" type="radio"></div>
+	<div class="caption"><label id="gamepad-label" for="gamepad">Gamepad</label></div>
+</div>
 <div class="slot">
 	<div id="slot1-label" class="title">Slot1</div>
 	<div class="record">

@@ -1,5 +1,6 @@
 import { ipcRenderer, IpcMessageEvent } from "electron";
 import { KeyConfig } from "../config/KeyConfig";
+import { GamepadConfig } from "../config/GamepadConfig";
 import { RendererUtility } from "../RendererUtility";
 
 class KeyInputElements {
@@ -38,7 +39,7 @@ class KeyInputElements {
 		});
 	}
 
-	public setLabel(keyConfig: KeyConfig): void {
+	public initKeyboard(keyConfig: KeyConfig): void {
 		this.a.value = keyConfig.a.label;
 		this.b.value = keyConfig.b.label;
 		this.start.value = keyConfig.start.label;
@@ -47,6 +48,17 @@ class KeyInputElements {
 		this.down.value = keyConfig.down.label;
 		this.left.value = keyConfig.left.label;
 		this.right.value = keyConfig.right.label;
+	}
+
+	public initGamepad(gamepadConfig: GamepadConfig): void {
+		this.a.value = gamepadConfig.a.label;
+		this.b.value = gamepadConfig.b.label;
+		this.start.value = gamepadConfig.start.label;
+		this.select.value = gamepadConfig.select.label;
+		this.up.value = gamepadConfig.up.label;
+		this.down.value = gamepadConfig.down.label;
+		this.left.value = gamepadConfig.left.label;
+		this.right.value = gamepadConfig.right.label;
 	}
 
 	public indexOf(element: HTMLInputElement): number {
@@ -118,10 +130,16 @@ class SystemKeyInputElements {
 		});
 	}
 
-	public setLabel(keyConfig: KeyConfig): void {
+	public initKeyboard(keyConfig: KeyConfig): void {
 		this.fast.value = keyConfig.fast.label;
 		this.autoFire.value = keyConfig.autoFire.label;
 		this.pause.value = keyConfig.pause.label;
+	}
+	
+	public initGamepad(gamepadConfig: GamepadConfig): void {
+		this.fast.value = gamepadConfig.fast.label;
+		this.autoFire.value = gamepadConfig.autoFire.label;
+		this.pause.value = gamepadConfig.pause.label;
 	}
 
 	public indexOf(element: HTMLInputElement): number {
@@ -170,20 +188,45 @@ class SystemKeyInputElements {
 }
 
 export class KeyConfigRenderer {
-	constructor(languageJson: any, keyConfig: KeyConfig) {
+	constructor(languageJson: any, keyConfig: KeyConfig, gamepadConfig: GamepadConfig) {
 		RendererUtility.overrideConsoleLog();
 		keyConfig = KeyConfig.fromJSON(keyConfig);
+		gamepadConfig = GamepadConfig.fromJSON(gamepadConfig);
 		this.translateText(languageJson);
 
+		let isKeyboard = true;
+		const keyboard = document.querySelector("#keyboard") as HTMLInputElement;
+		const gamepad = document.querySelector("#gamepad") as HTMLInputElement;
 		const keySlot1 = new KeyInputElements("#slot1-");
 		const systemKey = new SystemKeyInputElements();
 
-		//console.log("keyConfig", keyConfig);
-		keySlot1.setLabel(keyConfig);
-		systemKey.setLabel(keyConfig);
+		keySlot1.initKeyboard(keyConfig);
+		systemKey.initKeyboard(keyConfig);
+
+		function initLabel() {
+			if (isKeyboard) {
+				keySlot1.initKeyboard(keyConfig);
+				systemKey.initKeyboard(keyConfig);
+			} else {
+				keySlot1.initGamepad(gamepadConfig);
+				systemKey.initGamepad(gamepadConfig);
+			}
+		}
+
+		keyboard.addEventListener("change", () => {
+			isKeyboard = keyboard.checked;
+			initLabel();
+		});
+		gamepad.addEventListener("change", () => {
+			isKeyboard = keyboard.checked;
+			initLabel();
+		});
 
 		document.addEventListener("keydown", (e: KeyboardEvent) => {
 			e.preventDefault();
+			if (!isKeyboard) {
+				return;
+			}
 			if (e.repeat) {
 				return;
 			}
@@ -217,9 +260,72 @@ export class KeyConfigRenderer {
 		});
 		
 		function updateConfig(): void {
-			ipcRenderer.send("KeyConfigWindow.apply", keyConfig);
+			ipcRenderer.send("KeyConfigWindow.apply", keyConfig, gamepadConfig);
 		}
 		
+		// gamepad (debug)
+		window.addEventListener("gamepadconnected", (e: GamepadEvent) => {
+			console.log("2 Gamepad connected at index %d: %s. %d buttons, %d axes.",
+				e.gamepad.index, e.gamepad.id,
+				e.gamepad.buttons.length, e.gamepad.axes.length);
+			startGamepadPolling();
+		});
+
+		let timerId = null;
+		function startGamepadPolling(): void {
+			timerId = setInterval(checkGamepadButtonPressed, 50);
+		}
+
+		function restartGamepadPolling(wait: number = 200): void {
+			if (timerId != null) {
+				clearInterval(timerId);
+			}
+			setTimeout(() => {
+				startGamepadPolling();
+			}, wait);
+		}
+
+		function checkGamepadButtonPressed(): void {
+			if (isKeyboard) {
+				return;
+			}
+			const gamepads = navigator.getGamepads();
+			for (let id = 0; id < gamepads.length; id++) {
+				if (gamepads[id] == null) {
+					continue;
+				}
+				const buttons = gamepads[id].buttons;
+				for (let b = 0; b < buttons.length; b++) {
+					if (!buttons[b].pressed) {
+						continue;
+					}
+					onPressGamepadButton(id, b);
+					restartGamepadPolling();
+					return;
+				}
+			}
+		}
+
+		function onPressGamepadButton(gamepadId: number, button: number): void {
+			if (keySlot1.focusElement != null) {
+				let id = keySlot1.getFocusElementSubId();
+				gamepadConfig.setValue(id, gamepadId, button);
+				keySlot1.focusElement.value = gamepadConfig[id].label;
+				if (!keySlot1.focusNext()) {
+					keySlot1.blur();
+					systemKey.fast.focus();
+				}
+				updateConfig();
+			} else if (systemKey.focusElement != null) {
+				let id = systemKey.getFocusElementSubId();
+				gamepadConfig.setValue(id, gamepadId, button);
+				systemKey.focusElement.value = gamepadConfig[id].label;
+				if (!systemKey.focusNext()) {
+					systemKey.blur();
+				}
+				updateConfig();
+			}
+		}
 		
 		// disable drag & drop
 		document.body.ondragover = () => {

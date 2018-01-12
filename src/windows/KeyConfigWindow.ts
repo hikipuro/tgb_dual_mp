@@ -6,11 +6,12 @@ import { ipcMain, IpcMessageEvent } from "electron";
 import { EventEmitter } from "events";
 import { Config } from "../config/Config";
 import { KeyConfig } from "../config/KeyConfig";
+import { GamepadConfig } from "../config/GamepadConfig";
 import { KeyCode } from "../KeyCode";
 
 module Settings {
 	export const Width: number = 340;
-	export const Height: number = 248;
+	export const Height: number = 272;
 	export const Title: string = "Key Settings";
 	export const Content: string = "../../html/KeyConfig.html";
 }
@@ -19,12 +20,16 @@ export class KeyConfigWindow extends EventEmitter {
 	public static Settings = Settings;
 	public browserWindow: Electron.BrowserWindow = null;
 	public keyConfig: KeyConfig = new KeyConfig();
+	public gamepadConfig: GamepadConfig = new GamepadConfig();
 
 	constructor(parent: Electron.BrowserWindow = null, config: Config = null) {
 		super();
 
 		if (config != null && config.key != null) {
 			this.keyConfig = config.key;
+		}
+		if (config != null && config.gamepad != null) {
+			this.gamepadConfig = config.gamepad;
 		}
 		
 		this.initWindow(parent, config);
@@ -78,12 +83,14 @@ export class KeyConfigWindow extends EventEmitter {
 			const languageJson = Config.getLanguageJson();
 			event.returnValue = {
 				languageJson: languageJson,
-				keyConfig: this.keyConfig
+				keyConfig: this.keyConfig,
+				gamepadConfig: this.gamepadConfig
 			};
 		});
-		ipcMain.on("KeyConfigWindow.apply", (event: IpcMessageEvent, arg: any): void => {
-			this.keyConfig = arg;
-			this.emit("apply", this.keyConfig);
+		ipcMain.on("KeyConfigWindow.apply", (event: IpcMessageEvent, keyConfig: KeyConfig, gamepadConfig: GamepadConfig): void => {
+			this.keyConfig = keyConfig;
+			this.gamepadConfig = gamepadConfig;
+			this.emit("apply", this.keyConfig, this.gamepadConfig);
 			//this.browserWindow.close();
 			event.returnValue = null;
 		});

@@ -71,7 +71,7 @@ export class MainRenderer {
 			this.updateSoundConfig(this.config.sound);
 			this.updateSpeedConfig();
 		});
-		this.tgbDual.on("update", this.updateGamepad);
+		this.tgbDual.on("updateAlways", this.updateGamepad);
 		this.tgbDual.on("fps", this.updateFps);
 		this.adjustScreenSize();
 		this.updateScreenSmoothing();
@@ -645,56 +645,117 @@ export class MainRenderer {
 	}
 
 	protected updateGamepad = (): void => {
+		if (this.isPausedWithLostFocus) {
+			return;
+		}
 		const keyState = this.tgbDual.keyState;
 		const gamePads = this.gamePads;
+		const gamepadConfig = this.config.gamepad;
 
 		gamePads.update();
-		if (gamePads.isKeyDown(0, 1)) {
+
+		let id = gamepadConfig.a.id;
+		let button = gamepadConfig.a.button;
+		if (gamePads.isKeyDown(id, button)) {
 			keyState.a = true;
-		} else if (gamePads.isKeyUp(0, 1)) {
+		} else if (gamePads.isKeyUp(id, button)) {
 			keyState.a = false;
 		}
 
-		if (gamePads.isKeyDown(0, 0)) {
+		id = gamepadConfig.b.id;
+		button = gamepadConfig.b.button;
+		if (gamePads.isKeyDown(id, button)) {
 			keyState.b = true;
-		} else if (gamePads.isKeyUp(0, 0)) {
+		} else if (gamePads.isKeyUp(id, button)) {
 			keyState.b = false;
 		}
 
-		if (gamePads.isKeyDown(0, 2)) {
+		id = gamepadConfig.select.id;
+		button = gamepadConfig.select.button;
+		if (gamePads.isKeyDown(id, button)) {
 			keyState.select = true;
-		} else if (gamePads.isKeyUp(0, 2)) {
+		} else if (gamePads.isKeyUp(id, button)) {
 			keyState.select = false;
 		}
 
-		if (gamePads.isKeyDown(0, 3)) {
+		id = gamepadConfig.start.id;
+		button = gamepadConfig.start.button;
+		if (gamePads.isKeyDown(id, button)) {
 			keyState.start = true;
-		} else if (gamePads.isKeyUp(0, 3)) {
+		} else if (gamePads.isKeyUp(id, button)) {
 			keyState.start = false;
 		}
 
-		if (gamePads.isKeyDown(0, 12)) {
+		id = gamepadConfig.up.id;
+		button = gamepadConfig.up.button;
+		if (gamePads.isKeyDown(id, button)) {
 			keyState.up = true;
-		} else if (gamePads.isKeyUp(0, 12)) {
+		} else if (gamePads.isKeyUp(id, button)) {
 			keyState.up = false;
 		}
 
-		if (gamePads.isKeyDown(0, 13)) {
+		id = gamepadConfig.down.id;
+		button = gamepadConfig.down.button;
+		if (gamePads.isKeyDown(id, button)) {
 			keyState.down = true;
-		} else if (gamePads.isKeyUp(0, 13)) {
+		} else if (gamePads.isKeyUp(id, button)) {
 			keyState.down = false;
 		}
 
-		if (gamePads.isKeyDown(0, 14)) {
+		id = gamepadConfig.left.id;
+		button = gamepadConfig.left.button;
+		if (gamePads.isKeyDown(id, button)) {
 			keyState.left = true;
-		} else if (gamePads.isKeyUp(0, 14)) {
+		} else if (gamePads.isKeyUp(id, button)) {
 			keyState.left = false;
 		}
 
-		if (gamePads.isKeyDown(0, 15)) {
+		id = gamepadConfig.right.id;
+		button = gamepadConfig.right.button;
+		if (gamePads.isKeyDown(id, button)) {
 			keyState.right = true;
-		} else if (gamePads.isKeyUp(0, 15)) {
+		} else if (gamePads.isKeyUp(id, button)) {
 			keyState.right = false;
+		}
+
+		id = gamepadConfig.fast.id;
+		button = gamepadConfig.fast.button;
+		if (gamePads.isKeyDown(id, button)) {
+			if (!this.tgbDual.isPaused) {
+				this.isFastMode = true;
+				this.updateSpeedConfig();
+				this.showMessage("Fast mode: on");
+			}
+		} else if (gamePads.isKeyUp(id, button)) {
+			if (!this.tgbDual.isPaused && this.isFastMode) {
+				this.isFastMode = false;
+				this.updateSpeedConfig();
+				this.showMessage("Fast mode: off");
+			}
+		}
+
+		id = gamepadConfig.autoFire.id;
+		button = gamepadConfig.autoFire.button;
+		if (gamePads.isKeyDown(id, button)) {
+			keyState.toggleAutoFire();
+			if (keyState.autoFire) {
+				this.showMessage("Auto fire: on");
+			} else {
+				this.showMessage("Auto fire: off");
+			}
+		}
+
+		id = gamepadConfig.pause.id;
+		button = gamepadConfig.pause.button;
+		if (gamePads.isKeyDown(id, button)) {
+			this.isFastMode = false;
+			this.updateSpeedConfig();
+			this.tgbDual.togglePause();
+			if (this.tgbDual.isPaused) {
+				this.showMessage("Pause");
+			} else {
+				this.showMessage("Resume");
+			}
 		}
 	};
 }

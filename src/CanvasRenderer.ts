@@ -4,6 +4,7 @@ export class CanvasRenderer extends EventEmitter {
 	public isPaused: boolean = false;
 	public update: (time: number) => void;
 	public render: () => void;
+	public updateAlways: (time: number) => void;
 	protected _element: HTMLCanvasElement;
 	protected _context: CanvasRenderingContext2D;
 	protected _requestAnimationFrameHandle: number = 0;
@@ -25,6 +26,7 @@ export class CanvasRenderer extends EventEmitter {
 		this._context.webkitImageSmoothingEnabled = false;
 		this.update = (time: number): void => { };
 		this.render = (): void => { };
+		this.updateAlways = (time: number): void => { };
 	}
 
 	public get element(): HTMLCanvasElement {
@@ -98,6 +100,8 @@ export class CanvasRenderer extends EventEmitter {
 		const now = performance.now();
 		let diff = now - this._prevTime;
 		this._elapsed += diff;
+
+		this.updateAlways(time);
 
 		if (this.isPaused) {
 			this._prevTime = now;

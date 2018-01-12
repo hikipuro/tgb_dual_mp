@@ -32,6 +32,9 @@ export class KeyConfig {
 	public pause: KeyInfo = new KeyInfo(KeyCode.P, "P");
 
 	public setValue(id: string, code: number, label: string): void {
+		if (id == null || !this.hasOwnProperty(id)) {
+			return;
+		}
 		this[id].set(code, label);
 	}
 

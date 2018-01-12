@@ -76,6 +76,7 @@ export class TgbDual extends EventEmitter {
 		);
 		this._canvasRenderer.update = this.onCanvasUpdate;
 		this._canvasRenderer.render = this.onCanvasRender;
+		this._canvasRenderer.updateAlways = this.onCanvasUpdateAlways;
 		this._canvasRenderer.on("fps", (fps: number) => {
 			this.lastFps = fps;
 			this.emit("fps", fps);
@@ -427,6 +428,10 @@ export class TgbDual extends EventEmitter {
 			}
 		}
 		//*/
+	}
+
+	protected onCanvasUpdateAlways = (time: number): void => {
+		this.emit("updateAlways");
 	}
 
 	protected onAudioProcess = (soundPlayer: SoundPlayer, event: AudioProcessingEvent): void => {
