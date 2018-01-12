@@ -24,6 +24,7 @@ public:
 	void render_screen(byte *buf,int width,int height,int depth);
 	word get_sensor(bool x_y) { return 0; }
 	void output_log(char *mes,...);
+	int get_timer_state();
 	byte get_time(int type);
 	void set_time(int type,byte dat);
 	void set_bibrate(bool bibrate) {};

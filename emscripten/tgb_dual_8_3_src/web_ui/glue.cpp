@@ -169,26 +169,26 @@ byte* getSram() {
 	return g_gb[0]->get_rom()->get_sram();
 }
 
-void save_sram(BYTE *buf,int size,int num)
-{
-/*
-	if (strstr(tmp_sram_name[num],".srt"))
-		return;
+void saveSram(char *path) {
+	BYTE *buf = g_gb[0]->get_rom()->get_sram();
+	int size = g_gb[0]->get_rom()->get_info()->ram_size;
+	int num = 0;
+	//if (strstr(tmp_sram_name[num],".srt"))
+	//	return;
 
 	int sram_tbl[]={1,1,1,4,16,8};
-	char cur_di[256],sv_dir[256];
-	GetCurrentDirectory(256,cur_di);
-	config->get_save_dir(sv_dir);
-	SetCurrentDirectory(sv_dir);
-	FILE *fs=fopen(tmp_sram_name[num],"wb");
+	//char cur_di[256],sv_dir[256];
+	//GetCurrentDirectory(256,cur_di);
+	//config->get_save_dir(sv_dir);
+	//SetCurrentDirectory(sv_dir);
+	FILE *fs=fopen(path,"wb");
 	fwrite(buf,1,0x2000*sram_tbl[size],fs);
 	if ((g_gb[num]->get_rom()->get_info()->cart_type>=0x0f)&&(g_gb[num]->get_rom()->get_info()->cart_type<=0x13)){
 		int tmp=render[0]->get_timer_state();
 		fwrite(&tmp,4,1,fs);
 	}
 	fclose(fs);
-	SetCurrentDirectory(cur_di);
-*/
+	//SetCurrentDirectory(cur_di);
 }
 
 void loadRom(int size, unsigned char* dat, int sramSize, unsigned char* sram)
@@ -231,8 +231,8 @@ void loadRom(int size, unsigned char* dat, int sramSize, unsigned char* sram)
 		g_gb[num]->get_apu()->get_renderer()->set_lowpass(true);
 	}
 	else{
-		if (g_gb[num]->get_rom()->has_battery())
-			save_sram(g_gb[num]->get_rom()->get_sram(),g_gb[num]->get_rom()->get_info()->ram_size,num);
+		//if (g_gb[num]->get_rom()->has_battery())
+		//	save_sram(g_gb[num]->get_rom()->get_sram(),g_gb[num]->get_rom()->get_info()->ram_size,num);
 	}
 	
 	/*

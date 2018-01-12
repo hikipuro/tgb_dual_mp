@@ -16,6 +16,7 @@ EMSCRIPTEN_KEEPALIVE void saveState(char *path);
 EMSCRIPTEN_KEEPALIVE void restoreState(char *path);
 EMSCRIPTEN_KEEPALIVE void setSkip(int frame);
 EMSCRIPTEN_KEEPALIVE byte* getSram();
+EMSCRIPTEN_KEEPALIVE void saveSram(char *path);
 
 EMSCRIPTEN_KEEPALIVE char* getCartName();
 EMSCRIPTEN_KEEPALIVE int getCartType();

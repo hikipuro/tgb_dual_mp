@@ -147,11 +147,22 @@ export class TgbDual extends EventEmitter {
 			fs.mkdirSync(this.pathConfig.save);
 		}
 
+		TgbDual.API.saveSram("/data/sram_tmp.sav");
+		const data = Module.FS.readFile("/data/sram_tmp.sav", {
+			encoding: "binary", flags: "r"
+		});
+		Module.FS.unlink("/data/sram_tmp.sav");
+
+		const saveFilePath = path.join(this.pathConfig.save, saveFileName);
+		fs.writeFileSync(saveFilePath, data);
+
+		/*
 		const pointer = TgbDual.API.getSram();
 		const size = 0x2000 * this.romInfo.ramSize;
 		const data = Module.HEAPU8.subarray(pointer, pointer + size);
 		const saveFilePath = path.join(this.pathConfig.save, saveFileName);
 		fs.writeFileSync(saveFilePath, data);
+		*/
 	}
 	
 	public loadSram(romFileName: string): Buffer {
@@ -506,6 +517,7 @@ export module TgbDual {
 		public static restoreState: (path: string) => void;
 		public static setSkip: (frame: number) => void;
 		public static getSram: () => number;
+		public static saveSram: (path: string) => void;
 		public static enableSoundChannel: (ch: number, enable: boolean) => void;
 		public static enableSoundEcho: (enable: boolean) => void;
 		public static enableSoundLowPass: (enable: boolean) => void;
@@ -550,6 +562,8 @@ export module TgbDual {
 				"setSkip", "void", ["number"]);
 			this.getSram = Module.cwrap(
 				"getSram", "number", []);
+			this.saveSram = Module.cwrap(
+				"saveSram", "void", ["string"]);
 			this.enableSoundChannel = Module.cwrap(
 				"enableSoundChannel", "void", ["number", "boolean"]);
 			this.enableSoundEcho = Module.cwrap(

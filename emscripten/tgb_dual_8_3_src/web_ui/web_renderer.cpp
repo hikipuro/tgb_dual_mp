@@ -161,6 +161,11 @@ int web_renderer::check_pad()
 	//return key_state;
 }
 
+int web_renderer::get_timer_state()
+{
+	return cur_time;
+}
+
 byte web_renderer::get_time(int type)
 {
 	dword now=fixed_time-cur_time;
