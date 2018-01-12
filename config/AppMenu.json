@@ -303,7 +303,13 @@
 			{
 				"id": "option.emulator",
 				"label": "Emulator Settings (&E)",
-				"enabled": false
+				"submenu": [
+					{
+						"id": "option.emulator.pause",
+						"label": "Pause when inactive (&P)",
+						"type": "checkbox"
+					}
+				]
 			},
 			{
 				"id": "option.directory",

@@ -2,6 +2,7 @@ import { debug } from "util";
 
 export class MiscConfig {
 	public type: string = "auto";
+	public pauseWhenInactive: boolean = true;
 
 	public static fromJSON(json: any): MiscConfig {
 		const miscConfig = new MiscConfig();

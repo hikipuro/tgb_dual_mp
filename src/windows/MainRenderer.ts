@@ -159,6 +159,12 @@ export class MainRenderer {
 					this.config.screen.smoothing = menu.checked;
 					this.updateScreenSmoothing();
 					break;
+				case "option.emulator.pause":
+					this.config.misc.pauseWhenInactive = menu.checked;
+					if (!menu.checked) {
+						this.isPausedWithLostFocus = false;
+					}
+					break;
 				case "option.record.screen":
 					this.screenshot();
 					break;
@@ -204,6 +210,9 @@ export class MainRenderer {
 		
 		ipcRenderer.on("MainWindow.focus", (event: Electron.IpcMessageEvent, arg: any) => {
 			console.log("MainWindow.focus");
+			if (!this.config.misc.pauseWhenInactive) {
+				return;
+			}
 			if (this.tgbDual.isPaused) {
 				if (this.isPausedWithLostFocus) {
 					this.tgbDual.togglePause();
@@ -213,6 +222,9 @@ export class MainRenderer {
 		});
 		ipcRenderer.on("MainWindow.blur", (event: Electron.IpcMessageEvent, arg: any) => {
 			console.log("MainWindow.blur");
+			if (!this.config.misc.pauseWhenInactive) {
+				return;
+			}
 			if (!this.tgbDual.isPaused) {
 				this.isPausedWithLostFocus = true;
 				this.tgbDual.togglePause();

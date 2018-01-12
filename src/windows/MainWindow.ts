@@ -170,6 +170,8 @@ export class MainWindow {
 		menu.checkItem("option.type.gbc", this._config.misc.type === "gbc");
 		menu.checkItem("option.type.gba", this._config.misc.type === "gba");
 		menu.checkItem("option.type.auto", this._config.misc.type === "auto");
+
+		menu.checkItem("option.emulator.pause", this._config.misc.pauseWhenInactive);
 	}
 
 	protected addIpcEvents(): void {
@@ -249,6 +251,10 @@ export class MainWindow {
 				return;
 			case "option.screen.smoothing":
 				this._config.screen.smoothing = item.checked;
+				this.send("MainWindow.menu", item);
+				return;
+			case "option.emulator.pause":
+				this._config.misc.pauseWhenInactive = item.checked;
 				this.send("MainWindow.menu", item);
 				return;
 			case "option.directory":
