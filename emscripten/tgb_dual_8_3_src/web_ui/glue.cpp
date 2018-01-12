@@ -13,6 +13,8 @@ typedef	unsigned long DWORD;
 	extern "C" {
 #endif
 
+extern void jsLog(const char *message);
+
 static int rom_size_tbl[]={2,4,8,16,32,64,128,256,512};
 
 static char tmp_sram_name[2][256];
@@ -142,23 +144,17 @@ void freeTgbDual() {
 }
 
 void reset() {
-	printf("********************* reset\n");
-	fflush(stdout);
 	g_gb[0]->reset();
 	//g_gb[0]->get_renderer()->reset();
 }
 
 void saveState(char *path) {
-	printf("path: %s\n", path);
-	fflush(stdout);
 	FILE *file = fopen(path, "w");
 	g_gb[0]->save_state(file);
 	fclose(file);
 }
 
 void restoreState(char *path) {
-	printf("path: %s\n", path);
-	fflush(stdout);
 	FILE *file = fopen(path, "r");
 	g_gb[0]->restore_state(file);
 	fclose(file);
@@ -196,8 +192,6 @@ void saveSram(char *path) {
 
 void loadRom(int size, unsigned char* dat, int sramSize, unsigned char* sram)
 {
-	printf("################# loadRom\n");
-	fflush(stdout);
 	int num = 0;
 	//int size;
 	//BYTE *dat;
@@ -272,8 +266,6 @@ void loadRom(int size, unsigned char* dat, int sramSize, unsigned char* sram)
 		memcpy(ram, sram, sramSize);
 	}
 	
-	//printf("ram_size: %04x\n", ram_size);
-	
 	org_gbtype[num]=dat[0x143]&0x80;
 	
 	if (gb_type == 1) {
@@ -284,12 +276,6 @@ void loadRom(int size, unsigned char* dat, int sramSize, unsigned char* sram)
 	
 	//g_gb[num]->set_use_gba(false);
 	g_gb[num]->load_rom(dat,size,ram,ram_size);
-	
-	//char pb[256];
-	//sprintf(pb,"Load ROM \"test\" slot[%d] :\ntype-%d:%s\nsize=%dKB : name=%s\n\n",num+1,g_gb[num]->get_rom()->get_info()->cart_type,mbc_types[g_gb[num]->get_rom()->get_info()->cart_type],size/1024,g_gb[num]->get_rom()->get_info()->cart_name);
-	
-	//free(dat);
-	//printf("%s\n", pb);
 	
 	/*
 	FILE *file;
@@ -493,8 +479,7 @@ void loadRom(int size, unsigned char* dat, int sramSize, unsigned char* sram)
 
 	char pb[256];
 	sprintf(pb,"Load ROM slot[%d] :\ntype-%d:%s\nsize=%dKB : name=%s\n\n",num+1,g_gb[num]->get_rom()->get_info()->cart_type,mbc_types[g_gb[num]->get_rom()->get_info()->cart_type],size/1024,g_gb[num]->get_rom()->get_info()->cart_name);
-	printf("%s", pb);
-	fflush(stdout);
+	jsLog(pb);
 	
 	/*
 	SendMessage(hWnd,WM_OUTLOG,0,(LPARAM)pb);

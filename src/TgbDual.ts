@@ -71,6 +71,10 @@ export class TgbDual extends EventEmitter {
 		this.initModuleFS();
 		this.keyState = new TgbDual.KeyState();
 
+		if (window && window["TgbDual.Callback"]) {
+			window["TgbDual.Callback"].on("log", this.onLog);
+		}
+
 		this._canvasRenderer = new CanvasRenderer(
 			TgbDual.Width, TgbDual.Height
 		);
@@ -489,6 +493,10 @@ export class TgbDual extends EventEmitter {
 			pointer += 2;
 		}
 	}
+
+	protected onLog(...args: any[]): void {
+		console.log(...args);
+	}
 }
 
 export module TgbDual {
@@ -639,6 +647,16 @@ export module TgbDual {
 		public checkSum: number = 0; // 1
 		public gbType: number = 0; // 4
 	}
+	
+	export class Callback extends EventEmitter {
+		public call(method: string, ...args: any[]): void {
+			this.emit(method, ...args);
+		}
+	}
+}
+
+if (window && window["TgbDual.Callback"] == null) {
+	window["TgbDual.Callback"] = new TgbDual.Callback();
 }
 
 Module["onRuntimeInitialized"] = () => {

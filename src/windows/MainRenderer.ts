@@ -430,7 +430,6 @@ export class MainRenderer {
 		
 		const json = languageJson.main.messages;
 		for (const name in messages) {
-			console.log(name, json[name]);
 			if (json[name] == null) {
 				continue;
 			}
