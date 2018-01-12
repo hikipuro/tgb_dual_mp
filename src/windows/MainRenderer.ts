@@ -288,6 +288,7 @@ export class MainRenderer {
 			if (this.tgbDual != null) {
 				this.tgbDual.stop();
 			}
+			this.writeCrashLog(message, filename, lineno, colno, error);
 		}
 
 		// window resize
@@ -405,6 +406,18 @@ export class MainRenderer {
 					break;
 			}
 		};
+	}
+
+	protected writeCrashLog(message, filename, lineno, colno, error): void {
+		const fd = fs.openSync("crash.log", "a+");
+		const newLine = "\r\n";
+		const date = new Date();
+		fs.writeSync(fd, "[" + date + "]" + newLine);
+		fs.writeSync(fd, filename + ", line: " + lineno + ", col: " + colno + newLine);
+		fs.writeSync(fd, "error: " + error + newLine);
+		fs.writeSync(fd, "message: " + message + newLine);
+		fs.writeSync(fd, newLine);
+		fs.closeSync(fd);
 	}
 
 	protected translateMessageText(languageJson: any, messages: Messages): void {
