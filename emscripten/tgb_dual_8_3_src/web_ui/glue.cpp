@@ -143,12 +143,14 @@ void freeTgbDual() {
 
 void reset() {
 	printf("********************* reset\n");
+	fflush(stdout);
 	g_gb[0]->reset();
 	//g_gb[0]->get_renderer()->reset();
 }
 
 void saveState(char *path) {
 	printf("path: %s\n", path);
+	fflush(stdout);
 	FILE *file = fopen(path, "w");
 	g_gb[0]->save_state(file);
 	fclose(file);
@@ -156,6 +158,7 @@ void saveState(char *path) {
 
 void restoreState(char *path) {
 	printf("path: %s\n", path);
+	fflush(stdout);
 	FILE *file = fopen(path, "r");
 	g_gb[0]->restore_state(file);
 	fclose(file);
@@ -194,6 +197,7 @@ void saveSram(char *path) {
 void loadRom(int size, unsigned char* dat, int sramSize, unsigned char* sram)
 {
 	printf("################# loadRom\n");
+	fflush(stdout);
 	int num = 0;
 	//int size;
 	//BYTE *dat;
@@ -485,9 +489,14 @@ void loadRom(int size, unsigned char* dat, int sramSize, unsigned char* sram)
 
 	free(dat);
 	free(ram);
+	*/
 
 	char pb[256];
-	sprintf(pb,"Load ROM \"%s\" slot[%d] :\ntype-%d:%s\nsize=%dKB : name=%s\n\n",buf,num+1,g_gb[num]->get_rom()->get_info()->cart_type,mbc_types[g_gb[num]->get_rom()->get_info()->cart_type],size/1024,g_gb[num]->get_rom()->get_info()->cart_name);
+	sprintf(pb,"Load ROM slot[%d] :\ntype-%d:%s\nsize=%dKB : name=%s\n\n",num+1,g_gb[num]->get_rom()->get_info()->cart_type,mbc_types[g_gb[num]->get_rom()->get_info()->cart_type],size/1024,g_gb[num]->get_rom()->get_info()->cart_name);
+	printf("%s", pb);
+	fflush(stdout);
+	
+	/*
 	SendMessage(hWnd,WM_OUTLOG,0,(LPARAM)pb);
 
 

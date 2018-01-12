@@ -78,6 +78,7 @@ web_renderer::~web_renderer()
 
 void web_renderer::reset() {
 	printf("web_renderer::reset\n");
+	fflush(stdout);
 	memset(bytes, 0, 160 * 144 * 4);
 	memset(soundBytes, 0, 2048 * 2 * 4);
 }
@@ -218,6 +219,7 @@ void web_renderer::output_log(char *mes,...)
 	va_start(vl,mes);
 	vsprintf(buf,mes,vl);
 	printf("%s\n", buf);
+	fflush(stdout);
 	
 	//EM_ASM_({
 	//	console.log("*** log", $0);
