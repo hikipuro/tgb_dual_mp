@@ -299,6 +299,47 @@ export class MainWindow {
 		const position = this.browserWindow.getPosition();
 		this._config.window.x = position[0];
 		this._config.window.y = position[1];
+
+		this.saveKeyConfigWindowPosition();
+		this.saveSoundConfigWindowPosition();
+		this.saveSpeedConfigWindowPosition();
+		this.savePathConfigWindowPosition();
+	}
+
+	protected saveKeyConfigWindowPosition() {
+		if (this._keyConfigWindow == null) {
+			return;
+		}
+		const position = this._keyConfigWindow.browserWindow.getPosition();
+		this._config.window.keyX = position[0];
+		this._config.window.keyY = position[1];
+	}
+
+	protected saveSoundConfigWindowPosition() {
+		if (this._soundConfigWindow == null) {
+			return;
+		}
+		const position = this._soundConfigWindow.browserWindow.getPosition();
+		this._config.window.soundX = position[0];
+		this._config.window.soundY = position[1];
+	}
+
+	protected saveSpeedConfigWindowPosition() {
+		if (this._speedConfigWindow == null) {
+			return;
+		}
+		const position = this._speedConfigWindow.browserWindow.getPosition();
+		this._config.window.speedX = position[0];
+		this._config.window.speedY = position[1];
+	}
+
+	protected savePathConfigWindowPosition() {
+		if (this._pathConfigWindow == null) {
+			return;
+		}
+		const position = this._pathConfigWindow.browserWindow.getPosition();
+		this._config.window.pathX = position[0];
+		this._config.window.pathY = position[1];
 	}
 
 	protected showOpenFileDialog() {
@@ -330,12 +371,14 @@ export class MainWindow {
 			return;
 		}
 
-		this._keyConfigWindow = new KeyConfigWindow(this.browserWindow, this._config.key);
+		this._keyConfigWindow = new KeyConfigWindow(this.browserWindow, this._config);
 		this._keyConfigWindow.browserWindow.once("ready-to-show", () => {
 			this._keyConfigWindow.show();
 		});
 		this._keyConfigWindow.browserWindow.once("close", () => {
 			this._keyConfigWindow.removeAllListeners("apply");
+			this.saveKeyConfigWindowPosition();
+
 			this._keyConfigWindow.destroy();
 			this._keyConfigWindow = null;
 		});
@@ -351,16 +394,18 @@ export class MainWindow {
 			return;
 		}
 
-		this._soundConfigWindow = new SoundConfigWindow(this.browserWindow, this._config.sound);
+		this._soundConfigWindow = new SoundConfigWindow(this.browserWindow, this._config);
 		this._soundConfigWindow.browserWindow.once("ready-to-show", () => {
 			this._soundConfigWindow.show();
 		});
 		this._soundConfigWindow.browserWindow.once("close", () => {
-			this._soundConfigWindow.removeAllListeners("update");
+			this._soundConfigWindow.removeAllListeners("apply");
+			this.saveSoundConfigWindowPosition();
+
 			this._soundConfigWindow.destroy();
 			this._soundConfigWindow = null;
 		});
-		this._soundConfigWindow.on("update", (soundConfig: SoundConfig) => {
+		this._soundConfigWindow.on("apply", (soundConfig: SoundConfig) => {
 			this._config.sound = soundConfig;
 			this.send("MainWindow.soundConfig", this._config);
 		});
@@ -372,12 +417,14 @@ export class MainWindow {
 			return;
 		}
 
-		this._speedConfigWindow = new SpeedConfigWindow(this.browserWindow, this._config.speed);
+		this._speedConfigWindow = new SpeedConfigWindow(this.browserWindow, this._config);
 		this._speedConfigWindow.browserWindow.once("ready-to-show", () => {
 			this._speedConfigWindow.show();
 		});
 		this._speedConfigWindow.browserWindow.once("close", () => {
 			this._speedConfigWindow.removeAllListeners("apply");
+			this.saveSpeedConfigWindowPosition();
+
 			this._speedConfigWindow.destroy();
 			this._speedConfigWindow = null;
 		});
@@ -393,12 +440,14 @@ export class MainWindow {
 			return;
 		}
 
-		this._pathConfigWindow = new PathConfigWindow(this.browserWindow, this._config.path);
+		this._pathConfigWindow = new PathConfigWindow(this.browserWindow, this._config);
 		this._pathConfigWindow.browserWindow.once("ready-to-show", () => {
 			this._pathConfigWindow.show();
 		});
 		this._pathConfigWindow.browserWindow.once("close", () => {
 			this._pathConfigWindow.removeAllListeners("close");
+			this.savePathConfigWindowPosition();
+
 			this._pathConfigWindow.destroy();
 			this._pathConfigWindow = null;
 		});

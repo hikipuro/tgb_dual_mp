@@ -6,6 +6,14 @@ export class WindowConfig {
 	public height: number = Constants.ScreenHeight * 3;
 	public x: number = null;
 	public y: number = null;
+	public keyX: number = null;
+	public keyY: number = null;
+	public soundX: number = null;
+	public soundY: number = null;
+	public speedX: number = null;
+	public speedY: number = null;
+	public pathX: number = null;
+	public pathY: number = null;
 
 	public static fromJSON(json: any): WindowConfig {
 		const windowConfig = new WindowConfig();

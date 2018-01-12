@@ -74,7 +74,7 @@ export class SoundConfigRenderer {
 			soundConfig.noise = noise.checked;
 			soundConfig.echo = echo.checked;
 			soundConfig.lowPass = lowPass.checked;
-			ipcRenderer.send("SoundConfigWindow.update", soundConfig);
+			ipcRenderer.send("SoundConfigWindow.apply", soundConfig);
 		}
 		
 		// disable drag & drop

@@ -22,14 +22,14 @@ export class PathConfigWindow extends EventEmitter {
 	public pathConfig: PathConfig = new PathConfig();
 	public newPathConfig: PathConfig = new PathConfig();
 
-	constructor(parent: Electron.BrowserWindow = null, pathConfig: PathConfig = null) {
+	constructor(parent: Electron.BrowserWindow = null, config: Config = null) {
 		super();
 
-		if (pathConfig != null) {
-			this.pathConfig = pathConfig;
+		if (config != null && config.path != null) {
+			this.pathConfig = config.path;
 		}
 
-		this.initWindow(parent);
+		this.initWindow(parent, config);
 		this.addIpcEvents();
 	}
 
@@ -49,7 +49,10 @@ export class PathConfigWindow extends EventEmitter {
 		webContents.send(channel, ...args);
 	}
 
-	protected initWindow(parent: Electron.BrowserWindow): void {
+	protected initWindow(parent: Electron.BrowserWindow, config: Config): void {
+		if (config == null) {
+			config = new Config();
+		}
 		this.browserWindow = new Electron.BrowserWindow({
 			parent: parent,
 			title: Settings.Title,
@@ -57,6 +60,8 @@ export class PathConfigWindow extends EventEmitter {
 			useContentSize: true,
 			width: Settings.Width,
 			height: Settings.Height,
+			x: config.window.pathX,
+			y: config.window.pathY,
 			acceptFirstMouse: true,
 			minimizable: false,
 			maximizable: false,

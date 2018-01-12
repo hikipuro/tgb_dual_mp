@@ -19,14 +19,14 @@ export class SoundConfigWindow extends EventEmitter {
 	public browserWindow: Electron.BrowserWindow = null;
 	public soundConfig: SoundConfig = new SoundConfig();
 
-	constructor(parent: Electron.BrowserWindow = null, soundConfig: SoundConfig = null) {
+	constructor(parent: Electron.BrowserWindow = null, config: Config = null) {
 		super();
 
-		if (soundConfig != null) {
-			this.soundConfig = soundConfig;
+		if (config != null && config.sound != null) {
+			this.soundConfig = config.sound;
 		}
 
-		this.initWindow(parent);
+		this.initWindow(parent, config);
 		this.addIpcEvents();
 	}
 
@@ -38,7 +38,10 @@ export class SoundConfigWindow extends EventEmitter {
 		this.browserWindow.destroy();
 	}
 
-	protected initWindow(parent: Electron.BrowserWindow): void {
+	protected initWindow(parent: Electron.BrowserWindow, config: Config): void {
+		if (config == null) {
+			config = new Config();
+		}
 		this.browserWindow = new Electron.BrowserWindow({
 			parent: parent,
 			title: Settings.Title,
@@ -46,6 +49,8 @@ export class SoundConfigWindow extends EventEmitter {
 			useContentSize: true,
 			width: Settings.Width,
 			height: Settings.Height,
+			x: config.window.soundX,
+			y: config.window.soundY,
 			acceptFirstMouse: true,
 			minimizable: false,
 			maximizable: false,
@@ -73,15 +78,15 @@ export class SoundConfigWindow extends EventEmitter {
 				soundConfig: this.soundConfig
 			};
 		});
-		ipcMain.on("SoundConfigWindow.update", (event: IpcMessageEvent, arg: any): void => {
+		ipcMain.on("SoundConfigWindow.apply", (event: IpcMessageEvent, arg: any): void => {
 			this.soundConfig = arg;
-			this.emit("update", this.soundConfig);
+			this.emit("apply", this.soundConfig);
 			event.returnValue = null;
 		});
 	}
 
 	protected removeIpcEvents(): void {
 		ipcMain.removeAllListeners("SoundConfigWindow.init");
-		ipcMain.removeAllListeners("SoundConfigWindow.update");
+		ipcMain.removeAllListeners("SoundConfigWindow.apply");
 	}
 }

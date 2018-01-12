@@ -19,14 +19,14 @@ export class SpeedConfigWindow extends EventEmitter {
 	public browserWindow: Electron.BrowserWindow = null;
 	public speedConfig: SpeedConfig = new SpeedConfig();
 
-	constructor(parent: Electron.BrowserWindow = null, speedConfig: SpeedConfig = null) {
+	constructor(parent: Electron.BrowserWindow = null, config: Config = null) {
 		super();
 
-		if (speedConfig != null) {
-			this.speedConfig = speedConfig;
+		if (config != null && config.speed != null) {
+			this.speedConfig = config.speed;
 		}
 		
-		this.initWindow(parent);
+		this.initWindow(parent, config);
 		this.addIpcEvents();
 	}
 
@@ -38,7 +38,10 @@ export class SpeedConfigWindow extends EventEmitter {
 		this.browserWindow.destroy();
 	}
 
-	protected initWindow(parent: Electron.BrowserWindow): void {
+	protected initWindow(parent: Electron.BrowserWindow, config: Config): void {
+		if (config == null) {
+			config = new Config();
+		}
 		this.browserWindow = new Electron.BrowserWindow({
 			parent: parent,
 			title: Settings.Title,
@@ -46,6 +49,8 @@ export class SpeedConfigWindow extends EventEmitter {
 			useContentSize: true,
 			width: Settings.Width,
 			height: Settings.Height,
+			x: config.window.speedX,
+			y: config.window.speedY,
 			acceptFirstMouse: true,
 			//titleBarStyle: "hidden",
 			minimizable: false,

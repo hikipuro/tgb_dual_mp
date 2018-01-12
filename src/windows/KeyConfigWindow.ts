@@ -20,14 +20,14 @@ export class KeyConfigWindow extends EventEmitter {
 	public browserWindow: Electron.BrowserWindow = null;
 	public keyConfig: KeyConfig = new KeyConfig();
 
-	constructor(parent: Electron.BrowserWindow = null, keyConfig: KeyConfig = null) {
+	constructor(parent: Electron.BrowserWindow = null, config: Config = null) {
 		super();
 
-		if (keyConfig != null) {
-			this.keyConfig = keyConfig;
+		if (config != null && config.key != null) {
+			this.keyConfig = config.key;
 		}
 		
-		this.initWindow(parent);
+		this.initWindow(parent, config);
 		this.addIpcEvents();
 	}
 
@@ -39,7 +39,10 @@ export class KeyConfigWindow extends EventEmitter {
 		this.browserWindow.destroy();
 	}
 
-	protected initWindow(parent: Electron.BrowserWindow): void {
+	protected initWindow(parent: Electron.BrowserWindow, config: Config): void {
+		if (config == null) {
+			config = new Config();
+		}
 		this.browserWindow = new Electron.BrowserWindow({
 			parent: parent,
 			title: Settings.Title,
@@ -47,6 +50,8 @@ export class KeyConfigWindow extends EventEmitter {
 			useContentSize: true,
 			width: Settings.Width,
 			height: Settings.Height,
+			x: config.window.keyX,
+			y: config.window.keyY,
 			acceptFirstMouse: true,
 			//titleBarStyle: "hidden",
 			minimizable: false,
