@@ -43,6 +43,23 @@
 		"help.open-app-folder": "アプリのフォルダを開く (&O)",
 		"help.version": "バージョン情報 (&V)"
 	},
+	"main": {
+		"messages": {
+			"saveState": "状態保存: ",
+			"loadState": "状態復元: ",
+			"reset": "リセット",
+			"pause": "一時停止",
+			"resume": "再開",
+			"release": "解放",
+			"fastOn": "高速モード: ON",
+			"fastOff": "高速モード: OFF",
+			"autoFireOn": "連射: ON",
+			"autoFireOff": "連射: OFF",
+			"screenshot": "スクリーンショット: ",
+			"startSoundRecording": "録音開始: ",
+			"stopSoundRecording": "録音停止"
+		}
+	},
 	"key": {
 		"title": "ボタン設定",
 		"system": "システム",

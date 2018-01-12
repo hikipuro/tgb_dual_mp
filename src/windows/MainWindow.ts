@@ -177,8 +177,12 @@ export class MainWindow {
 	protected addIpcEvents(): void {
 		ipcMain.on("App.menu.click", this.onClickMenuItem);
 		ipcMain.on("MainWindow.init", (event: IpcMessageEvent, arg: any) => {
-			this.send("MainWindow.init", process.argv);
-			event.returnValue = process.argv;
+			const languageJson = Config.getLanguageJson();
+			//this.send("MainWindow.init", process.argv);
+			event.returnValue = {
+				languageJson: languageJson,
+				commandLineArgs: process.argv
+			}
 		});
 		ipcMain.on("MainWindow.getConfig", (event: IpcMessageEvent, arg: any) => {
 			event.sender.send("MainWindow.getConfig", this._config);

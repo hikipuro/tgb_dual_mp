@@ -18,6 +18,22 @@ declare module "electron" {
 	}
 }
 
+class Messages {
+	public saveState: string = "Save state: ";
+	public loadState: string = "Load state: ";
+	public reset: string = "Reset";
+	public pause: string = "Pause";
+	public resume: string = "Resume";
+	public release: string = "Release";
+	public fastOn: string = "Fast mode: on";
+	public fastOff: string = "Fast mode: off";
+	public autoFireOn: string = "Auto fire: on";
+	public autoFireOff: string = "Auto fire: off";
+	public screenshot: string = "Screenshot: ";
+	public startSoundRecording: string = "Start sound recording: ";
+	public stopSoundRecording: string = "Stop sound recording";
+}
+
 export class MainRenderer {
 	protected tgbDual: TgbDual;
 	protected config: Config;
@@ -30,8 +46,9 @@ export class MainRenderer {
 	protected fpsElement: HTMLElement;
 	protected isFastMode: boolean = false;
 	protected isPausedWithLostFocus: boolean = false;
+	protected messages: Messages;
 
-	constructor(commandLineArgs: string[]) {
+	constructor(languageJson: any, commandLineArgs: string[]) {
 		this.commandLineArgs = commandLineArgs;
 		this.mainElement = document.getElementById("main");
 		this.messageOuterElement = document.getElementById("message-outer");
@@ -45,6 +62,9 @@ export class MainRenderer {
 		this.initWindowEvents();
 		this.initDocumentEvents();
 		this.config = ipcRenderer.sendSync("MainWindow.getConfig");
+
+		this.messages = new Messages();
+		this.translateMessageText(languageJson, this.messages);
 
 		console.log("TgbDual.isInitialized: ", TgbDual.isInitialized);
 		if (TgbDual.isInitialized) {
@@ -112,7 +132,7 @@ export class MainRenderer {
 				console.log("save", fileNumber);
 				this.tgbDual.saveState(fileNumber);
 				ipcRenderer.send("MainWindow.updateSaveLoadStateMenu", this.tgbDual.romPath);
-				this.showMessage("Save state: " + fileNumber);
+				this.showMessage(this.messages.saveState + fileNumber);
 				return;
 			}
 
@@ -120,7 +140,7 @@ export class MainRenderer {
 				const fileNumber = Number(id.substr(-1, 1));
 				console.log("restore", fileNumber);
 				this.tgbDual.restoreState(fileNumber);
-				this.showMessage("Load state: " + fileNumber);
+				this.showMessage(this.messages.loadState + fileNumber);
 				return;
 			}
 
@@ -128,16 +148,16 @@ export class MainRenderer {
 				case "file.reset-slot1":
 					if (this.tgbDual.isFileLoaded) {
 						this.loadFile(this.tgbDual.romPath);
-						this.showMessage("Reset");
+						this.showMessage(this.messages.reset);
 					}
 					break;
 				case "file.pause":
 					if (this.tgbDual.isFileLoaded) {
 						this.tgbDual.togglePause();
 						if (this.tgbDual.isPaused) {
-							this.showMessage("Pause");
+							this.showMessage(this.messages.pause);
 						} else {
-							this.showMessage("Resume");
+							this.showMessage(this.messages.resume);
 						}
 					}
 					break;
@@ -148,7 +168,7 @@ export class MainRenderer {
 						this.updateFps(0);
 						this.fpsElement.style.display = "none";
 						ipcRenderer.send("MainWindow.updateSaveLoadStateMenu", null);
-						this.showMessage("Release");
+						this.showMessage(this.messages.release);
 					}
 					break;
 				case "option.screen.aspect-ratio":
@@ -337,15 +357,15 @@ export class MainRenderer {
 					if (!this.tgbDual.isPaused) {
 						this.isFastMode = true;
 						this.updateSpeedConfig();
-						this.showMessage("Fast mode: on");
+						this.showMessage(this.messages.fastOn);
 					}
 					break;
 				case keyConfig.autoFire.code:
 					keyState.toggleAutoFire();
 					if (keyState.autoFire) {
-						this.showMessage("Auto fire: on");
+						this.showMessage(this.messages.autoFireOn);
 					} else {
-						this.showMessage("Auto fire: off");
+						this.showMessage(this.messages.autoFireOff);
 					}
 					break;
 				case keyConfig.pause.code:
@@ -353,9 +373,9 @@ export class MainRenderer {
 					this.updateSpeedConfig();
 					this.tgbDual.togglePause();
 					if (this.tgbDual.isPaused) {
-						this.showMessage("Pause");
+						this.showMessage(this.messages.pause);
 					} else {
-						this.showMessage("Resume");
+						this.showMessage(this.messages.resume);
 					}
 					break;
 			}
@@ -380,11 +400,29 @@ export class MainRenderer {
 					if (!this.tgbDual.isPaused && this.isFastMode) {
 						this.isFastMode = false;
 						this.updateSpeedConfig();
-						this.showMessage("Fast mode: off");
+						this.showMessage(this.messages.fastOff);
 					}
 					break;
 			}
 		};
+	}
+
+	protected translateMessageText(languageJson: any, messages: Messages): void {
+		if (languageJson == null || languageJson.main == null) {
+			return;
+		}
+		if (languageJson.main.messages == null) {
+			return;
+		}
+		
+		const json = languageJson.main.messages;
+		for (const name in messages) {
+			console.log(name, json[name]);
+			if (json[name] == null) {
+				continue;
+			}
+			messages[name] = json[name];
+		}
 	}
 
 	protected adjustScreenSize(): void {
@@ -586,7 +624,7 @@ export class MainRenderer {
 		}
 		const buffer = this.tgbDual.screenshot();
 		fs.writeFile(pathObject.path, buffer, (err) => {
-			this.showMessage("Screenshot: " + pathObject.number);
+			this.showMessage(this.messages.screenshot + pathObject.number);
 		});
 	}
 
@@ -616,7 +654,7 @@ export class MainRenderer {
 		}
 		if (this.tgbDual.isSoundRecording) {
 			this.tgbDual.stopSoundRecording();
-			this.showMessage("Stop sound recording");
+			this.showMessage(this.messages.stopSoundRecording);
 			return;
 		}
 		let pathObject = this.getSoundRecordFilePath();
@@ -625,7 +663,7 @@ export class MainRenderer {
 		}
 		console.log(pathObject.path);
 		this.tgbDual.startSoundRecording(pathObject.path);
-		this.showMessage("Start sound recording: " + pathObject.number);
+		this.showMessage(this.messages.startSoundRecording + pathObject.number);
 	}
 
 	protected getSoundRecordFilePath(): any {
@@ -736,13 +774,13 @@ export class MainRenderer {
 			if (!this.tgbDual.isPaused) {
 				this.isFastMode = true;
 				this.updateSpeedConfig();
-				this.showMessage("Fast mode: on");
+				this.showMessage(this.messages.fastOn);
 			}
 		} else if (gamePads.isKeyUp(id, button)) {
 			if (!this.tgbDual.isPaused && this.isFastMode) {
 				this.isFastMode = false;
 				this.updateSpeedConfig();
-				this.showMessage("Fast mode: off");
+				this.showMessage(this.messages.fastOff);
 			}
 		}
 
@@ -751,9 +789,9 @@ export class MainRenderer {
 		if (gamePads.isKeyDown(id, button)) {
 			keyState.toggleAutoFire();
 			if (keyState.autoFire) {
-				this.showMessage("Auto fire: on");
+				this.showMessage(this.messages.autoFireOn);
 			} else {
-				this.showMessage("Auto fire: off");
+				this.showMessage(this.messages.autoFireOff);
 			}
 		}
 
@@ -764,9 +802,9 @@ export class MainRenderer {
 			this.updateSpeedConfig();
 			this.tgbDual.togglePause();
 			if (this.tgbDual.isPaused) {
-				this.showMessage("Pause");
+				this.showMessage(this.messages.pause);
 			} else {
-				this.showMessage("Resume");
+				this.showMessage(this.messages.resume);
 			}
 		}
 	};

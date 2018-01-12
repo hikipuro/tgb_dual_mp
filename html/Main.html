@@ -12,11 +12,13 @@ Electron.webFrame.setZoomLevel(0);
 Electron.webFrame.setVisualZoomLevelLimits(1, 1);
 Electron.webFrame.setLayoutZoomLevelLimits(0, 0);
 
-let mainRenderer = null;
+let renderer = null;
 document.addEventListener("DOMContentLoaded", () => {
-	let commandLineArgs = Electron.ipcRenderer.sendSync("MainWindow.init");
+	let args = Electron.ipcRenderer.sendSync("MainWindow.init");
 	//console.log("commandLineArgs", commandLineArgs);
-	mainRenderer = new Module.MainRenderer(commandLineArgs);
+	renderer = new Module.MainRenderer(
+		args.languageJson, args.commandLineArgs
+	);
 });
 </script>
 </head>
