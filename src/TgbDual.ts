@@ -31,6 +31,8 @@ export class TgbDual extends EventEmitter {
 	protected _romInfo: TgbDual.RomInfo = null;
 	public pathConfig: PathConfig;
 
+	protected _log: string[] = [];
+
 	public static get isInitialized(): boolean {
 		return _isInitialized;
 	}
@@ -64,6 +66,10 @@ export class TgbDual extends EventEmitter {
 
 	public set fps(value: number) {
 		this._canvasRenderer.fps = value;
+	}
+
+	public get log(): string {
+		return this._log.join("\n");
 	}
 
 	constructor() {
@@ -127,7 +133,7 @@ export class TgbDual extends EventEmitter {
 		
 		this.romPath = "";
 		this._romInfo = null;
-		TgbDual.API.reset();
+		//TgbDual.API.reset();
 	}
 
 	public saveSram(): void {
@@ -293,7 +299,7 @@ export class TgbDual extends EventEmitter {
 	}
 
 	public loadFile(path: string): boolean {
-		console.log("loadFile", path);
+		//console.log("loadFile", path);
 		if (!fs.existsSync(path)) {
 			return false;
 		}
@@ -308,7 +314,7 @@ export class TgbDual extends EventEmitter {
 	}
 
 	public loadRom(data: Buffer): void {
-		console.log("loadRom", typeof data);
+		//console.log("loadRom", typeof data);
 		const sram = this.loadSram(this.romPath);
 		if (sram == null) {
 			TgbDual.API.loadRom(data.length, data, 0, []);
@@ -494,8 +500,16 @@ export class TgbDual extends EventEmitter {
 		}
 	}
 
-	protected onLog(...args: any[]): void {
-		console.log(...args);
+	protected onLog = (message: string): void => {
+		const maxLines = 1000;
+
+		const lines = message.split("\n");
+		lines.pop();
+		this._log.push(...lines);
+		if (this._log.length > maxLines) {
+			this._log.splice(0, this._log.length - maxLines);
+		}
+		this.emit("log", message);
 	}
 }
 

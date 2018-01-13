@@ -18,6 +18,9 @@ export class WindowConfig {
 	public showPath: boolean = false;
 	public pathX: number = null;
 	public pathY: number = null;
+	public showLog: boolean = false;
+	public logX: number = null;
+	public logY: number = null;
 
 	public static fromJSON(json: any): WindowConfig {
 		const windowConfig = new WindowConfig();

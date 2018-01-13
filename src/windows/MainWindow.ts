@@ -17,6 +17,7 @@ import { KeyConfigWindow } from "./KeyConfigWindow";
 import { SoundConfigWindow } from "./SoundConfigWindow";
 import { SpeedConfigWindow } from "./SpeedConfigWindow";
 import { PathConfigWindow } from "./PathConfigWindow";
+import { LogWindow } from "./LogWindow";
 import { VersionWindow } from "./VersionWindow";
 
 module Settings {
@@ -39,6 +40,7 @@ export class MainWindow {
 	protected _soundConfigWindow: SoundConfigWindow;
 	protected _speedConfigWindow: SpeedConfigWindow;
 	protected _pathConfigWindow: PathConfigWindow;
+	protected _logWindow: LogWindow;
 	protected _versionWindow: VersionWindow;
 	protected _config: Config;
 
@@ -69,6 +71,9 @@ export class MainWindow {
 		if (this._config.window.showPath) {
 			this.showPathConfigWindow();
 		}
+		if (this._config.window.showLog) {
+			this.showLogWindow();
+		}
 	}
 
 	public destroy(): void {
@@ -86,7 +91,7 @@ export class MainWindow {
 		const webContents = this.browserWindow.webContents;
 		webContents.send(channel, ...args);
 	}
-	
+
 	protected initWindow(parent: Electron.BrowserWindow): void {
 		this.browserWindow = new Electron.BrowserWindow({
 			title: Settings.Title,
@@ -278,6 +283,9 @@ export class MainWindow {
 			case "option.directory":
 				this.showPathConfigWindow();
 				return;
+			case "option.log":
+				this.showLogWindow();
+				return;
 			case "help.open-app-folder":
 				Electron.shell.openItem(Config.getCurrentPath());
 				return;
@@ -293,7 +301,7 @@ export class MainWindow {
 			this.setWindowSize(width, height);
 			return;
 		}
-		
+
 		if (id.indexOf("option.screen.") === 0) {
 			const layerName = id.split(".", 3)[2];
 			if (this._config.screen[layerName] == null) {
@@ -325,6 +333,7 @@ export class MainWindow {
 		this._config.window.showSound = false;
 		this._config.window.showSpeed = false;
 		this._config.window.showPath = false;
+		this._config.window.showLog = false;
 
 		if (this._keyConfigWindow != null) {
 			this._config.window.showKey = true;
@@ -338,6 +347,9 @@ export class MainWindow {
 		if (this._pathConfigWindow != null) {
 			this._config.window.showPath = true;
 		}
+		if (this._logWindow != null) {
+			this._config.window.showLog = true;
+		}
 	}
 
 	protected saveWindowPosition(): void {
@@ -349,9 +361,10 @@ export class MainWindow {
 		this.saveSoundConfigWindowPosition();
 		this.saveSpeedConfigWindowPosition();
 		this.savePathConfigWindowPosition();
+		this.saveLogWindowPosition();
 	}
 
-	protected saveKeyConfigWindowPosition() {
+	protected saveKeyConfigWindowPosition(): void {
 		if (this._keyConfigWindow == null) {
 			return;
 		}
@@ -360,7 +373,7 @@ export class MainWindow {
 		this._config.window.keyY = position[1];
 	}
 
-	protected saveSoundConfigWindowPosition() {
+	protected saveSoundConfigWindowPosition(): void {
 		if (this._soundConfigWindow == null) {
 			return;
 		}
@@ -369,7 +382,7 @@ export class MainWindow {
 		this._config.window.soundY = position[1];
 	}
 
-	protected saveSpeedConfigWindowPosition() {
+	protected saveSpeedConfigWindowPosition(): void {
 		if (this._speedConfigWindow == null) {
 			return;
 		}
@@ -378,13 +391,22 @@ export class MainWindow {
 		this._config.window.speedY = position[1];
 	}
 
-	protected savePathConfigWindowPosition() {
+	protected savePathConfigWindowPosition(): void {
 		if (this._pathConfigWindow == null) {
 			return;
 		}
 		const position = this._pathConfigWindow.browserWindow.getPosition();
 		this._config.window.pathX = position[0];
 		this._config.window.pathY = position[1];
+	}
+
+	protected saveLogWindowPosition(): void {
+		if (this._logWindow == null) {
+			return;
+		}
+		const position = this._logWindow.browserWindow.getPosition();
+		this._config.window.logX = position[0];
+		this._config.window.logY = position[1];
 	}
 
 	protected showOpenFileDialog() {
@@ -500,6 +522,26 @@ export class MainWindow {
 		this._pathConfigWindow.on("close", (pathConfig: PathConfig) => {
 			this._config.path = pathConfig;
 			this.send("MainWindow.pathConfig", this._config);
+		});
+	}
+
+	protected showLogWindow(): void {
+		if (this._logWindow != null) {
+			this._logWindow.show();
+			return;
+		}
+
+		this._logWindow = new LogWindow(this.browserWindow, this._config);
+		this._logWindow.browserWindow.once("ready-to-show", () => {
+			this._logWindow.show();
+		});
+		this._logWindow.browserWindow.once("show", () => {
+			this.send("MainWindow.showLogWindow");
+		});
+		this._logWindow.browserWindow.once("close", () => {
+			this.saveLogWindowPosition();
+			this._logWindow.destroy();
+			this._logWindow = null;
 		});
 	}
 

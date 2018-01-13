@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="css/Log.css">
+<script>
+let Electron = require("electron");
+let Module = require("../dist/windows/LogRenderer.js");
+
+let renderer = null;
+document.addEventListener("DOMContentLoaded", () => {
+	let args = Electron.ipcRenderer.sendSync("LogWindow.init");
+	renderer = new Module.LogRenderer(
+		args.languageJson
+	);
+});
+</script>
+</head>
+<body>
+<textarea id="log" readonly></textarea>
+</body>
+</html>

@@ -93,6 +93,7 @@ export class MainRenderer {
 		});
 		this.tgbDual.on("updateAlways", this.updateGamepad);
 		this.tgbDual.on("fps", this.updateFps);
+		this.tgbDual.on("log", this.onLog);
 		this.adjustScreenSize();
 		this.updateScreenSmoothing();
 
@@ -249,6 +250,17 @@ export class MainRenderer {
 				this.isPausedWithLostFocus = true;
 				this.tgbDual.togglePause();
 			}
+		});
+		ipcRenderer.on("MainWindow.showLogWindow", (event: Electron.IpcMessageEvent, arg: any) => {
+			console.log("MainWindow.showLogWindow");
+			if (!TgbDual.isInitialized) {
+				return;
+			}
+			const log = this.tgbDual.log;
+			if (log == null || log === "") {
+				return;
+			}
+			ipcRenderer.send("LogWindow.log", this.tgbDual.log + "\n");
 		});
 
 		/*
@@ -566,7 +578,7 @@ export class MainRenderer {
 
 	protected loadFile(filePath: string): void {
 		const ext = path.extname(filePath).toLowerCase();
-		console.log(filePath, "ext:" + ext);
+		//console.log(filePath, "ext:" + ext);
 
 		if (ext === ".zip") {
 			this.loadZipFile(filePath);
@@ -704,6 +716,10 @@ export class MainRenderer {
 		}
 		//const text = "<span class='emoji'>📽</span> " + String(fps);
 		this.fpsElement.innerHTML = String(fps);
+	}
+
+	protected onLog = (message: string): void => {
+		ipcRenderer.send("LogWindow.log", message);
 	}
 
 	protected updateGamepad = (): void => {

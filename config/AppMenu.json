@@ -358,8 +358,7 @@
 			},
 			{
 				"id": "option.log",
-				"label": "Log (&L)",
-				"enabled": false
+				"label": "Log (&L)"
 			}
 		]
 	},

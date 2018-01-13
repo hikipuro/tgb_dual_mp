@@ -7,6 +7,7 @@ import { KeyConfigWindow } from "./windows/KeyConfigWindow";
 import { SoundConfigWindow } from "./windows/SoundConfigWindow";
 import { SpeedConfigWindow } from "./windows/SpeedConfigWindow";
 import { PathConfigWindow } from "./windows/PathConfigWindow";
+import { LogWindow } from "./windows/LogWindow";
 import { VersionWindow } from "./windows/VersionWindow";
 
 class NodeMain {
@@ -118,6 +119,15 @@ class NodeMain {
 		});
 		pathConfig.browserWindow.webContents.openDevTools();
 		pathConfig.show();
+		//*/
+		
+		/*
+		const log = new LogWindow();
+		log.browserWindow.once("closed", () => {
+			this._app.quit();
+		});
+		log.browserWindow.webContents.openDevTools();
+		log.show();
 		//*/
 
 		/*
