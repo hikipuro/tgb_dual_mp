@@ -1,13 +1,17 @@
 import { EventEmitter } from "events";
+import * as PIXI from "pixi.js";
 
 export class CanvasRenderer extends EventEmitter {
 	public isPaused: boolean = false;
 	public update: (time: number) => void;
 	public render: () => void;
 	public updateAlways: (time: number) => void;
-	protected _element: HTMLCanvasElement;
+	protected _canvas: HTMLCanvasElement;
 	protected _context: CanvasRenderingContext2D;
 	protected _requestAnimationFrameHandle: number = 0;
+	
+	protected _app: PIXI.Application;
+	protected _sprite: PIXI.Sprite;
 
 	protected _fps: number = 60;
 	protected _prevTime: number = 0;
@@ -18,19 +22,33 @@ export class CanvasRenderer extends EventEmitter {
 
 	constructor(width: number, height: number) {
 		super();
-		this._element = document.createElement("canvas");
-		this._element.width = width;
-		this._element.height = height;
-		this._context = this._element.getContext("2d");
-		this._context.imageSmoothingEnabled = false;
-		this._context.webkitImageSmoothingEnabled = false;
+		this._canvas = document.createElement("canvas");
+		this._canvas.width = width;
+		this._canvas.height = height;
+		this._context = this._canvas.getContext("2d");
+		//this._context.imageSmoothingEnabled = false;
+		//this._context.webkitImageSmoothingEnabled = false;
+
+		this._app = new PIXI.Application({
+			width: width,
+			height: height,
+			antialias: false,
+			transparent: false,
+			resolution: 1,
+			autoStart: false
+		});
+
+		this._sprite = new PIXI.Sprite();
+		this._app.stage.addChild(this._sprite);
+		this._app.render();
+
 		this.update = (time: number): void => { };
 		this.render = (): void => { };
 		this.updateAlways = (time: number): void => { };
 	}
 
 	public get element(): HTMLCanvasElement {
-		return this._element;
+		return this._app.renderer.view;
 	}
 
 	public get context(): CanvasRenderingContext2D {
@@ -75,8 +93,8 @@ export class CanvasRenderer extends EventEmitter {
 	}
 
 	public clear(color: string = "#000"): void {
-		const width = this._element.width;
-		const height = this._element.height;
+		const width = this._canvas.width;
+		const height = this._canvas.height;
 		const context = this._context;
 		context.fillStyle = color;
 		context.fillRect(0, 0, width, height);
@@ -94,6 +112,12 @@ export class CanvasRenderer extends EventEmitter {
 	
 	public putImageData(imageData: ImageData): void {
 		this._context.putImageData(imageData, 0, 0);
+	}
+
+	protected updatePixi(): void {
+		this._sprite.texture = PIXI.Texture.fromCanvas(this._canvas);
+		this._sprite.texture.update();
+		this._app.render();
 	}
 
 	protected onUpdate = (time: number): void => {
@@ -118,6 +142,7 @@ export class CanvasRenderer extends EventEmitter {
 		if (this._fps === 60) {
 			this.update(time);
 			this.render();
+			this.updatePixi();
 			this._fpsCount++;
 			this._prevTime = now;
 			if (this._elapsed > 1000) {
@@ -157,6 +182,8 @@ export class CanvasRenderer extends EventEmitter {
 			}
 		}
 		this.render();
+		this.updatePixi();
+
 		this._prevTimeDiff = diff;
 		this._requestAnimationFrameHandle = requestAnimationFrame(this.onUpdate);
 	}
