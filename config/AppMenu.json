@@ -371,6 +371,10 @@
 				"label": "Open App Folder (&O)"
 			},
 			{
+				"id": "help.open-dev-tools",
+				"label": "Open Developer Tools (&D)"
+			},
+			{
 				"type": "separator"
 			},
 			{

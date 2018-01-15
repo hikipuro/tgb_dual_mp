@@ -289,6 +289,9 @@ export class MainWindow {
 			case "help.open-app-folder":
 				Electron.shell.openItem(Config.getCurrentPath());
 				return;
+			case "help.open-dev-tools":
+				this.browserWindow.webContents.openDevTools();
+				return;
 			case "help.version":
 				this.showVersionWindow();
 				return;

@@ -41,6 +41,7 @@
 
 		"help": "ヘルプ (&H)",
 		"help.open-app-folder": "アプリのフォルダを開く (&O)",
+		"help.open-dev-tools": "開発者ツールを開く (&D)",
 		"help.version": "バージョン情報 (&V)"
 	},
 	"main": {
