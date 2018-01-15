@@ -669,6 +669,9 @@ export module TgbDual {
 	}
 }
 
+const data = fs.readFileSync("html/tgb_dual.wasm");
+Module.wasmBinary = data;
+
 if (window && window["TgbDual.Callback"] == null) {
 	window["TgbDual.Callback"] = new TgbDual.Callback();
 }

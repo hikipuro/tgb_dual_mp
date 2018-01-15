@@ -24,4 +24,5 @@ emmake make
 
 cd ..
 cp $BuildDir/tgb_dual.js ../html
-cp $BuildDir/tgb_dual.js.mem ../html
+#cp $BuildDir/tgb_dual.js.mem ../html
+cp $BuildDir/tgb_dual.wasm ../html
