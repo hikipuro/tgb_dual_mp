@@ -12,6 +12,7 @@ extern void jsLog(const char *message);
 
 unsigned char* bytes;
 short* soundBytes;
+float* soundBytesF;
 unsigned int map_24[0x10000];
 unsigned char keys;
 
@@ -29,6 +30,18 @@ short* getSoundBytes(int size) {
 	}
 	self->snd_render->render((short*)soundBytes, size);
 	return soundBytes;
+}
+
+float* getSoundBytesF(int size) {
+	if (!self->snd_render) {
+		return (float*)0;
+	}
+	short data[size * 2];
+	self->snd_render->render((short*)data, size);
+	for (int i = 0; i < size * 2; i++) {
+		soundBytesF[i] = (float)data[i] / 32768.0;
+	}
+	return soundBytesF;
 }
 
 void setKeys(int down, int up, int left, int right, int a, int b, int select, int start) {
@@ -59,7 +72,8 @@ web_renderer::web_renderer()
 	color_type=2; 
 	
 	bytes = (unsigned char*)malloc(160 * 144 * 4);
-	soundBytes = (short*)malloc(2048 * 2 * 4); 
+	soundBytes = (short*)malloc(2048 * 2 * 4);
+	soundBytesF = (float*)malloc(4096 * 2 * 4);
 	
 	//snd_render = NULL;
 	//snd_render2 = NULL;
@@ -74,6 +88,7 @@ web_renderer::~web_renderer()
 {
 	free(bytes);
 	free(soundBytes);
+	free(soundBytesF);
 }
 
 void web_renderer::reset() {

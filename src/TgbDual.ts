@@ -475,27 +475,30 @@ export class TgbDual extends EventEmitter {
 
 		if (this.isSoundRecording) {
 			let buffer = new Buffer(bufferSize * 4);
+			pointer /= 2;
+			const HEAP16 = Module.HEAP16;
 			for (let i = 0; i < bufferSize; i++) {
-				const shortDataL = Module.getValue(pointer, "i16");
-				const shortDataR = Module.getValue(pointer + 2, "i16");
+				const shortDataL = HEAP16[pointer];
+				const shortDataR = HEAP16[pointer + 1];
 				buffer.writeInt16LE(shortDataL, i * 4);
 				buffer.writeInt16LE(shortDataR, i * 4 + 2);
 				L[i] = shortDataL / 32768;
 				R[i] = shortDataR / 32768;
-				pointer += 4;
+				pointer += 2;
 			}
 			this._waveFileWriter.write(buffer);
 			return;
 		}
 		
 		pointer /= 2;
-		const data = Module.HEAP16.subarray(pointer, pointer + bufferSize * 2);
-		pointer = 0;
+		const HEAP16 = Module.HEAP16;
+		//const data = Module.HEAP16.subarray(pointer, pointer + bufferSize * 2);
+		//pointer = 0;
 		for (let i = 0; i < bufferSize; i++) {
-			const shortDataL = data[pointer];
-			const shortDataR = data[pointer + 1];
-			L[i] = shortDataL / 32768;
-			R[i] = shortDataR / 32768;
+			//const shortDataL = HEAP16[pointer];
+			//const shortDataR = HEAP16[pointer + 1];
+			L[i] = HEAP16[pointer] / 32768;
+			R[i] = HEAP16[pointer + 1] / 32768;
 			pointer += 2;
 		}
 	}
@@ -527,6 +530,7 @@ export module TgbDual {
 		public static nextFrame: () => void;
 		public static getBytes: () => number;
 		public static getSoundBytes: (size: number) => number;
+		public static getSoundBytesF: (size: number) => number;
 		public static setKeys: (down: number, up: number, left: number, right: number, a: number, b: number, select: number, start: number) => void;
 		public static reset: () => void;
 		public static getCartName: () => string;
@@ -557,6 +561,8 @@ export module TgbDual {
 				"getBytes", "number", []);
 			this.getSoundBytes = Module.cwrap(
 				"getSoundBytes", "number", ["number"]);
+			this.getSoundBytesF = Module.cwrap(
+				"getSoundBytesF", "number", ["number"]);
 			this.setKeys = Module.cwrap(
 				"setKeys", "void", [
 					"number", "number", "number", "number",
