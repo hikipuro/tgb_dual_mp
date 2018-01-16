@@ -3,18 +3,135 @@ import * as path from "path";
 import * as url from "url";
 import * as fs from "fs";
 
-import { MenuItem, ipcMain, IpcMessageEvent, MenuItemConstructorOptions } from "electron";
+import { EventEmitter } from "events";
+import { MenuItem, ipcMain, IpcMessageEvent } from "electron";
 import { Config } from "./config/Config";
 
 module Settings {
 	export const Content: string = "../config/AppMenu.json";
 }
 
-export class MainMenu {
-	public static Instance: MainMenu = null;
-	public menu: Electron.Menu = null;
+class MenuTemplate {
+	public data: Electron.MenuItemConstructorOptions[] = null;
+	protected _itemCache: object = {};
 
 	constructor() {
+	}
+
+	public load(path: string): void {
+		if (!fs.existsSync(path)) {
+			return;
+		}
+		this.data = JSON.parse(fs.readFileSync(path, "utf8"));
+		this._itemCache = {};
+	}
+
+	public build(): Electron.Menu {
+		if (this.data == null) {
+			return null;
+		}
+		return Electron.Menu.buildFromTemplate(this.data);
+	}
+	
+	public translateText(languageJson: any): void {
+		if (this.data == null || languageJson == null) {
+			return;
+		}
+		this.translateSubMenuText(this.data, languageJson);
+	}
+
+	public translateSubMenuText(submenu: Electron.MenuItemConstructorOptions[], languageJson: any): void {
+		if (submenu == null || languageJson == null) {
+			return;
+		}
+		submenu.every((options: Electron.MenuItemConstructorOptions, index: number): boolean => {
+			const text: string = languageJson.menu[options.id];
+			if (text == null || text === "") {
+				return true;
+			}
+			options.label = text;
+			this.translateSubMenuText(
+				options.submenu as Electron.MenuItemConstructorOptions[],
+				languageJson
+			);
+			return true;
+		});
+	}
+
+	public setClickEventAllMenuItems(
+		clickHandler: (item: Electron.MenuItem, focusedWindow: Electron.BrowserWindow, event: Event) => void
+	): void {
+		if (this.data == null) {
+			return;
+		}
+		this.setClickEventMenuItems(this.data, clickHandler);
+	}
+	
+	public setClickEventMenuItems(
+		templateMenu: Electron.MenuItemConstructorOptions[],
+		clickHandler: (item: Electron.MenuItem, focusedWindow: Electron.BrowserWindow, event: Event) => void
+	): void {
+		if (templateMenu == null) {
+			return;
+		}
+		templateMenu.every((options: Electron.MenuItemConstructorOptions, index: number): boolean => {
+			options.click = clickHandler;
+			this.setClickEventMenuItems(
+				options.submenu as Electron.MenuItemConstructorOptions[],
+				clickHandler
+			);
+			return true;
+		});
+	}
+
+	public getItemById(id: string): Electron.MenuItemConstructorOptions {
+		if (id == null || id === "") {
+			return null;
+		}
+		if (this._itemCache[id] != null) {
+			return this._itemCache[id];
+		}
+		const item = this._getItemById(this.data, id);
+		if (item != null) {
+			this._itemCache[id] = item;
+		}
+		return item;
+	}
+	
+	protected _getItemById(
+		templateMenu: Electron.MenuItemConstructorOptions[],
+		id: string
+	): Electron.MenuItemConstructorOptions {
+		if (id == null || id === "") {
+			return null;
+		}
+		for (let i = 0; i < templateMenu.length; i++) {
+			const item = templateMenu[i];
+			if (item.id === id) {
+				return item;
+			}
+			if (item.submenu == null) {
+				continue;
+			}
+			const subItem = this._getItemById(
+				item.submenu as Electron.MenuItemConstructorOptions[],
+				id
+			);
+			if (subItem != null) {
+				return subItem;
+			}
+		}
+		return null;
+	}
+}
+
+export class MainMenu extends EventEmitter {
+	public static Instance: MainMenu = null;
+	protected _menu: Electron.Menu = null;
+	protected _template: MenuTemplate = null;
+
+	constructor() {
+		super();
 		MainMenu.Instance = this;
 		this.addIpcEvents();
 	}
@@ -23,15 +140,22 @@ export class MainMenu {
 		ipcMain.emit("App.menu.call", methodName, ...args);
 	}
 
-	public createMenu(): Electron.Menu {
+	public createMenu(): void {
 		const appMenuFile = path.join(__dirname, Settings.Content);
-		const templateMenu = JSON.parse(fs.readFileSync(appMenuFile, "utf8"));
 		const languageJson = Config.getLanguageJson();
 
-		this.translateMenuText(templateMenu, languageJson);
-		this.addClickEventAllMenuItems(templateMenu, this.onClickMenuItem);
-		this.menu = Electron.Menu.buildFromTemplate(templateMenu);
-		return this.menu;
+		this._template = new MenuTemplate();
+		this._template.load(appMenuFile);
+		this._template.translateText(languageJson);
+		this._template.setClickEventAllMenuItems(this.onClickMenuItem);
+
+		this._menu = this._template.build();
+		this.emit("update", this._menu);
+	}
+
+	public rebuild(): void {
+		this._menu = this._template.build();
+		this.emit("update", this._menu);
 	}
 
 	protected addIpcEvents(): void {
@@ -47,68 +171,35 @@ export class MainMenu {
 		ipcMain.removeAllListeners("App.menu.call");
 	}
 
-	protected translateMenuText(templateMenu: MenuItemConstructorOptions[], languageJson: any): void {
-		if (templateMenu == null || languageJson == null) {
-			return;
-		}
-		templateMenu.every((options: MenuItemConstructorOptions, index: number): boolean => {
-			const text: string = languageJson.menu[options.id];
-			if (text == null || text === "") {
-				return true;
-			}
-			options.label = text;
-			this.translateMenuText(options.submenu as MenuItemConstructorOptions[], languageJson);
-			return true;
-		});
-	}
-
-	protected addClickEventAllMenuItems(
-		templateMenu: MenuItemConstructorOptions[],
-		clickHandler: (item: MenuItem, focusedWindow: Electron.BrowserWindow, event: Event) => void
-	): void {
-		if (templateMenu == null) {
-			return;
-		}
-		templateMenu.every((options: MenuItemConstructorOptions, index: number): boolean => {
-			options.click = clickHandler;
-			this.addClickEventAllMenuItems(
-				options.submenu as MenuItemConstructorOptions[],
-				clickHandler
-			);
-			return true;
-		});
-	}
-
 	public disableAllSaveLoadState(): void {
-		if (this.menu == null) {
-			return;
-		}
 		for (let i = 1; i < 10; i++) {
 			const loadItemId = "file.load-state." + i;
-			const loadItem = this.menu.getMenuItemById(loadItemId);
+			const loadItem = this._template.getItemById(loadItemId);
 			const saveItemId = "file.save-state." + i;
-			const saveItem = this.menu.getMenuItemById(saveItemId);
+			const saveItem = this._template.getItemById(saveItemId);
 			if (loadItem == null || saveItem == null) {
 				continue;
 			}
 			loadItem.enabled = false;
 			saveItem.enabled = false;
 		}
+		this.rebuild();
 	}
 
 	public checkItem(id: string, checked: boolean): void {
-		const menuItem = this.menu.getMenuItemById(id);
+		const menuItem = this._template.getItemById(id);
 		if (menuItem == null) {
 			return;
 		}
 		menuItem.checked = checked;
+		this.rebuild();
 	}
 
 	public selectGBType(menuItem: MenuItem): void {
-		const gb = this.menu.getMenuItemById("option.type.gb");
-		const gbc = this.menu.getMenuItemById("option.type.gbc");
-		const gba = this.menu.getMenuItemById("option.type.gba");
-		const auto = this.menu.getMenuItemById("option.type.auto");
+		const gb = this._template.getItemById("option.type.gb");
+		const gbc = this._template.getItemById("option.type.gbc");
+		const gba = this._template.getItemById("option.type.gba");
+		const auto = this._template.getItemById("option.type.auto");
 
 		gb.checked = false;
 		gbc.checked = false;
@@ -129,6 +220,7 @@ export class MainMenu {
 			auto.checked = true;
 			break;
 		}
+		this.rebuild();
 	}
 
 	protected onClickMenuItem = (item: MenuItem, focusedWindow: Electron.BrowserWindow, event: Event): void => {

@@ -71,8 +71,10 @@ class NodeMain {
 		this.addIpcEvents();
 		//*
 		this._mainMenu = new MainMenu();
-		const menu = this._mainMenu.createMenu();
-		Electron.Menu.setApplicationMenu(menu);
+		this._mainMenu.on("update", (menu: Electron.Menu) => {
+			Electron.Menu.setApplicationMenu(menu);
+		});
+		this._mainMenu.createMenu();
 		//*/
 
 		//*
