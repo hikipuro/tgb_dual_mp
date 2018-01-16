@@ -217,27 +217,18 @@ export class MainWindow {
 			filePath = pathInfo.name + ".";
 			filePath = path.join(this._config.path.save, filePath);
 
-			const menu = Electron.Menu.getApplicationMenu();
-			if (menu == null) {
-				MainMenu.Instance.disableAllSaveLoadState();
-				return;
-			}
-
+			const menu = MainMenu.Instance;
 			for (let i = 1; i < 10; i++) {
-				const loadItemId = "file.load-state." + i;
-				const loadItem = menu.getMenuItemById(loadItemId);
 				const saveItemId = "file.save-state." + i;
-				const saveItem = menu.getMenuItemById(saveItemId);
-				if (loadItem == null || saveItem == null) {
-					continue;
-				}
-				saveItem.enabled = true;
+				const saveItem = menu.enableItem(saveItemId, true);
+
+				const loadItemId = "file.load-state." + i;
 				const saveFile = filePath + "sv" + i;
 				if (!fs.existsSync(saveFile)) {
-					loadItem.enabled = false;
+					menu.enableItem(loadItemId, false);
 					continue;
 				}
-				loadItem.enabled = true;
+				menu.enableItem(loadItemId, true);
 			}
 		});
 	}

@@ -195,6 +195,15 @@ export class MainMenu extends EventEmitter {
 		this.rebuild();
 	}
 
+	public enableItem(id: string, enabled: boolean): void {
+		const menuItem = this._template.getItemById(id);
+		if (menuItem == null) {
+			return;
+		}
+		menuItem.enabled = enabled;
+		this.rebuild();
+	}
+
 	public selectGBType(menuItem: MenuItem): void {
 		const gb = this._template.getItemById("option.type.gb");
 		const gbc = this._template.getItemById("option.type.gbc");
