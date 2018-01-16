@@ -17,6 +17,7 @@ export class TgbDual extends EventEmitter {
 
 	public keyState: TgbDual.KeyState;
 	protected _canvasRenderer: CanvasRenderer;
+	protected _imageData: ImageData;
 	protected _soundPlayer: SoundPlayer;
 	protected _waveFileWriter: WaveFileWriter;
 
@@ -92,6 +93,7 @@ export class TgbDual extends EventEmitter {
 			this.emit("fps", fps);
 		});
 		this._canvasRenderer.clear();
+		this._imageData = new ImageData(TgbDual.Width, TgbDual.Height);
 
 		this._soundPlayer = new SoundPlayer();
 		this._soundPlayer.handler = this.onAudioProcess;
@@ -437,13 +439,12 @@ export class TgbDual extends EventEmitter {
 			this._frameSkipCount = 0;
 		}
 		let pointer = TgbDual.API.getBytes();
-		const len = TgbDual.Width * TgbDual.Height * 4;
-		const data = Module.HEAPU8.subarray(pointer, pointer + len);
+		const data = Module.HEAPU8.subarray(pointer, pointer + TgbDual.ScreenBufferSize);
 
-		let imageData = this._canvasRenderer.createImageData();
-		imageData.data.set(data, 0);
-		this._canvasRenderer.putImageData(imageData);
-		imageData = null;
+		//let imageData = this._canvasRenderer.createImageData();
+		this._imageData.data.set(data);
+		this._canvasRenderer.putImageData(this._imageData);
+		//imageData = null;
 
 		/*
 		this._updateCounter++;
@@ -524,6 +525,7 @@ export class TgbDual extends EventEmitter {
 export module TgbDual {
 	export const Width = 160;
 	export const Height = 144;
+	export const ScreenBufferSize = TgbDual.Width * TgbDual.Height * 4;
 	export const ScreenRatio = TgbDual.Width / TgbDual.Height;
 
 	export function oninit() {
