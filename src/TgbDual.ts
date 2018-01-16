@@ -439,13 +439,14 @@ export class TgbDual extends EventEmitter {
 			this._frameSkipCount = 0;
 		}
 		let pointer = TgbDual.API.getBytes();
-		const data = Module.HEAPU8.subarray(pointer, pointer + TgbDual.ScreenBufferSize);
+		let data = Module.HEAPU8.subarray(pointer, pointer + TgbDual.ScreenBufferSize);
 
 		//let imageData = this._canvasRenderer.createImageData();
 		this._imageData.data.set(data);
 		this._canvasRenderer.putImageData(this._imageData);
 		//imageData = null;
 
+		data = null;
 		/*
 		this._updateCounter++;
 		if (this._updateCounter > 120) {

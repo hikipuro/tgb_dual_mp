@@ -126,6 +126,8 @@ export class CanvasRenderer extends EventEmitter {
 	}
 
 	protected updatePixi(): void {
+		this._sprite.texture.removeAllListeners();
+		this._sprite.texture.destroy(true);
 		this._sprite.texture = PIXI.Texture.fromCanvas(this._canvas);
 		this._sprite.texture.update();
 		this._app.render();
