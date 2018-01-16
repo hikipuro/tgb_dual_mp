@@ -38,6 +38,10 @@ export class CanvasRenderer extends EventEmitter {
 			autoStart: false
 		});
 
+		const ticker = PIXI.ticker.shared;
+		ticker.autoStart = false;
+		ticker.stop();
+
 		this._sprite = new PIXI.Sprite();
 		this._app.stage.addChild(this._sprite);
 		this._app.render();
