@@ -18,6 +18,7 @@ export class CanvasRenderer extends EventEmitter {
 	protected _prevTime2: number = 0;
 	protected _prevTimeDiff: number = 0;
 	protected _fpsCount: number = 0;
+	protected _prevFpsCount: number = 0;
 	protected _elapsed: number = 0;
 
 	constructor(width: number, height: number) {
@@ -26,8 +27,8 @@ export class CanvasRenderer extends EventEmitter {
 		this._canvas.width = width;
 		this._canvas.height = height;
 		this._context = this._canvas.getContext("2d");
-		//this._context.imageSmoothingEnabled = false;
-		//this._context.webkitImageSmoothingEnabled = false;
+		this._context.imageSmoothingEnabled = false;
+		this._context.webkitImageSmoothingEnabled = false;
 
 		this._app = new PIXI.Application({
 			width: width,
@@ -35,7 +36,9 @@ export class CanvasRenderer extends EventEmitter {
 			antialias: false,
 			transparent: false,
 			resolution: 1,
-			autoStart: false
+			autoStart: false,
+			clearBeforeRender: false,
+			legacy: true
 		});
 
 		const ticker = PIXI.ticker.shared;
@@ -77,6 +80,8 @@ export class CanvasRenderer extends EventEmitter {
 	public start(): void {
 		this._prevTime = performance.now();
 		this._prevTime2 = this._prevTime;
+		this._fpsCount = 0;
+		this._prevFpsCount = 0;
 		this._requestAnimationFrameHandle = requestAnimationFrame(this.onUpdate);
 	}
 	
@@ -137,6 +142,20 @@ export class CanvasRenderer extends EventEmitter {
 		this._app.render();
 	}
 
+	protected emitFpsEvent(): void {
+		if (this._elapsed < 1000) {
+			return;
+		}
+		this._elapsed -= 1000;
+		if (this._prevFpsCount === this._fpsCount) {
+			this._fpsCount = 0;
+			return;
+		}
+		this.emit("fps", this._fpsCount);
+		this._prevFpsCount = this._fpsCount;
+		this._fpsCount = 0;
+	}
+
 	protected onUpdate = (time: number): void => {
 		const now = performance.now();
 		let diff = now - this._prevTime;
@@ -147,11 +166,7 @@ export class CanvasRenderer extends EventEmitter {
 		if (this.isPaused) {
 			this._prevTime = now;
 			this._prevTime2 += diff;
-			if (this._elapsed > 1000) {
-				this._elapsed -= 1000;
-				this.emit("fps", this._fpsCount);
-				this._fpsCount = 0;
-			}
+			this.emitFpsEvent();
 			this._requestAnimationFrameHandle = requestAnimationFrame(this.onUpdate);
 			return;
 		}
@@ -162,22 +177,13 @@ export class CanvasRenderer extends EventEmitter {
 			this.updatePixi();
 			this._fpsCount++;
 			this._prevTime = now;
-			if (this._elapsed > 1000) {
-				this._elapsed -= 1000;
-				this.emit("fps", this._fpsCount);
-				this._fpsCount = 0;
-			}
+			this.emitFpsEvent();
 			this._requestAnimationFrameHandle = requestAnimationFrame(this.onUpdate);
 			return;
 		}
 
 		this._prevTime = now;
-		if (this._elapsed > 1000) {
-			this._elapsed -= 1000;
-			this.emit("fps", this._fpsCount);
-			console.log(this._fpsCount);
-			this._fpsCount = 0;
-		}
+		this.emitFpsEvent();
 
 		diff = now - this._prevTime2;
 		const frameTime = 1000 / this._fps;
