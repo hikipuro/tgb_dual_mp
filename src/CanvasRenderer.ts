@@ -121,6 +121,10 @@ export class CanvasRenderer extends EventEmitter {
 		this._context.putImageData(imageData, 0, 0);
 	}
 
+	public createDataURL(type: string = "image/png"): string {		
+		return this._canvas.toDataURL(type);
+	}
+
 	protected updatePixi(): void {
 		this._sprite.texture = PIXI.Texture.fromCanvas(this._canvas);
 		this._sprite.texture.update();

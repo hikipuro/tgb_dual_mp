@@ -290,7 +290,7 @@ export class TgbDual extends EventEmitter {
 	}
 
 	public screenshot(): Buffer {
-		const dataURL = this.element.toDataURL("image/png");
+		const dataURL = this._canvasRenderer.createDataURL("image/png");
 		const image = Electron.nativeImage.createFromDataURL(dataURL);
 		return image.toPNG();
 	}
