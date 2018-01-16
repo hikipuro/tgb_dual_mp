@@ -191,6 +191,7 @@ export class MainWindow {
 		menu.checkItem("option.type.auto", this._config.misc.type === "auto");
 
 		menu.checkItem("option.emulator.pause", this._config.misc.pauseWhenInactive);
+		menu.rebuild();
 	}
 
 	protected addIpcEvents(): void {
@@ -217,19 +218,35 @@ export class MainWindow {
 			filePath = pathInfo.name + ".";
 			filePath = path.join(this._config.path.save, filePath);
 
+			const locale = Electron.app.getLocale();
 			const menu = MainMenu.Instance;
 			for (let i = 1; i < 10; i++) {
+				let label = i + ":";
+				let loadItemEnabled = false;
+
 				const saveItemId = "file.save-state." + i;
-				const saveItem = menu.enableItem(saveItemId, true);
+				menu.enableItem(saveItemId, true);
 
 				const loadItemId = "file.load-state." + i;
 				const saveFile = filePath + "sv" + i;
-				if (!fs.existsSync(saveFile)) {
-					menu.enableItem(loadItemId, false);
-					continue;
+				if (fs.existsSync(saveFile)) {
+					loadItemEnabled = true;
+					const stats = fs.statSync(saveFile);
+					label = i + ": " + stats.mtime.toLocaleString(locale, {
+						hour12: false,
+						year: "numeric",
+						month: "2-digit",
+						day: "2-digit",
+						hour: "2-digit",
+						minute: "2-digit",
+						second: "2-digit"
+					});
 				}
-				menu.enableItem(loadItemId, true);
+				menu.enableItem(loadItemId, loadItemEnabled);
+				menu.setLabel(saveItemId, label);
+				menu.setLabel(loadItemId, label);
 			}
+			menu.rebuild();
 		});
 	}
 

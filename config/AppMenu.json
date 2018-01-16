@@ -19,55 +19,55 @@
 				"submenu": [
 					{
 						"id": "file.save-state.1",
-						"label": "1",
+						"label": "1:",
 						"enabled": false,
 						"accelerator": "Shift+F1"
 					},
 					{
 						"id": "file.save-state.2",
-						"label": "2",
+						"label": "2:",
 						"enabled": false,
 						"accelerator": "Shift+F2"
 					},
 					{
 						"id": "file.save-state.3",
-						"label": "3",
+						"label": "3:",
 						"enabled": false,
 						"accelerator": "Shift+F3"
 					},
 					{
 						"id": "file.save-state.4",
-						"label": "4",
+						"label": "4:",
 						"enabled": false,
 						"accelerator": "Shift+F4"
 					},
 					{
 						"id": "file.save-state.5",
-						"label": "5",
+						"label": "5:",
 						"enabled": false,
 						"accelerator": "Shift+F5"
 					},
 					{
 						"id": "file.save-state.6",
-						"label": "6",
+						"label": "6:",
 						"enabled": false,
 						"accelerator": "Shift+F6"
 					},
 					{
 						"id": "file.save-state.7",
-						"label": "7",
+						"label": "7:",
 						"enabled": false,
 						"accelerator": "Shift+F7"
 					},
 					{
 						"id": "file.save-state.8",
-						"label": "8",
+						"label": "8:",
 						"enabled": false,
 						"accelerator": "Shift+F8"
 					},
 					{
 						"id": "file.save-state.9",
-						"label": "9",
+						"label": "9:",
 						"enabled": false,
 						"accelerator": "Shift+F9"
 					}
@@ -80,55 +80,55 @@
 				"submenu": [
 					{
 						"id": "file.load-state.1",
-						"label": "1",
+						"label": "1:",
 						"enabled": false,
 						"accelerator": "F1"
 					},
 					{
 						"id": "file.load-state.2",
-						"label": "2",
+						"label": "2:",
 						"enabled": false,
 						"accelerator": "F2"
 					},
 					{
 						"id": "file.load-state.3",
-						"label": "3",
+						"label": "3:",
 						"enabled": false,
 						"accelerator": "F3"
 					},
 					{
 						"id": "file.load-state.4",
-						"label": "4",
+						"label": "4:",
 						"enabled": false,
 						"accelerator": "F4"
 					},
 					{
 						"id": "file.load-state.5",
-						"label": "5",
+						"label": "5:",
 						"enabled": false,
 						"accelerator": "F5"
 					},
 					{
 						"id": "file.load-state.6",
-						"label": "6",
+						"label": "6:",
 						"enabled": false,
 						"accelerator": "F6"
 					},
 					{
 						"id": "file.load-state.7",
-						"label": "7",
+						"label": "7:",
 						"enabled": false,
 						"accelerator": "F7"
 					},
 					{
 						"id": "file.load-state.8",
-						"label": "8",
+						"label": "8:",
 						"enabled": false,
 						"accelerator": "F8"
 					},
 					{
 						"id": "file.load-state.9",
-						"label": "9",
+						"label": "9:",
 						"enabled": false,
 						"accelerator": "F9"
 					}

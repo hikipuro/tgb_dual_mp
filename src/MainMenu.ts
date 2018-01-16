@@ -181,9 +181,20 @@ export class MainMenu extends EventEmitter {
 				continue;
 			}
 			loadItem.enabled = false;
+			loadItem.label = i + ":";
 			saveItem.enabled = false;
+			saveItem.label = i + ":";
 		}
 		this.rebuild();
+	}
+
+	public setLabel(id: string, label: string): void {
+		const menuItem = this._template.getItemById(id);
+		if (menuItem == null) {
+			return;
+		}
+		menuItem.label = label;
+		//this.rebuild();
 	}
 
 	public checkItem(id: string, checked: boolean): void {
@@ -192,7 +203,7 @@ export class MainMenu extends EventEmitter {
 			return;
 		}
 		menuItem.checked = checked;
-		this.rebuild();
+		//this.rebuild();
 	}
 
 	public enableItem(id: string, enabled: boolean): void {
@@ -201,7 +212,7 @@ export class MainMenu extends EventEmitter {
 			return;
 		}
 		menuItem.enabled = enabled;
-		this.rebuild();
+		//this.rebuild();
 	}
 
 	public selectGBType(menuItem: MenuItem): void {
