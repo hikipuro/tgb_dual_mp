@@ -72,6 +72,13 @@ class NodeMain {
 		//*
 		this._mainMenu = new MainMenu();
 		this._mainMenu.on("update", (menu: Electron.Menu) => {
+			if (process.platform === "linux") {
+				Electron.Menu.setApplicationMenu(null);
+				setTimeout(() => {
+					Electron.Menu.setApplicationMenu(menu);
+				}, 10);
+				return;
+			}
 			Electron.Menu.setApplicationMenu(menu);
 		});
 		this._mainMenu.createMenu();

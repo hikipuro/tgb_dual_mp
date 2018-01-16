@@ -263,6 +263,7 @@ export class MainWindow {
 			return;
 		}
 
+		const menu = MainMenu.Instance;
 		switch (id) {
 			case "file.load-slot1":
 				this.showOpenFileDialog();
@@ -279,14 +280,23 @@ export class MainWindow {
 			case "option.screen.aspect-ratio":
 				this._config.screen.fixedAspectRatio = item.checked;
 				this.send("MainWindow.menu", item);
+
+				menu.checkItem(item.id, item.checked);
+				menu.rebuild();
 				return;
 			case "option.screen.smoothing":
 				this._config.screen.smoothing = item.checked;
 				this.send("MainWindow.menu", item);
+
+				menu.checkItem(item.id, item.checked);
+				menu.rebuild();
 				return;
 			case "option.emulator.pause":
 				this._config.misc.pauseWhenInactive = item.checked;
 				this.send("MainWindow.menu", item);
+
+				menu.checkItem(item.id, item.checked);
+				menu.rebuild();
 				return;
 			case "option.directory":
 				this.showPathConfigWindow();
@@ -321,6 +331,8 @@ export class MainWindow {
 			}
 			this._config.screen[layerName] = item.checked;
 			this.send("MainWindow.screenConfig", this._config);
+			menu.checkItem(item.id, item.checked);
+			menu.rebuild();
 			return;
 		}
 
