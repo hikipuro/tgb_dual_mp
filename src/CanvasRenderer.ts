@@ -86,10 +86,16 @@ export class CanvasRenderer extends EventEmitter {
 
 	public pause(): void {
 		this.isPaused = true;
+		if (this._requestAnimationFrameHandle !== 0) {
+			cancelAnimationFrame(this._requestAnimationFrameHandle);
+		}
 	}
 	
 	public resume(): void {
 		this.isPaused = false;
+		if (this._requestAnimationFrameHandle !== 0) {
+			this._requestAnimationFrameHandle = requestAnimationFrame(this.onUpdate);
+		}
 	}
 
 	public clear(color: string = "#000"): void {
@@ -98,6 +104,7 @@ export class CanvasRenderer extends EventEmitter {
 		const context = this._context;
 		context.fillStyle = color;
 		context.fillRect(0, 0, width, height);
+		this.updatePixi();
 	}
 
 	public togglePause(): void {

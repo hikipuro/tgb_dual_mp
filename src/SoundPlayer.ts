@@ -56,6 +56,20 @@ export class SoundPlayer {
 		this._context = null;
 	}
 
+	public pause(): void {
+		if (this._context == null) {
+			return;
+		}
+		this._context.suspend();
+	}
+
+	public resume(): void {
+		if (this._context == null) {
+			return;
+		}
+		this._context.resume();
+	}
+
 	public writeEmptySound(outputBuffer: AudioBuffer): void {
 		const bufferSize = this._bufferSize;
 		const L = outputBuffer.getChannelData(0);

@@ -207,6 +207,11 @@ export class TgbDual extends EventEmitter {
 			return;
 		}
 		this._canvasRenderer.togglePause();
+		if (this._canvasRenderer.isPaused) {
+			this._soundPlayer.pause();
+		} else {
+			this._soundPlayer.resume();
+		}
 		console.log("pause", this._canvasRenderer.isPaused);
 	}
 
