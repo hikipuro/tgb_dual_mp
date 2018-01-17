@@ -350,8 +350,12 @@ export class MainRenderer {
 		}
 
 		// keyboard input
+		document.onkeypress = (e: KeyboardEvent) => {
+			e.stopPropagation();
+		};
 		document.onkeydown = (e: KeyboardEvent) => {
 			//e.preventDefault();
+			e.stopPropagation();
 			if (e.repeat) {
 				return;
 			}
@@ -395,6 +399,7 @@ export class MainRenderer {
 		};
 		document.onkeyup = (e: KeyboardEvent) => {
 			//e.preventDefault();
+			e.stopPropagation();
 			if (e.repeat) {
 				return;
 			}
