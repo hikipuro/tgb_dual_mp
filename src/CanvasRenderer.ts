@@ -41,6 +41,7 @@ export class CanvasRenderer extends EventEmitter {
 			legacy: true
 		});
 
+		this._app.renderer.plugins.interaction.destroy();
 		const ticker = PIXI.ticker.shared;
 		ticker.autoStart = false;
 		ticker.stop();
@@ -135,7 +136,7 @@ export class CanvasRenderer extends EventEmitter {
 	}
 
 	protected updatePixi(): void {
-		this._sprite.texture.removeAllListeners();
+		//this._sprite.texture.removeAllListeners();
 		this._sprite.texture.destroy(true);
 		this._sprite.texture = PIXI.Texture.fromCanvas(this._canvas);
 		this._sprite.texture.update();

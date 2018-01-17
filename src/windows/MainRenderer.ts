@@ -349,11 +349,16 @@ export class MainRenderer {
 			this.loadFile(file.path);
 		}
 
-		// keyboard input
-		document.onkeypress = (e: KeyboardEvent) => {
+		// mouse
+		document.addEventListener("mousemove", (e: MouseEvent) => {
 			e.stopPropagation();
-		};
-		document.onkeydown = (e: KeyboardEvent) => {
+		}, true);
+		
+		// keyboard input
+		document.addEventListener("keypress", (e: KeyboardEvent) => {
+			e.stopPropagation();
+		}, true);
+		document.addEventListener("keydown", (e: KeyboardEvent) => {
 			//e.preventDefault();
 			e.stopPropagation();
 			if (e.repeat) {
@@ -396,8 +401,8 @@ export class MainRenderer {
 					}
 					break;
 			}
-		};
-		document.onkeyup = (e: KeyboardEvent) => {
+		}, true);
+		document.addEventListener("keyup", (e: KeyboardEvent) => {
 			//e.preventDefault();
 			e.stopPropagation();
 			if (e.repeat) {
@@ -422,7 +427,7 @@ export class MainRenderer {
 					}
 					break;
 			}
-		};
+		}, true);
 	}
 
 	protected writeCrashLog(message, filename, lineno, colno, error): void {
