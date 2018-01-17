@@ -451,6 +451,7 @@ export class TgbDual extends EventEmitter {
 		//imageData = null;
 
 		//data = null;
+		/*
 		this._updateCounter++;
 		if (this._updateCounter >= 60) {
 			this._updateCounter = 0;

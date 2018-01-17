@@ -350,15 +350,15 @@ export class MainRenderer {
 		}
 
 		// mouse
-		document.addEventListener("mousemove", (e: MouseEvent) => {
+		window.addEventListener("mousemove", (e: MouseEvent) => {
 			e.stopPropagation();
 		}, true);
 		
 		// keyboard input
-		document.addEventListener("keypress", (e: KeyboardEvent) => {
+		window.addEventListener("keypress", (e: KeyboardEvent) => {
 			e.stopPropagation();
 		}, true);
-		document.addEventListener("keydown", (e: KeyboardEvent) => {
+		window.addEventListener("keydown", (e: KeyboardEvent) => {
 			//e.preventDefault();
 			e.stopPropagation();
 			if (e.repeat) {
@@ -402,7 +402,7 @@ export class MainRenderer {
 					break;
 			}
 		}, true);
-		document.addEventListener("keyup", (e: KeyboardEvent) => {
+		window.addEventListener("keyup", (e: KeyboardEvent) => {
 			//e.preventDefault();
 			e.stopPropagation();
 			if (e.repeat) {

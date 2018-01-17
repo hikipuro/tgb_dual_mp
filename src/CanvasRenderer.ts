@@ -45,6 +45,8 @@ export class CanvasRenderer extends EventEmitter {
 		const ticker = PIXI.ticker.shared;
 		ticker.autoStart = false;
 		ticker.stop();
+		this._app.ticker.autoStart = false;
+		this._app.ticker.stop();
 
 		this._sprite = new PIXI.Sprite();
 		this._app.stage.addChild(this._sprite);
