@@ -31,10 +31,6 @@ export class FpsCounter {
 }
 
 export class CanvasRenderer extends EventEmitter {
-	public update: (time: number) => void;
-	public render: () => void;
-	public updateAlways: (time: number) => void;
-
 	protected _canvas: HTMLCanvasElement;
 	protected _context: CanvasRenderingContext2D;
 
@@ -51,15 +47,14 @@ export class CanvasRenderer extends EventEmitter {
 
 	protected _fps: number = 60;
 	protected _fpsCounter: FpsCounter = new FpsCounter();
+	
+	public frameSkip: number = 0;
+	protected _frameSkipCount: number = 0;
 
 	constructor(width: number, height: number) {
 		super();
 		this.initCanvas(width, height);
 		this.initPixi(width, height);
-
-		this.update = (time: number): void => { };
-		this.render = (): void => { };
-		this.updateAlways = (time: number): void => { };
 	}
 
 	public get element(): HTMLCanvasElement {
@@ -257,6 +252,17 @@ export class CanvasRenderer extends EventEmitter {
 		this._timerId = 0;
 	}
 
+	protected render(): void {
+		if (this.frameSkip > 0) {
+			this._frameSkipCount++;
+			if (this._frameSkipCount <= this.frameSkip) {
+				return;
+			}
+			this._frameSkipCount = 0;
+		}
+		this.emit("render");
+	}
+
 	protected updatePixi(): void {
 		this._sprite.texture.update();
 		this._app.render();
@@ -277,13 +283,13 @@ export class CanvasRenderer extends EventEmitter {
 	}
 
 	protected onUpdateVsync = (time: number): void => {
-		this.update(time);
+		this.emit("update", time);
 		this.render();
 		this.updatePixi();
 
 		this._fpsCounter.update();
 		this.emitFpsEvent(this._fpsCounter);
-		if (!this.isPaused) {
+		if (!this._isPaused) {
 			this.requestAnimationFrame(this.onUpdateVsync);
 		}
 	}
@@ -291,13 +297,13 @@ export class CanvasRenderer extends EventEmitter {
 	protected onUpdateTimer = (): void => {
 		this._fpsCounter.update();
 
-		this.update(this._fpsCounter.prevTime);
+		this.emit("update", this._fpsCounter.prevTime);
 		this.render();
 		this.updatePixi();
 
 		this.emitFpsEvent(this._fpsCounter);
 		const timeout = this.getTimeout();
-		if (!this.isPaused) {
+		if (!this._isPaused) {
 			this.setTimeout(this.onUpdateTimer, timeout);
 		}
 	}

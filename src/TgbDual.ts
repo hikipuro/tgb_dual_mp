@@ -24,8 +24,6 @@ export class TgbDual extends EventEmitter {
 	protected _prevTime: number = 0;
 	protected _updateCounter: number = 0;
 
-	public frameSkip: number = 0;
-	protected _frameSkipCount: number = 0;
 	public lastFps: number = 0;
 
 	public romPath: string = "";
@@ -77,6 +75,14 @@ export class TgbDual extends EventEmitter {
 		this._canvasRenderer.isVsync = value;
 	}
 
+	public get frameSkip(): number {
+		return this._canvasRenderer.frameSkip;
+	}
+	
+	public set frameSkip(value: number) {
+		this._canvasRenderer.frameSkip = value;
+	}
+
 	public get log(): string {
 		return this._log.join("\n");
 	}
@@ -93,15 +99,17 @@ export class TgbDual extends EventEmitter {
 		this._canvasRenderer = new CanvasRenderer(
 			TgbDual.Width, TgbDual.Height
 		);
-		this._canvasRenderer.update = this.onCanvasUpdate;
-		this._canvasRenderer.render = this.onCanvasRender;
-		this._canvasRenderer.updateAlways = this.onCanvasUpdateAlways;
+		this._canvasRenderer.on("update", this.onCanvasUpdate);
+		this._canvasRenderer.on("render", this.onCanvasRender);
 		this._canvasRenderer.on("fps", (fps: number) => {
 			this.lastFps = fps;
 			this.emit("fps", fps);
 		});
 		this._canvasRenderer.clear();
-		//this._imageData = new ImageData(TgbDual.Width, TgbDual.Height);
+		
+		const pointer = TgbDual.API.getBytes();
+		const data = new Uint8ClampedArray(Module.HEAPU8.buffer, pointer, TgbDual.ScreenBufferSize);
+		this._imageData = new ImageData(data, TgbDual.Width, TgbDual.Height);
 
 		this._soundPlayer = new SoundPlayer();
 		this._soundPlayer.handler = this.onAudioProcess;
@@ -432,47 +440,13 @@ export class TgbDual extends EventEmitter {
 	}
 
 	protected onCanvasUpdate = (time: number): void => {
-		/*
-		if (this.isFastMode) {
-			TgbDual.API.nextFrame();
-			if (this._prevTime + 17 >= performance.now()) {
-				this.render(time);
-				return;
-			}
-			this.emit("update");
-			this.setKeys(this.keyState);
-			this.updateScreen();
-			this._prevTime = performance.now();
-			return;
-		}
-		*/
-
 		this.emit("update");
 		this.setKeys(this.keyState);
 		TgbDual.API.nextFrame();
-		//this.updateScreen();
 	}
 
 	protected onCanvasRender = (): void => {
-		if (this.frameSkip > 0) {
-			this._frameSkipCount++;
-			if (this._frameSkipCount <= this.frameSkip) {
-				return;
-			}
-			this._frameSkipCount = 0;
-		}
-		if (this._imageData == null) {
-			const pointer = TgbDual.API.getBytes();
-			const data = new Uint8ClampedArray(Module.HEAPU8.buffer, pointer, TgbDual.ScreenBufferSize);
-			this._imageData = new ImageData(data, TgbDual.Width, TgbDual.Height);
-		}
-		//let data = new Uint8ClampedArray(Module.HEAPU8.buffer, pointer, TgbDual.ScreenBufferSize);
-		//let data = Module.HEAPU8.subarray(pointer, pointer + TgbDual.ScreenBufferSize);
-
-		this._canvasRenderer.putImageData(this._imageData);
-		//imageData = null;
-
-		//data = null;
+		this._canvasRenderer.putImageData(this._imageData, 0, 0);
 		/*
 		this._updateCounter++;
 		if (this._updateCounter >= 60) {
@@ -482,10 +456,6 @@ export class TgbDual extends EventEmitter {
 			}
 		}
 		//*/
-	}
-
-	protected onCanvasUpdateAlways = (time: number): void => {
-		this.emit("updateAlways");
 	}
 
 	protected onAudioProcess = (soundPlayer: SoundPlayer, event: AudioProcessingEvent): void => {
