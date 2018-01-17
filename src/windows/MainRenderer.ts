@@ -579,6 +579,7 @@ export class MainRenderer {
 		this.tgbDual.vsync = speed.vsync;
 		this.updateFps(this.tgbDual.lastFps);
 		if (this.isFastMode) {
+			this.tgbDual.vsync = false;
 			this.tgbDual.fps = speed.fastFps;
 			this.tgbDual.frameSkip = speed.fastFrameSkip;
 			return;

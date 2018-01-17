@@ -87,14 +87,20 @@ export class CanvasRenderer extends EventEmitter {
 			return;
 		}
 		let restart = false;
+		let isPaused = this._isPaused;
 		if (this._isStarted) {
 			restart = true;
 			this.stop();
 		}
 		this._isVsync = value;
-		if (restart) {
-			this.start();
+		if (!restart) {
+			return;
 		}
+		this.start();
+		if (!isPaused) {
+			return;
+		}
+		this.pause();
 	}
 
 	public get fps(): number {
