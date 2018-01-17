@@ -47,6 +47,7 @@ export class MainRenderer {
 	protected isFastMode: boolean = false;
 	protected isPausedWithLostFocus: boolean = false;
 	protected messages: Messages;
+	protected timerId: any = 0;
 
 	constructor(languageJson: any, commandLineArgs: string[]) {
 		this.commandLineArgs = commandLineArgs;
@@ -91,7 +92,7 @@ export class MainRenderer {
 			this.updateSoundConfig(this.config.sound);
 			this.updateSpeedConfig();
 		});
-		this.tgbDual.on("updateAlways", this.updateGamepad);
+		this.tgbDual.on("update", this.updateGamepad);
 		this.tgbDual.on("fps", this.updateFps);
 		this.tgbDual.on("log", this.onLog);
 		this.adjustScreenSize();
@@ -153,14 +154,7 @@ export class MainRenderer {
 					}
 					break;
 				case "file.pause":
-					if (this.tgbDual.isFileLoaded) {
-						this.tgbDual.togglePause();
-						if (this.tgbDual.isPaused) {
-							this.showMessage(this.messages.pause);
-						} else {
-							this.showMessage(this.messages.resume);
-						}
-					}
+					this.pause();
 					break;
 				case "file.release-slot1":
 					if (this.tgbDual.isFileLoaded) {
@@ -391,14 +385,7 @@ export class MainRenderer {
 					}
 					break;
 				case keyConfig.pause.code:
-					this.isFastMode = false;
-					this.updateSpeedConfig();
-					this.tgbDual.togglePause();
-					if (this.tgbDual.isPaused) {
-						this.showMessage(this.messages.pause);
-					} else {
-						this.showMessage(this.messages.resume);
-					}
+					this.pause();
 					break;
 			}
 		}, true);
@@ -734,6 +721,23 @@ export class MainRenderer {
 		ipcRenderer.send("LogWindow.log", message);
 	}
 
+	protected pause(): void {
+		if (!this.tgbDual.isFileLoaded) {
+			return;
+		}
+		this.isFastMode = false;
+		this.updateSpeedConfig();
+		this.tgbDual.togglePause();
+		if (this.tgbDual.isPaused) {
+			this.showMessage(this.messages.pause);
+			this.timerId = setInterval(this.updateGamepad, 16);
+		} else {
+			this.showMessage(this.messages.resume);
+			clearInterval(this.timerId);
+			this.timerId = 0;
+		}
+	}
+
 	protected updateGamepad = (): void => {
 		if (this.isPausedWithLostFocus) {
 			return;
@@ -838,14 +842,7 @@ export class MainRenderer {
 		id = gamepadConfig.pause.id;
 		button = gamepadConfig.pause.button;
 		if (gamePads.isKeyDown(id, button)) {
-			this.isFastMode = false;
-			this.updateSpeedConfig();
-			this.tgbDual.togglePause();
-			if (this.tgbDual.isPaused) {
-				this.showMessage(this.messages.pause);
-			} else {
-				this.showMessage(this.messages.resume);
-			}
+			this.pause();
 		}
 	};
 }

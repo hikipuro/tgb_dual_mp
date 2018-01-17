@@ -283,7 +283,9 @@ export class CanvasRenderer extends EventEmitter {
 
 		this._fpsCounter.update();
 		this.emitFpsEvent(this._fpsCounter);
-		this.requestAnimationFrame(this.onUpdateVsync);
+		if (!this.isPaused) {
+			this.requestAnimationFrame(this.onUpdateVsync);
+		}
 	}
 	
 	protected onUpdateTimer = (): void => {
@@ -295,7 +297,9 @@ export class CanvasRenderer extends EventEmitter {
 
 		this.emitFpsEvent(this._fpsCounter);
 		const timeout = this.getTimeout();
-		this.setTimeout(this.onUpdateTimer, timeout);
+		if (!this.isPaused) {
+			this.setTimeout(this.onUpdateTimer, timeout);
+		}
 	}
 
 	protected getTimeout(): number {

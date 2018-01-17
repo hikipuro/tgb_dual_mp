@@ -136,7 +136,7 @@ export class TgbDual extends EventEmitter {
 		if (!this._canvasRenderer.isStarted) {
 			return;
 		}
-		this.togglePause();
+		this.pause();
 		this.saveSram();
 
 		this._canvasRenderer.stop();
@@ -216,17 +216,28 @@ export class TgbDual extends EventEmitter {
 		}
 	}
 
-	public togglePause(): void {
+	public pause(): void {
 		if (!this.isFileLoaded) {
 			return;
 		}
-		this._canvasRenderer.togglePause();
-		if (this._canvasRenderer.isPaused) {
-			this._soundPlayer.pause();
-		} else {
-			this._soundPlayer.resume();
+		this._canvasRenderer.pause();
+		this._soundPlayer.pause();
+	}
+
+	public resume(): void {
+		if (!this.isFileLoaded) {
+			return;
 		}
-		console.log("pause", this._canvasRenderer.isPaused);
+		this._canvasRenderer.resume();
+		this._soundPlayer.resume();
+	}
+
+	public togglePause(): void {
+		if (this._canvasRenderer.isPaused) {
+			this.resume();
+		} else {
+			this.pause();
+		}
 	}
 
 	public saveState(index: number): void {
