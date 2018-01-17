@@ -10,6 +10,7 @@ import { Config } from "./config/Config";
 const Module = require("../html/tgb_dual.js");
 
 let _isInitialized = false;
+const Uint8Array_subarray: Function = Uint8Array.prototype.subarray;
 
 export class TgbDual extends EventEmitter {
 	public static AudioBufferSize: number = 256 * 4;
@@ -22,7 +23,7 @@ export class TgbDual extends EventEmitter {
 	protected _waveFileWriter: WaveFileWriter;
 
 	protected _prevTime: number = 0;
-	//protected _updateCounter: number = 0;
+	protected _updateCounter: number = 0;
 
 	public frameSkip: number = 0;
 	protected _frameSkipCount: number = 0;
@@ -439,6 +440,9 @@ export class TgbDual extends EventEmitter {
 			this._frameSkipCount = 0;
 		}
 		let pointer = TgbDual.API.getBytes();
+		//let data = Uint8Array_subarray.call(
+		//	Module.HEAPU8, pointer, pointer + TgbDual.ScreenBufferSize
+		//);
 		let data = Module.HEAPU8.subarray(pointer, pointer + TgbDual.ScreenBufferSize);
 
 		//let imageData = this._canvasRenderer.createImageData();
@@ -446,10 +450,9 @@ export class TgbDual extends EventEmitter {
 		this._canvasRenderer.putImageData(this._imageData);
 		//imageData = null;
 
-		data = null;
-		/*
+		//data = null;
 		this._updateCounter++;
-		if (this._updateCounter > 120) {
+		if (this._updateCounter >= 60) {
 			this._updateCounter = 0;
 			if (global.gc) {
 				global.gc();
