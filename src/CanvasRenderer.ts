@@ -49,6 +49,8 @@ export class CanvasRenderer extends EventEmitter {
 		this._app.ticker.stop();
 
 		this._sprite = new PIXI.Sprite();
+		this._sprite.texture = PIXI.Texture.fromCanvas(this._canvas);
+		//this._sprite.texture.update();
 		this._app.stage.addChild(this._sprite);
 		this._app.render();
 
@@ -125,7 +127,7 @@ export class CanvasRenderer extends EventEmitter {
 
 	public createImageData(): ImageData {
 		return this._context.createImageData(
-			this.element.width, this.element.height
+			this._canvas.width, this._canvas.height
 		);
 	}
 	
@@ -139,8 +141,7 @@ export class CanvasRenderer extends EventEmitter {
 
 	protected updatePixi(): void {
 		//this._sprite.texture.removeAllListeners();
-		this._sprite.texture.destroy(true);
-		this._sprite.texture = PIXI.Texture.fromCanvas(this._canvas);
+		//sprite.texture.destroy(true);
 		this._sprite.texture.update();
 		this._app.render();
 	}

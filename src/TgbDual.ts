@@ -10,7 +10,6 @@ import { Config } from "./config/Config";
 const Module = require("../html/tgb_dual.js");
 
 let _isInitialized = false;
-const Uint8Array_subarray: Function = Uint8Array.prototype.subarray;
 
 export class TgbDual extends EventEmitter {
 	public static AudioBufferSize: number = 256 * 4;
@@ -94,7 +93,7 @@ export class TgbDual extends EventEmitter {
 			this.emit("fps", fps);
 		});
 		this._canvasRenderer.clear();
-		this._imageData = new ImageData(TgbDual.Width, TgbDual.Height);
+		//this._imageData = new ImageData(TgbDual.Width, TgbDual.Height);
 
 		this._soundPlayer = new SoundPlayer();
 		this._soundPlayer.handler = this.onAudioProcess;
@@ -439,14 +438,14 @@ export class TgbDual extends EventEmitter {
 			}
 			this._frameSkipCount = 0;
 		}
-		let pointer = TgbDual.API.getBytes();
-		//let data = Uint8Array_subarray.call(
-		//	Module.HEAPU8, pointer, pointer + TgbDual.ScreenBufferSize
-		//);
-		let data = Module.HEAPU8.subarray(pointer, pointer + TgbDual.ScreenBufferSize);
+		if (this._imageData == null) {
+			const pointer = TgbDual.API.getBytes();
+			const data = new Uint8ClampedArray(Module.HEAPU8.buffer, pointer, TgbDual.ScreenBufferSize);
+			this._imageData = new ImageData(data, TgbDual.Width, TgbDual.Height);
+		}
+		//let data = new Uint8ClampedArray(Module.HEAPU8.buffer, pointer, TgbDual.ScreenBufferSize);
+		//let data = Module.HEAPU8.subarray(pointer, pointer + TgbDual.ScreenBufferSize);
 
-		//let imageData = this._canvasRenderer.createImageData();
-		this._imageData.data.set(data);
 		this._canvasRenderer.putImageData(this._imageData);
 		//imageData = null;
 
