@@ -9,6 +9,7 @@ export class SpeedConfigRenderer {
 		this.translateText(languageJson);
 
 		const renderer = this;
+		const vsync = document.querySelector("#vsync") as HTMLInputElement;
 		const frameSkip = document.querySelector("#frameSkip") as HTMLInputElement;
 		const fps = document.querySelector("#fps") as HTMLInputElement;
 		const fastFrameSkip = document.querySelector("#fastFrameSkip") as HTMLInputElement;
@@ -16,6 +17,7 @@ export class SpeedConfigRenderer {
 		const showFps = document.querySelector("#showFps") as HTMLInputElement;
 		const reset = document.querySelector("#reset") as HTMLInputElement;
 
+		vsync.checked = speedConfig.vsync;
 		frameSkip.value = String(speedConfig.frameSkip);
 		fps.value = String(speedConfig.fps);
 		fastFrameSkip.value = String(speedConfig.fastFrameSkip);
@@ -35,6 +37,10 @@ export class SpeedConfigRenderer {
 			renderer.applyConfig(speedConfig);
 		}
 
+		vsync.addEventListener("change", () => {
+			speedConfig.vsync = vsync.checked;
+			renderer.applyConfig(speedConfig);
+		});
 		frameSkip.addEventListener("input", onInput);
 		fps.addEventListener("input", onInput);
 		fastFrameSkip.addEventListener("input", onInput);

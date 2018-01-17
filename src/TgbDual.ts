@@ -69,6 +69,14 @@ export class TgbDual extends EventEmitter {
 		this._canvasRenderer.fps = value;
 	}
 
+	public get vsync(): boolean {
+		return this._canvasRenderer.isVsync;
+	}
+
+	public set vsync(value: boolean) {
+		this._canvasRenderer.isVsync = value;
+	}
+
 	public get log(): string {
 		return this._log.join("\n");
 	}
@@ -108,7 +116,9 @@ export class TgbDual extends EventEmitter {
 		if (this._canvasRenderer.isStarted) {
 			return;
 		}
-		this._canvasRenderer.isPaused = false;
+		if (this._canvasRenderer.isPaused) {
+			this._canvasRenderer.resume();
+		}
 		//TgbDual.API.setSkip(20);
 		
 		this._prevTime = performance.now();
@@ -201,7 +211,9 @@ export class TgbDual extends EventEmitter {
 			return;
 		}
 		TgbDual.API.reset();
-		this._canvasRenderer.isPaused = false;
+		if (this._canvasRenderer.isPaused) {
+			this._canvasRenderer.resume();
+		}
 	}
 
 	public togglePause(): void {

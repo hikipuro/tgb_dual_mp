@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </head>
 <body>
-<div class="pane">
+<div class="pane normal">
 	<div id="normal-label" class="title">Normal Mode</div>
 	<div class="record">
 		<div id="frameSkip-label" class="caption">Frame Skip</div>
@@ -26,6 +26,10 @@ document.addEventListener("DOMContentLoaded", () => {
 	<div class="record">
 		<div id="fps-label" class="caption">FPS</div>
 		<div class="value"><input id="fps" type="number" min="1" max="300"></div>
+	</div>
+	<div class="record-vsync">
+		<div class="value-fps"><input id="vsync" type="checkbox"></div>
+		<div class="caption-fps"><label id="vsync-label" for="vsync">Vsync</label></div>
 	</div>
 </div>
 

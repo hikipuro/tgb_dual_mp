@@ -1,5 +1,6 @@
 export class SpeedConfig {
 	public fps: number = 60;
+	public vsync: boolean = true;
 	public frameSkip: number = 0;
 	public fastFps: number = 300;
 	public fastFrameSkip: number = 9;
