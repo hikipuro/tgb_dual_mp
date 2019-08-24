@@ -197,7 +197,7 @@ export class CanvasRenderer extends EventEmitter {
 		this._canvas.height = height;
 		this._context = this._canvas.getContext("2d");
 		this._context.imageSmoothingEnabled = false;
-		this._context.webkitImageSmoothingEnabled = false;
+		//this._context.webkitImageSmoothingEnabled = false;
 	}
 
 	protected initPixi(width: number, height: number): void {
