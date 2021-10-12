@@ -25,7 +25,7 @@
     "typescript": "^3.5.3"
   },
   "dependencies": {
-    "electron": "^2.0.18",
+    "electron": "^11.5.0",
     "node-zip": "^1.1.1",
     "pixi.js": "^4.8.8"
   }
