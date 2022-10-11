@@ -17,7 +17,7 @@
     "@types/lodash": "^4.14.137",
     "@types/node": "^8.10.52",
     "@types/pixi.js": "^4.8.8",
-    "electron-packager": "^10.1.2",
+    "electron-packager": "^16.0.0",
     "gulp": "^3.9.1",
     "gulp-typedoc": "^2.2.2",
     "rimraf": "^2.7.1",
